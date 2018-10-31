@@ -15,7 +15,6 @@
 #include "GrOpFlushState.h"
 #include "GrPathUtils.h"
 #include "GrRenderTargetContextPriv.h"
-#include "GrTest.h"
 #include "SkColorPriv.h"
 #include "SkGeometry.h"
 #include "SkPointPriv.h"
@@ -52,7 +51,7 @@ public:
 
     const char* name() const override { return "PolyBoundsOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fProcessors.visitProxies(func);
     }
 
@@ -69,7 +68,7 @@ private:
 
     PolyBoundsOp(GrPaint&& paint, const SkRect& rect)
             : INHERITED(ClassID())
-            , fColor(paint.getColor())
+            , fColor(GrColor4h::FromFloats(paint.getColor4f().vec()))
             , fProcessors(std::move(paint))
             , fRect(outset(rect)) {
         this->setBounds(sorted_rect(fRect), HasAABloat::kNo, IsZeroArea::kNo);
@@ -87,8 +86,8 @@ private:
                 SkMatrix::I()));
 
         SkASSERT(gp->debugOnly_vertexStride() == sizeof(SkPoint));
-        QuadHelper helper;
-        SkPoint* verts = reinterpret_cast<SkPoint*>(helper.init(target, sizeof(SkPoint), 1));
+        QuadHelper helper(target, sizeof(SkPoint), 1);
+        SkPoint* verts = reinterpret_cast<SkPoint*>(helper.vertices());
         if (!verts) {
             return;
         }
@@ -99,9 +98,7 @@ private:
         helper.recordDraw(target, std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState);
     }
 
-    bool onCombineIfPossible(GrOp* op, const GrCaps& caps) override { return false; }
-
-    GrColor fColor;
+    GrColor4h fColor;
     GrProcessorSet fProcessors;
     SkRect fRect;
 
@@ -214,7 +211,7 @@ protected:
                 }
 
                 GrPaint grPaint;
-                grPaint.setColor4f(GrColor4f(0, 0, 0, 1.f));
+                grPaint.setColor4f({ 0, 0, 0, 1.f });
                 grPaint.setXPFactory(GrPorterDuffXPFactory::Get(SkBlendMode::kSrc));
                 grPaint.addCoverageFragmentProcessor(std::move(fp));
 
@@ -254,7 +251,7 @@ protected:
                 }
 
                 GrPaint grPaint;
-                grPaint.setColor4f(GrColor4f(0, 0, 0, 1.f));
+                grPaint.setColor4f({ 0, 0, 0, 1.f });
                 grPaint.setXPFactory(GrPorterDuffXPFactory::Get(SkBlendMode::kSrc));
                 grPaint.addCoverageFragmentProcessor(std::move(fp));
 

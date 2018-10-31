@@ -78,7 +78,7 @@ public:
     void* lock(int vertexCount) override {
         size_t size = vertexCount * stride();
         fVertexBuffer.reset(fResourceProvider->createBuffer(
-            size, kVertex_GrBufferType, kStatic_GrAccessPattern, 0));
+            size, kVertex_GrBufferType, kStatic_GrAccessPattern, GrResourceProvider::Flags::kNone));
         if (!fVertexBuffer.get()) {
             return nullptr;
         }
@@ -184,20 +184,20 @@ public:
 
     const char* name() const override { return "TessellatingPathOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
     }
 
     SkString dumpInfo() const override {
         SkString string;
-        string.appendf("Color 0x%08x, aa: %d\n", fColor, fAntiAlias);
+        string.appendf("Color 0x%08x, aa: %d\n", fColor.toGrColor(), fAntiAlias);
         string += fHelper.dumpInfo();
         string += INHERITED::dumpInfo();
         return string;
     }
 
     TessellatingPathOp(Helper::MakeArgs helperArgs,
-                       GrColor color,
+                       const GrColor4h& color,
                        const GrShape& shape,
                        const SkMatrix& viewMatrix,
                        const SkIRect& devClipBounds,
@@ -300,8 +300,10 @@ private:
         SkScalar tol = GrPathUtils::kDefaultTolerance;
         bool isLinear;
         DynamicVertexAllocator allocator(vertexStride, target);
+        // TODO4F: Preserve float colors
         int count =
-                GrTessellator::PathToTriangles(path, tol, clipBounds, &allocator, true, fColor,
+                GrTessellator::PathToTriangles(path, tol, clipBounds, &allocator, true,
+                                               fColor.toGrColor(),
                                                fHelper.compatibleWithAlphaAsCoverage(), &isLinear);
         if (count == 0) {
             return;
@@ -358,17 +360,16 @@ private:
 
     void drawVertices(Target* target, sk_sp<const GrGeometryProcessor> gp, const GrBuffer* vb,
                       int firstVertex, int count) {
-        GrMesh mesh(TESSELLATOR_WIREFRAME ? GrPrimitiveType::kLines : GrPrimitiveType::kTriangles);
-        mesh.setNonIndexedNonInstanced(count);
-        mesh.setVertexData(vb, firstVertex);
+        GrMesh* mesh = target->allocMesh(TESSELLATOR_WIREFRAME ? GrPrimitiveType::kLines
+                                                               : GrPrimitiveType::kTriangles);
+        mesh->setNonIndexedNonInstanced(count);
+        mesh->setVertexData(vb, firstVertex);
         auto pipe = fHelper.makePipeline(target);
         target->draw(std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState, mesh);
     }
 
-    bool onCombineIfPossible(GrOp*, const GrCaps&) override { return false; }
-
     Helper fHelper;
-    GrColor                 fColor;
+    GrColor4h               fColor;
     GrShape                 fShape;
     SkMatrix                fViewMatrix;
     SkIRect                 fDevClipBounds;

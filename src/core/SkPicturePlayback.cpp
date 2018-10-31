@@ -102,38 +102,32 @@ void SkPicturePlayback::draw(SkCanvas* canvas,
     AutoResetOpID aroi(this);
     SkASSERT(0 == fCurOffset);
 
-    std::unique_ptr<SkReadBuffer> reader;
-    if (buffer) {
-        reader.reset(buffer->clone(fPictureData->opData()->bytes(),
-                                   fPictureData->opData()->size()));
-    } else {
-        reader.reset(new SkReadBuffer(fPictureData->opData()->bytes(),
-                                      fPictureData->opData()->size()));
-    }
+    SkReadBuffer reader(fPictureData->opData()->bytes(),
+                        fPictureData->opData()->size());
 
     // Record this, so we can concat w/ it if we encounter a setMatrix()
     SkMatrix initialMatrix = canvas->getTotalMatrix();
 
     SkAutoCanvasRestore acr(canvas, false);
 
-    while (!reader->eof()) {
+    while (!reader.eof()) {
         if (callback && callback->abort()) {
             return;
         }
 
-        fCurOffset = reader->offset();
+        fCurOffset = reader.offset();
         uint32_t size;
-        DrawType op = ReadOpAndSize(reader.get(), &size);
-        if (!reader->validate(op > UNUSED && op <= LAST_DRAWTYPE_ENUM)) {
+        DrawType op = ReadOpAndSize(&reader, &size);
+        if (!reader.validate(op > UNUSED && op <= LAST_DRAWTYPE_ENUM)) {
             return;
         }
 
-        this->handleOp(reader.get(), op, size, canvas, initialMatrix);
+        this->handleOp(&reader, op, size, canvas, initialMatrix);
     }
 
     // need to propagate invalid state to the parent reader
     if (buffer) {
-        buffer->validate(reader->isValid());
+        buffer->validate(reader.isValid());
     }
 }
 
@@ -354,6 +348,25 @@ void SkPicturePlayback::handleOp(SkReadBuffer* reader,
             BREAK_ON_READ_ERROR(reader);
 
             canvas->legacy_drawImageRect(image, src, dst, paint, constraint);
+        } break;
+        case DRAW_IMAGE_SET: {
+            int cnt = reader->readInt();
+            if (!reader->validate(cnt >= 0)) {
+                break;
+            }
+            float alpha = SkScalarToFloat(reader->readScalar());
+            SkFilterQuality filterQuality = (SkFilterQuality)reader->readUInt();
+            SkBlendMode mode = (SkBlendMode)reader->readUInt();
+            SkAutoTArray<SkCanvas::ImageSetEntry> set(cnt);
+            for (int i = 0; i < cnt; ++i) {
+                set[i].fImage = sk_ref_sp(fPictureData->getImage(reader));
+                reader->readRect(&set[i].fSrcRect);
+                reader->readRect(&set[i].fDstRect);
+                set[i].fAAFlags = reader->readUInt();
+            }
+            BREAK_ON_READ_ERROR(reader);
+
+            canvas->experimental_DrawImageSetV0(set.get(), cnt, alpha, filterQuality, mode);
         } break;
         case DRAW_OVAL: {
             const SkPaint* paint = fPictureData->getPaint(reader);
@@ -583,17 +596,14 @@ void SkPicturePlayback::handleOp(SkReadBuffer* reader,
                 canvas->drawText(text.text(), text.length(), ptr[0], ptr[1], *paint);
             }
         } break;
-        case DRAW_TEXT_ON_PATH: {
+        case DRAW_TEXT_ON_PATH_RETIRED_08_2018_REMOVED_10_2018: {
             const SkPaint* paint = fPictureData->getPaint(reader);
             TextContainer text(reader, paint);
-            const SkPath& path = fPictureData->getPath(reader);
+            /* ignored */ fPictureData->getPath(reader);
             SkMatrix matrix;
             reader->readMatrix(&matrix);
             BREAK_ON_READ_ERROR(reader);
-
-            if (paint && text.text()) {
-                canvas->drawTextOnPath(text.text(), text.length(), path, &matrix, *paint);
-            }
+            // no longer supported, so we draw nothing
         } break;
         case DRAW_TEXT_RSXFORM: {
             const SkPaint* paint = fPictureData->getPaint(reader);
@@ -616,9 +626,9 @@ void SkPicturePlayback::handleOp(SkReadBuffer* reader,
             const SkPaint* paint = fPictureData->getPaint(reader);
             const SkVertices* vertices = fPictureData->getVertices(reader);
             const int boneCount = reader->readInt();
-            const SkMatrix* bones = boneCount ?
-                                    (const SkMatrix*) reader->skip(boneCount, sizeof(SkMatrix)) :
-                                    nullptr;
+            const SkVertices::Bone* bones = boneCount ?
+                    (const SkVertices::Bone*) reader->skip(boneCount, sizeof(SkVertices::Bone)) :
+                    nullptr;
             SkBlendMode bmode = reader->read32LE(SkBlendMode::kLastMode);
             BREAK_ON_READ_ERROR(reader);
 

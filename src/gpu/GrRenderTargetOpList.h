@@ -118,8 +118,6 @@ public:
     GrRenderTargetOpList* asRenderTargetOpList() override { return this; }
 
     SkDEBUGCODE(void dump(bool printDependencies) const override;)
-
-    SkDEBUGCODE(int numOps() const override { return fRecordedOps.count(); })
     SkDEBUGCODE(int numClips() const override { return fNumClips; })
     SkDEBUGCODE(void visitProxies_debugOnly(const GrOp::VisitProxyFunc&) const;)
 
@@ -143,9 +141,9 @@ private:
 
         void deleteOp(GrOpMemoryPool* opMemoryPool);
 
-        void visitProxies(const GrOp::VisitProxyFunc& func) const {
+        void visitProxies(const GrOp::VisitProxyFunc& func, GrOp::VisitorType visitor) const {
             if (fOp) {
-                fOp->visitProxies(func);
+                fOp->visitProxies(func, visitor);
             }
             if (fDstProxy.proxy()) {
                 func(fDstProxy.proxy());
@@ -171,16 +169,15 @@ private:
 
     void forwardCombine(const GrCaps&);
 
-    // If this returns true then b has been merged into a's op.
-    bool combineIfPossible(const RecordedOp& a, GrOp* b, const GrAppliedClip* bClip,
-                           const DstProxy* bDstTexture, const GrCaps&);
+    GrOp::CombineResult combineIfPossible(const RecordedOp& a, GrOp* b, const GrAppliedClip* bClip,
+                                          const DstProxy* bDstTexture, const GrCaps&);
 
     uint32_t                       fLastClipStackGenID;
     SkIRect                        fLastDevClipBounds;
     int                            fLastClipNumAnalyticFPs;
 
     // For ops/opList we have mean: 5 stdDev: 28
-    SkSTArray<5, RecordedOp, true> fRecordedOps;
+    SkSTArray<25, RecordedOp, true> fRecordedOps;
 
     // MDB TODO: 4096 for the first allocation of the clip space will be huge overkill.
     // Gather statistics to determine the correct size.

@@ -13,7 +13,6 @@
 #include "SkWriter32.h"
 #include "../private/SkTHash.h"
 
-class SkDeduper;
 class SkFactorySet;
 class SkFlattenable;
 class SkImage;
@@ -59,12 +58,9 @@ public:
     virtual void writeTypeface(SkTypeface* typeface) = 0;
     virtual void writePaint(const SkPaint& paint) = 0;
 
-    void setDeduper(SkDeduper* deduper) { fDeduper = deduper; }
-
     void setSerialProcs(const SkSerialProcs& procs) { fProcs = procs; }
 
 protected:
-    SkDeduper*      fDeduper = nullptr;
     SkSerialProcs   fProcs;
 
     friend class SkPicturePriv; // fProcs
@@ -122,8 +118,8 @@ public:
     void writeTypeface(SkTypeface* typeface) override;
     void writePaint(const SkPaint& paint) override;
 
-    bool writeToStream(SkWStream*);
-    void writeToMemory(void* dst) { fWriter.flatten(dst); }
+    bool writeToStream(SkWStream*) const;
+    void writeToMemory(void* dst) const { fWriter.flatten(dst); }
 
     void setFactoryRecorder(sk_sp<SkFactorySet>);
     void setTypefaceRecorder(sk_sp<SkRefCntSet>);

@@ -149,7 +149,8 @@ public:
     bool getReadPixelsFormat(GrPixelConfig surfaceConfig, GrPixelConfig externalConfig,
                              GrGLenum* externalFormat, GrGLenum* externalType) const;
 
-    bool getRenderbufferFormat(GrPixelConfig config, GrGLenum* internalFormat) const;
+    void getRenderbufferFormat(GrPixelConfig config, GrGLenum* internalFormat) const;
+    void getSizedInternalFormat(GrPixelConfig config, GrGLenum* internalFormat) const;
 
     /** The format to use read/write a texture as an image in a shader */
     GrGLenum getImageFormat(GrPixelConfig config) const {
@@ -390,13 +391,17 @@ public:
         return fRequiresFlushBetweenNonAndInstancedDraws;
     }
 
-    // Returns the observed maximum number of instances the driver can handle in a single call to
-    // glDrawArraysInstanced without crashing, or 'pendingInstanceCount' if this
-    // workaround is not necessary.
+    // Some Adreno drivers refuse to ReadPixels from an MSAA buffer that has stencil attached.
+    bool detachStencilFromMSAABuffersBeforeReadPixels() const {
+        return fDetachStencilFromMSAABuffersBeforeReadPixels;
+    }
+
+    // Returns the observed maximum number of instances the driver can handle in a single draw call
+    // without crashing, or 'pendingInstanceCount' if this workaround is not necessary.
     // NOTE: the return value may be larger than pendingInstanceCount.
-    int maxInstancesPerDrawArraysWithoutCrashing(int pendingInstanceCount) const {
-        return fMaxInstancesPerDrawArraysWithoutCrashing ? fMaxInstancesPerDrawArraysWithoutCrashing
-                                                         : pendingInstanceCount;
+    int maxInstancesPerDrawWithoutCrashing(int pendingInstanceCount) const {
+        return (fMaxInstancesPerDrawWithoutCrashing)
+                ? fMaxInstancesPerDrawWithoutCrashing : pendingInstanceCount;
     }
 
     bool canCopyTexSubImage(GrPixelConfig dstConfig, bool dstHasMSAARenderBuffer,
@@ -420,9 +425,9 @@ public:
     bool initDescForDstCopy(const GrRenderTargetProxy* src, GrSurfaceDesc* desc, GrSurfaceOrigin*,
                             bool* rectsMustMatch, bool* disallowSubrect) const override;
 
-    bool programBinarySupport() const {
-        return fProgramBinarySupport;
-    }
+    bool programBinarySupport() const { return fProgramBinarySupport; }
+
+    bool samplerObjectSupport() const { return fSamplerObjectSupport; }
 
     bool validateBackendTexture(const GrBackendTexture&, SkColorType,
                                 GrPixelConfig*) const override;
@@ -431,6 +436,10 @@ public:
 
     bool getConfigFromBackendFormat(const GrBackendFormat&, SkColorType,
                                     GrPixelConfig*) const override;
+    bool getYUVAConfigFromBackendTexture(const GrBackendTexture&,
+                                         GrPixelConfig*) const override;
+    bool getYUVAConfigFromBackendFormat(const GrBackendFormat&,
+                                        GrPixelConfig*) const override;
 
 #if GR_TEST_UTILS
     GrGLStandard standard() const { return fStandard; }
@@ -510,6 +519,7 @@ private:
     bool fUseBufferDataNullHint                : 1;
     bool fClearTextureSupport : 1;
     bool fProgramBinarySupport : 1;
+    bool fSamplerObjectSupport : 1;
 
     // Driver workarounds
     bool fDoManualMipmapping : 1;
@@ -521,7 +531,8 @@ private:
     bool fUseDrawInsteadOfAllRenderTargetWrites : 1;
     bool fRequiresCullFaceEnableDisableWhenDrawingLinesAfterNonLines : 1;
     bool fRequiresFlushBetweenNonAndInstancedDraws : 1;
-    int fMaxInstancesPerDrawArraysWithoutCrashing;
+    bool fDetachStencilFromMSAABuffersBeforeReadPixels : 1;
+    int fMaxInstancesPerDrawWithoutCrashing;
 
     uint32_t fBlitFramebufferFlags;
 

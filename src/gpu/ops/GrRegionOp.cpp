@@ -70,7 +70,7 @@ public:
                                                aaType, stencilSettings);
     }
 
-    RegionOp(const Helper::MakeArgs& helperArgs, GrColor color, const SkMatrix& viewMatrix,
+    RegionOp(const Helper::MakeArgs& helperArgs, const GrColor4h& color, const SkMatrix& viewMatrix,
              const SkRegion& region, GrAAType aaType, const GrUserStencilSettings* stencilSettings)
             : INHERITED(ClassID())
             , fHelper(helperArgs, aaType, stencilSettings)
@@ -85,7 +85,7 @@ public:
 
     const char* name() const override { return "GrRegionOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
     }
 
@@ -94,7 +94,7 @@ public:
         str.appendf("# combined: %d\n", fRegions.count());
         for (int i = 0; i < fRegions.count(); ++i) {
             const RegionInfo& info = fRegions[i];
-            str.appendf("%d: Color: 0x%08x, Region with %d rects\n", i, info.fColor,
+            str.appendf("%d: Color: 0x%08x, Region with %d rects\n", i, info.fColor.toGrColor(),
                         info.fRegion.computeRegionComplexity());
         }
         str += fHelper.dumpInfo();
@@ -129,9 +129,9 @@ private:
             return;
         }
         sk_sp<const GrBuffer> indexBuffer = target->resourceProvider()->refQuadIndexBuffer();
-        PatternHelper helper(GrPrimitiveType::kTriangles);
-        void* vertices = helper.init(target, kVertexStride, indexBuffer.get(), kVertsPerInstance,
-                                     kIndicesPerInstance, numRects);
+        PatternHelper helper(target, GrPrimitiveType::kTriangles, kVertexStride, indexBuffer.get(),
+                             kVertsPerInstance, kIndicesPerInstance, numRects);
+        void* vertices = helper.vertices();
         if (!vertices || !indexBuffer) {
             SkDebugf("Could not allocate vertices\n");
             return;
@@ -139,7 +139,9 @@ private:
 
         intptr_t verts = reinterpret_cast<intptr_t>(vertices);
         for (int i = 0; i < numRegions; i++) {
-            tesselate_region(verts, kVertexStride, fRegions[i].fColor, fRegions[i].fRegion);
+            // TODO4F: Preserve float colors
+            tesselate_region(verts, kVertexStride, fRegions[i].fColor.toGrColor(),
+                             fRegions[i].fRegion);
             int numRectsInRegion = fRegions[i].fRegion.computeRegionComplexity();
             verts += numRectsInRegion * kVertsPerInstance * kVertexStride;
         }
@@ -147,23 +149,22 @@ private:
         helper.recordDraw(target, std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState);
     }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
         RegionOp* that = t->cast<RegionOp>();
         if (!fHelper.isCompatible(that->fHelper, caps, this->bounds(), that->bounds())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (fViewMatrix != that->fViewMatrix) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         fRegions.push_back_n(that->fRegions.count(), that->fRegions.begin());
-        this->joinBounds(*that);
-        return true;
+        return CombineResult::kMerged;
     }
 
     struct RegionInfo {
-        GrColor fColor;
+        GrColor4h fColor;
         SkRegion fRegion;
     };
 

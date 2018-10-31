@@ -72,9 +72,11 @@ protected:
         return SkRect::MakeIWH(isize.width(), isize.height());
     }
 
-    void onRender(SkCanvas* canvas) const override {
+    void onRender(SkCanvas* canvas, const RenderContext* ctx) const override {
         SkAutoCanvasRestore acr(canvas, true);
         canvas->clipRect(SkRect::Make(fSlide->getDimensions()), true);
+
+        // TODO: commit the context?
         fSlide->draw(canvas);
     }
 
@@ -247,7 +249,7 @@ private:
     using INHERITED = sksg::Animator;
 };
 
-SlideDir::SlideDir(const SkString& name, SkTArray<sk_sp<Slide>, true>&& slides, int columns)
+SlideDir::SlideDir(const SkString& name, SkTArray<sk_sp<Slide>>&& slides, int columns)
     : fSlides(std::move(slides))
     , fColumns(columns) {
     fName = name;
@@ -260,7 +262,7 @@ static sk_sp<sksg::RenderNode> MakeLabel(const SkString& txt,
     auto text = sksg::Text::Make(nullptr, txt);
     text->setFlags(SkPaint::kAntiAlias_Flag);
     text->setSize(size);
-    text->setAlign(SkPaint::kCenter_Align);
+    text->setAlign(SkTextUtils::kCenter_Align);
     text->setPosition(pos + SkPoint::Make(0, size));
 
     return sksg::Draw::Make(std::move(text), sksg::Color::Make(SK_ColorBLACK));

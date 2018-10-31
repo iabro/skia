@@ -7,6 +7,8 @@
 
 #include "GrDistanceFieldGeoProc.h"
 #include "GrAtlasedShaderHelpers.h"
+#include "GrCaps.h"
+#include "GrShaderCaps.h"
 #include "GrTexture.h"
 #include "SkDistanceFieldGen.h"
 #include "glsl/GrGLSLFragmentShaderBuilder.h"
@@ -152,7 +154,7 @@ public:
             // doing gamma-correct rendering (to an sRGB or F16 buffer), then we actually want
             // distance mapped linearly to coverage, so use a linear step:
             fragBuilder->codeAppend(
-                "half val = clamp((distance + afwidth) / (2.0 * afwidth), 0.0, 1.0);");
+                "half val = saturate((distance + afwidth) / (2.0 * afwidth));");
         } else {
             fragBuilder->codeAppend("half val = smoothstep(-afwidth, afwidth, distance);");
         }
@@ -205,9 +207,9 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 
 constexpr GrPrimitiveProcessor::Attribute GrDistanceFieldA8TextGeoProc::kInColor;
-constexpr GrPrimitiveProcessor::Attribute GrDistanceFieldA8TextGeoProc::kInTextureCoords;
 
-GrDistanceFieldA8TextGeoProc::GrDistanceFieldA8TextGeoProc(const sk_sp<GrTextureProxy>* proxies,
+GrDistanceFieldA8TextGeoProc::GrDistanceFieldA8TextGeoProc(const GrShaderCaps& caps,
+                                                           const sk_sp<GrTextureProxy>* proxies,
                                                            int numProxies,
                                                            const GrSamplerState& params,
 #ifdef SK_GAMMA_APPLY_TO_A8
@@ -226,10 +228,12 @@ GrDistanceFieldA8TextGeoProc::GrDistanceFieldA8TextGeoProc(const sk_sp<GrTexture
     SkASSERT(!(flags & ~kNonLCD_DistanceFieldEffectMask));
 
     if (flags & kPerspective_DistanceFieldEffectFlag) {
-        fInPosition = {"inPosition", kFloat3_GrVertexAttribType};
+        fInPosition = {"inPosition", kFloat3_GrVertexAttribType, kFloat3_GrSLType};
     } else {
-        fInPosition = {"inPosition", kFloat2_GrVertexAttribType};
+        fInPosition = {"inPosition", kFloat2_GrVertexAttribType, kFloat2_GrSLType};
     }
+    fInTextureCoords = {"inTextureCoords", kUShort2_GrVertexAttribType,
+                        caps.integerSupport() ? kUShort2_GrSLType : kFloat2_GrSLType};
     this->setVertexAttributeCnt(3);
 
     if (numProxies) {
@@ -302,7 +306,8 @@ sk_sp<GrGeometryProcessor> GrDistanceFieldA8TextGeoProc::TestCreate(GrProcessorT
 #ifdef SK_GAMMA_APPLY_TO_A8
     float lum = d->fRandom->nextF();
 #endif
-    return GrDistanceFieldA8TextGeoProc::Make(proxies, 1,
+    return GrDistanceFieldA8TextGeoProc::Make(*d->caps()->shaderCaps(),
+                                              proxies, 1,
                                               samplerState,
 #ifdef SK_GAMMA_APPLY_TO_A8
                                               lum,
@@ -447,7 +452,7 @@ public:
         // mapped linearly to coverage, so use a linear step:
         if (isGammaCorrect) {
             fragBuilder->codeAppend(
-                "half val = clamp((distance + afwidth) / (2.0 * afwidth), 0.0, 1.0);");
+                "half val = saturate((distance + afwidth) / (2.0 * afwidth));");
         } else {
             fragBuilder->codeAppend("half val = smoothstep(-afwidth, afwidth, distance);");
         }
@@ -506,9 +511,9 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 constexpr GrPrimitiveProcessor::Attribute GrDistanceFieldPathGeoProc::kInPosition;
 constexpr GrPrimitiveProcessor::Attribute GrDistanceFieldPathGeoProc::kInColor;
-constexpr GrPrimitiveProcessor::Attribute GrDistanceFieldPathGeoProc::kInTextureCoords;
 
-GrDistanceFieldPathGeoProc::GrDistanceFieldPathGeoProc(const SkMatrix& matrix,
+GrDistanceFieldPathGeoProc::GrDistanceFieldPathGeoProc(const GrShaderCaps& caps,
+                                                       const SkMatrix& matrix,
                                                        const sk_sp<GrTextureProxy>* proxies,
                                                        int numProxies,
                                                        const GrSamplerState& params,
@@ -519,6 +524,8 @@ GrDistanceFieldPathGeoProc::GrDistanceFieldPathGeoProc(const SkMatrix& matrix,
     SkASSERT(numProxies <= kMaxTextures);
     SkASSERT(!(flags & ~kNonLCD_DistanceFieldEffectMask));
 
+    fInTextureCoords = {"inTextureCoords", kUShort2_GrVertexAttribType,
+                        caps.integerSupport() ? kUShort2_GrSLType : kFloat2_GrSLType};
     this->setVertexAttributeCnt(3);
 
     if (numProxies) {
@@ -564,7 +571,7 @@ GrDistanceFieldPathGeoProc::createGLSLInstance(const GrShaderCaps&) const {
 }
 
 const GrPrimitiveProcessor::Attribute& GrDistanceFieldPathGeoProc::onVertexAttribute(int i) const {
-    return IthAttribute(i, kInPosition, kInColor, kInTextureCoords);
+    return IthAttribute(i, kInPosition, kInColor, fInTextureCoords);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -594,7 +601,8 @@ sk_sp<GrGeometryProcessor> GrDistanceFieldPathGeoProc::TestCreate(GrProcessorTes
         flags |= d->fRandom->nextBool() ? kScaleOnly_DistanceFieldEffectFlag : 0;
     }
 
-    return GrDistanceFieldPathGeoProc::Make(GrTest::TestMatrix(d->fRandom),
+    return GrDistanceFieldPathGeoProc::Make(*d->caps()->shaderCaps(),
+                                            GrTest::TestMatrix(d->fRandom),
                                             proxies, 1,
                                             samplerState,
                                             flags);
@@ -766,7 +774,7 @@ public:
         // mapped linearly to coverage, so use a linear step:
         if (isGammaCorrect) {
             fragBuilder->codeAppendf("%s = "
-                "half4(clamp((distance + half3(afwidth)) / half3(2.0 * afwidth), 0.0, 1.0), 1.0);",
+                "half4(saturate((distance + half3(afwidth)) / half3(2.0 * afwidth)), 1.0);",
                 args.fOutputCoverage);
         } else {
             fragBuilder->codeAppendf(
@@ -821,9 +829,9 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 
 constexpr GrPrimitiveProcessor::Attribute GrDistanceFieldLCDTextGeoProc::kInColor;
-constexpr GrPrimitiveProcessor::Attribute GrDistanceFieldLCDTextGeoProc::kInTextureCoords;
 
-GrDistanceFieldLCDTextGeoProc::GrDistanceFieldLCDTextGeoProc(const sk_sp<GrTextureProxy>* proxies,
+GrDistanceFieldLCDTextGeoProc::GrDistanceFieldLCDTextGeoProc(const GrShaderCaps& caps,
+                                                             const sk_sp<GrTextureProxy>* proxies,
                                                              int numProxies,
                                                              const GrSamplerState& params,
                                                              DistanceAdjust distanceAdjust,
@@ -837,10 +845,12 @@ GrDistanceFieldLCDTextGeoProc::GrDistanceFieldLCDTextGeoProc(const sk_sp<GrTextu
     SkASSERT(!(flags & ~kLCD_DistanceFieldEffectMask) && (flags & kUseLCD_DistanceFieldEffectFlag));
 
     if (fFlags & kPerspective_DistanceFieldEffectFlag) {
-        fInPosition = {"inPosition", kFloat3_GrVertexAttribType};
+        fInPosition = {"inPosition", kFloat3_GrVertexAttribType, kFloat3_GrSLType};
     } else {
-        fInPosition = {"inPosition", kFloat2_GrVertexAttribType};
+        fInPosition = {"inPosition", kFloat2_GrVertexAttribType, kFloat2_GrSLType};
     }
+    fInTextureCoords = {"inTextureCoords", kUShort2_GrVertexAttribType,
+                        caps.integerSupport() ? kUShort2_GrSLType : kFloat2_GrSLType};
     this->setVertexAttributeCnt(3);
 
     if (numProxies) {
@@ -886,7 +896,7 @@ GrGLSLPrimitiveProcessor* GrDistanceFieldLCDTextGeoProc::createGLSLInstance(cons
 
 const GrPrimitiveProcessor::Attribute& GrDistanceFieldLCDTextGeoProc::onVertexAttribute(
         int i) const {
-    return IthAttribute(i, fInPosition, kInColor, kInTextureCoords);
+    return IthAttribute(i, fInPosition, kInColor, fInTextureCoords);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -917,6 +927,7 @@ sk_sp<GrGeometryProcessor> GrDistanceFieldLCDTextGeoProc::TestCreate(GrProcessor
     }
     flags |= d->fRandom->nextBool() ? kBGR_DistanceFieldEffectFlag : 0;
     SkMatrix localMatrix = GrTest::TestMatrix(d->fRandom);
-    return GrDistanceFieldLCDTextGeoProc::Make(proxies, 1, samplerState, wa, flags, localMatrix);
+    return GrDistanceFieldLCDTextGeoProc::Make(*d->caps()->shaderCaps(), proxies, 1, samplerState,
+                                               wa, flags, localMatrix);
 }
 #endif

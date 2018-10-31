@@ -5,7 +5,7 @@
  * found in the LICENSE file.
  */
 
-#include "SampleCode.h"
+#include "Sample.h"
 #include "SkBlendMode.h"
 #include "SkCanvas.h"
 #include "SkColor.h"
@@ -27,8 +27,8 @@
 #include "SkSurface.h"
 #include "SkTArray.h"
 #include "SkTemplates.h"
+#include "SkTextUtils.h"
 #include "SkTypes.h"
-#include "SkView.h"
 #include "sk_tool_utils.h"
 
 #include <cfloat>
@@ -111,7 +111,7 @@ struct CircleTypeButton : public StrokeTypeButton {
     bool fFill;
 };
 
-class QuadStrokerView : public SampleView {
+class QuadStrokerView : public Sample {
     enum {
         SKELETON_COLOR = 0xFF0000FF,
         WIREFRAME_COLOR = 0x80FF0000
@@ -208,13 +208,13 @@ public:
     }
 
 protected:
-    bool onQuery(SkEvent* evt) override {
-        if (SampleCode::TitleQ(*evt)) {
-            SampleCode::TitleR(evt, "QuadStroker");
+    bool onQuery(Sample::Event* evt) override {
+        if (Sample::TitleQ(*evt)) {
+            Sample::TitleR(evt, "QuadStroker");
             return true;
         }
         SkUnichar uni;
-        if (fTextButton.fEnabled && SampleCode::CharQ(*evt, &uni)) {
+        if (fTextButton.fEnabled && Sample::CharQ(*evt, &uni)) {
             switch (uni) {
                 case ' ':
                     fText = "";
@@ -505,10 +505,9 @@ protected:
         canvas->drawRect(button.fBounds, paint);
         paint.setTextSize(25.0f);
         paint.setColor(button.fEnabled ? 0xFF3F0000 : 0x6F3F0000);
-        paint.setTextAlign(SkPaint::kCenter_Align);
         paint.setStyle(SkPaint::kFill_Style);
-        canvas->drawText(&button.fLabel, 1, button.fBounds.centerX(), button.fBounds.fBottom - 5,
-                paint);
+        SkTextUtils::DrawText(canvas, &button.fLabel, 1, button.fBounds.centerX(), button.fBounds.fBottom - 5,
+                paint, SkTextUtils::kCenter_Align);
     }
 
     void draw_control(SkCanvas* canvas, const SkRect& bounds, SkScalar value,
@@ -718,10 +717,10 @@ protected:
     class MyClick : public Click {
     public:
         int fIndex;
-        MyClick(SkView* target, int index) : Click(target), fIndex(index) {}
+        MyClick(Sample* target, int index) : Click(target), fIndex(index) {}
     };
 
-    virtual SkView::Click* onFindClickHandler(SkScalar x, SkScalar y,
+    virtual Sample::Click* onFindClickHandler(SkScalar x, SkScalar y,
                                               unsigned modi) override {
         for (size_t i = 0; i < SK_ARRAY_COUNT(fPts); ++i) {
             if (hittest(fPts[i], x, y)) {
@@ -807,10 +806,9 @@ protected:
     }
 
 private:
-    typedef SkView INHERITED;
+    typedef Sample INHERITED;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static SkView* F2() { return new QuadStrokerView; }
-static SkViewRegister gR2(F2);
+DEF_SAMPLE( return new QuadStrokerView(); )

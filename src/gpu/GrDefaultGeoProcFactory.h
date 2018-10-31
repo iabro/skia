@@ -12,6 +12,8 @@
 #include "GrGeometryProcessor.h"
 #include "GrShaderCaps.h"
 
+constexpr int kMaxBones = 80; // Supports up to 80 bones per mesh.
+
 /*
  * A factory for creating default Geometry Processors which simply multiply position by the uniform
  * view matrix and wire through color, coverage, UV coords if requested.
@@ -68,19 +70,19 @@ namespace GrDefaultGeoProcFactory {
             kPremulGrColorAttribute_Type,
             kUnpremulSkColorAttribute_Type,
         };
-        explicit Color(GrColor color)
+        explicit Color(const GrColor4h& color)
                 : fType(kPremulGrColorUniform_Type)
                 , fColor(color)
                 , fColorSpaceXform(nullptr) {}
         Color(Type type)
                 : fType(type)
-                , fColor(GrColor_ILLEGAL)
+                , fColor(GrColor4h_ILLEGAL)
                 , fColorSpaceXform(nullptr) {
             SkASSERT(type != kPremulGrColorUniform_Type);
         }
 
         Type fType;
-        GrColor fColor;
+        GrColor4h fColor;
 
         // This only applies to SkColor. Any GrColors are assumed to have been color converted
         // during paint conversion.

@@ -31,14 +31,14 @@ public:
 
     typedef GrTextBlob Blob;
     struct Geometry {
-        SkMatrix fViewMatrix;
-        SkIRect  fClipRect;
-        Blob*    fBlob;
-        SkScalar fX;
-        SkScalar fY;
-        uint16_t fRun;
-        uint16_t fSubRun;
-        GrColor  fColor;
+        SkMatrix  fViewMatrix;
+        SkIRect   fClipRect;
+        Blob*     fBlob;
+        SkScalar  fX;
+        SkScalar  fY;
+        uint16_t  fRun;
+        uint16_t  fSubRun;
+        GrColor4h fColor;
     };
 
     static std::unique_ptr<GrAtlasTextOp> MakeBitmap(GrContext* context,
@@ -68,7 +68,7 @@ public:
 
     const char* name() const override { return "AtlasTextOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override;
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override;
 
     SkString dumpInfo() const override;
 
@@ -145,13 +145,14 @@ private:
 
     inline void flush(GrMeshDrawOp::Target* target, FlushInfo* flushInfo) const;
 
-    GrColor color() const { SkASSERT(fGeoCount > 0); return fGeoData[0].fColor; }
+    const GrColor4h& color() const { SkASSERT(fGeoCount > 0); return fGeoData[0].fColor; }
     bool usesLocalCoords() const { return fUsesLocalCoords; }
     int numGlyphs() const { return fNumGlyphs; }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override;
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps& caps) override;
 
-    sk_sp<GrGeometryProcessor> setupDfProcessor(const sk_sp<GrTextureProxy>* proxies,
+    sk_sp<GrGeometryProcessor> setupDfProcessor(const GrShaderCaps& caps,
+                                                const sk_sp<GrTextureProxy>* proxies,
                                                 unsigned int numActiveProxies) const;
 
     SkAutoSTMalloc<kMinGeometryAllocated, Geometry> fGeoData;

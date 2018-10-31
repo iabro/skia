@@ -7,12 +7,12 @@
 
 #include "Test.h"
 
+#include "GrBackendSurface.h"
 #include "GrContextFactory.h"
 #include "GrContextOptions.h"
 #include "GrContextPriv.h"
 #include "GrGpu.h"
 #include "GrProxyProvider.h"
-#include "GrTest.h"
 #include "GrXferProcessor.h"
 #include "effects/GrPorterDuffXferProcessor.h"
 #include "gl/GrGLCaps.h"
@@ -63,7 +63,7 @@ static GrProcessorSet::Analysis do_analysis(const GrXPFactory* xpf,
     GrPaint paint;
     paint.setXPFactory(xpf);
     GrProcessorSet procs(std::move(paint));
-    GrColor overrideColor;
+    GrColor4h overrideColor;
     GrProcessorSet::Analysis analysis =
             procs.finalize(colorInput, coverageInput, nullptr, false, caps, &overrideColor);
     return analysis;
@@ -470,7 +470,7 @@ static void test_color_unknown_with_coverage(skiatest::Reporter* reporter, const
 }
 
 static void test_color_not_opaque_no_coverage(skiatest::Reporter* reporter, const GrCaps& caps) {
-    GrProcessorAnalysisColor inputColor(GrColorPackRGBA(229, 0, 154, 240));
+    GrProcessorAnalysisColor inputColor(GrColor4h::FromGrColor(GrColorPackRGBA(229, 0, 154, 240)));
     GrProcessorAnalysisCoverage inputCoverage = GrProcessorAnalysisCoverage::kNone;
 
     for (int m = 0; m <= (int)SkBlendMode::kLastCoeffMode; m++) {
@@ -1012,7 +1012,7 @@ static void test_color_opaque_no_coverage(skiatest::Reporter* reporter, const Gr
 
 static void test_lcd_coverage_fallback_case(skiatest::Reporter* reporter, const GrCaps& caps) {
     const GrXPFactory* xpf = GrPorterDuffXPFactory::Get(SkBlendMode::kSrcOver);
-    GrProcessorAnalysisColor color = GrColorPackRGBA(123, 45, 67, 255);
+    GrProcessorAnalysisColor color = GrColor4h::FromGrColor(GrColorPackRGBA(123, 45, 67, 255));
     GrProcessorAnalysisCoverage coverage = GrProcessorAnalysisCoverage::kLCD;
     TEST_ASSERT(!(GrXPFactory::GetAnalysisProperties(xpf, color, coverage, caps) &
                   GrXPFactory::AnalysisProperties::kRequiresDstTexture));
@@ -1028,7 +1028,7 @@ static void test_lcd_coverage_fallback_case(skiatest::Reporter* reporter, const 
     TEST_ASSERT(blendInfo.fWriteColor);
 
     // Test with non-opaque alpha
-    color = GrColorPackRGBA(123, 45, 67, 221);
+    color = GrColor4h::FromGrColor(GrColorPackRGBA(123, 45, 67, 221));
     coverage = GrProcessorAnalysisCoverage::kLCD;
     TEST_ASSERT(!(GrXPFactory::GetAnalysisProperties(xpf, color, coverage, caps) &
                 GrXPFactory::AnalysisProperties::kRequiresDstTexture));
@@ -1062,7 +1062,7 @@ DEF_GPUTEST(PorterDuffNoDualSourceBlending, reporter, options) {
     }
 
     GrBackendTexture backendTex =
-        gpu->createTestingOnlyBackendTexture(nullptr, 100, 100, kRGBA_8888_GrPixelConfig,
+        gpu->createTestingOnlyBackendTexture(nullptr, 100, 100, GrColorType::kRGBA_8888,
                                              false, GrMipMapped::kNo);
 
     GrXferProcessor::DstProxy fakeDstProxy;
@@ -1074,8 +1074,8 @@ DEF_GPUTEST(PorterDuffNoDualSourceBlending, reporter, options) {
 
     static const GrProcessorAnalysisColor colorInputs[] = {
             GrProcessorAnalysisColor::Opaque::kNo, GrProcessorAnalysisColor::Opaque::kYes,
-            GrProcessorAnalysisColor(GrColorPackRGBA(0, 82, 17, 100)),
-            GrProcessorAnalysisColor(GrColorPackRGBA(0, 82, 17, 255))};
+            GrProcessorAnalysisColor(GrColor4h::FromGrColor(GrColorPackRGBA(0, 82, 17, 100))),
+            GrProcessorAnalysisColor(GrColor4h::FromGrColor(GrColorPackRGBA(0, 82, 17, 255)))};
 
     for (const auto& colorInput : colorInputs) {
         for (GrProcessorAnalysisCoverage coverageType :

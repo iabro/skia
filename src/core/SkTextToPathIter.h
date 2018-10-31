@@ -26,7 +26,6 @@ protected:
     SkPaint::GlyphCacheProc fGlyphCacheProc;
 
     SkScalar        fXPos;      // accumulated xpos, returned in next
-    int             fXYIndex;   // cache for horizontal -vs- vertical text
 };
 
 class SkTextToPathIter : SkTextBaseIter {
@@ -55,7 +54,10 @@ public:
     SkTextInterceptsIter(const char text[], size_t length, const SkPaint& paint,
                          const SkScalar bounds[2], SkScalar x, SkScalar y, TextType textType)
                          : SkTextBaseIter(text, length, paint, false)
-                         , fTextType(textType) {
+#ifdef SK_SUPPORT_LEGACY_SETTEXTALIGN
+                         , fTextType(textType)
+#endif
+    {
         fBoundsBase[0] = bounds[0];
         fBoundsBase[1] = bounds[1];
         this->setPosition(x, y);
@@ -67,7 +69,8 @@ public:
     bool next(SkScalar* array, int* count);
 
     void setPosition(SkScalar x, SkScalar y) {
-        SkScalar xOffset = TextType::kText == fTextType && fXYIndex ? fXPos : 0;
+        SkScalar xOffset = 0;
+#ifdef SK_SUPPORT_LEGACY_SETTEXTALIGN
         if (TextType::kPosText == fTextType
                 && fPaint.getTextAlign() != SkPaint::kLeft_Align) { // need to measure first
             const char* text = fText;
@@ -78,23 +81,23 @@ public:
             }
             xOffset = width;
         }
+#endif
 
         for (int i = 0; i < (int) SK_ARRAY_COUNT(fBounds); ++i) {
-            SkScalar bound = fBoundsBase[i] - (fXYIndex ? x : y);
-            if (fXYIndex) {
-                bound += xOffset;
-            }
+            SkScalar bound = fBoundsBase[i] - y;
             fBounds[i] = bound / fScale;
         }
 
-        fXPos = xOffset + (fXYIndex ? y : x);
+        fXPos = xOffset + x;
         fPrevAdvance = 0;
     }
 
 private:
     SkScalar fBounds[2];
     SkScalar fBoundsBase[2];
+#ifdef SK_SUPPORT_LEGACY_SETTEXTALIGN
     TextType fTextType;
+#endif
 };
 
 #endif

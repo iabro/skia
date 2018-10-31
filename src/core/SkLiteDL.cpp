@@ -5,16 +5,17 @@
  * found in the LICENSE file.
  */
 
+#include "SkLiteDL.h"
+#include <algorithm>
 #include "SkCanvas.h"
 #include "SkData.h"
 #include "SkDrawShadowInfo.h"
 #include "SkImage.h"
 #include "SkImageFilter.h"
-#include "SkLiteDL.h"
 #include "SkMath.h"
 #include "SkPicture.h"
-#include "SkRegion.h"
 #include "SkRSXform.h"
+#include "SkRegion.h"
 #include "SkTextBlob.h"
 #include "SkVertices.h"
 
@@ -46,15 +47,15 @@ static const D* pod(const T* op, size_t offset = 0) {
 }
 
 namespace {
-#define TYPES(M)                                                                \
-    M(Flush) M(Save) M(Restore) M(SaveLayer)                                    \
-    M(Concat) M(SetMatrix) M(Translate)                                         \
-    M(ClipPath) M(ClipRect) M(ClipRRect) M(ClipRegion)                          \
-    M(DrawPaint) M(DrawPath) M(DrawRect) M(DrawRegion) M(DrawOval) M(DrawArc)   \
-    M(DrawRRect) M(DrawDRRect) M(DrawAnnotation) M(DrawDrawable) M(DrawPicture) \
-    M(DrawImage) M(DrawImageNine) M(DrawImageRect) M(DrawImageLattice)          \
-    M(DrawText) M(DrawPosText) M(DrawPosTextH)                                  \
-    M(DrawTextOnPath) M(DrawTextRSXform) M(DrawTextBlob)                        \
+#define TYPES(M)                                                                       \
+    M(Flush) M(Save) M(Restore) M(SaveLayer)                                           \
+    M(Concat) M(SetMatrix) M(Translate)                                                \
+    M(ClipPath) M(ClipRect) M(ClipRRect) M(ClipRegion)                                 \
+    M(DrawPaint) M(DrawPath) M(DrawRect) M(DrawRegion) M(DrawOval) M(DrawArc)          \
+    M(DrawRRect) M(DrawDRRect) M(DrawAnnotation) M(DrawDrawable) M(DrawPicture)        \
+    M(DrawImage) M(DrawImageNine) M(DrawImageRect) M(DrawImageLattice) M(DrawImageSet) \
+    M(DrawText) M(DrawPosText) M(DrawPosTextH)                                         \
+    M(DrawTextRSXform) M(DrawTextBlob)                                                 \
     M(DrawPatch) M(DrawPoints) M(DrawVertices) M(DrawAtlas) M(DrawShadowRec)
 
 #define M(T) T,
@@ -325,7 +326,22 @@ namespace {
                                 &paint);
         }
     };
-
+    struct DrawImageSet final : Op {
+        static const auto kType = Type::DrawImageSet;
+        DrawImageSet(const SkCanvas::ImageSetEntry set[], int count, float alpha,
+                     SkFilterQuality quality, SkBlendMode xfermode)
+                : count(count), alpha(alpha), quality(quality), xfermode(xfermode), set(count) {
+            std::copy_n(set, count, this->set.get());
+        }
+        int                                   count;
+        float                                 alpha;
+        SkFilterQuality                       quality;
+        SkBlendMode                           xfermode;
+        SkAutoTArray<SkCanvas::ImageSetEntry> set;
+        void draw(SkCanvas* c, const SkMatrix&) const {
+            c->experimental_DrawImageSetV0(set.get(), count, alpha, quality, xfermode);
+        }
+    };
     struct DrawText final : Op {
         static const auto kType = Type::DrawText;
         DrawText(size_t bytes, SkScalar x, SkScalar y, const SkPaint& paint)
@@ -362,21 +378,6 @@ namespace {
             auto xs   = pod<SkScalar>(this);
             auto text = pod<void>(this, n*sizeof(SkScalar));
             c->drawPosTextH(text, bytes, xs, y, paint);
-        }
-    };
-    struct DrawTextOnPath final : Op {
-        static const auto kType = Type::DrawTextOnPath;
-        DrawTextOnPath(size_t bytes, const SkPath& path,
-                       const SkMatrix* matrix, const SkPaint& paint)
-            : bytes(bytes), path(path), paint(paint) {
-            if (matrix) { this->matrix = *matrix; }
-        }
-        size_t   bytes;
-        SkPath   path;
-        SkMatrix matrix = SkMatrix::I();
-        SkPaint  paint;
-        void draw(SkCanvas* c, const SkMatrix&) const {
-            c->drawTextOnPath(pod<void>(this), bytes, path, &matrix, paint);
         }
     };
     struct DrawTextRSXform final : Op {
@@ -455,7 +456,7 @@ namespace {
         SkBlendMode mode;
         SkPaint paint;
         void draw(SkCanvas* c, const SkMatrix&) const {
-            c->drawVertices(vertices, pod<SkMatrix>(this), boneCount, mode, paint);
+            c->drawVertices(vertices, pod<SkVertices::Bone>(this), boneCount, mode, paint);
         }
     };
     struct DrawAtlas final : Op {
@@ -619,6 +620,11 @@ void SkLiteDL::drawImageLattice(sk_sp<const SkImage> image, const SkCanvas::Latt
                 lattice.fRectTypes, fs);
 }
 
+void SkLiteDL::drawImageSet(const SkCanvas::ImageSetEntry set[], int count, float alpha,
+                            SkFilterQuality filterQuality, SkBlendMode mode) {
+    this->push<DrawImageSet>(0, set, count, alpha, filterQuality, mode);
+}
+
 void SkLiteDL::drawText(const void* text, size_t bytes,
                         SkScalar x, SkScalar y, const SkPaint& paint) {
     void* pod = this->push<DrawText>(bytes, bytes, x, y, paint);
@@ -635,11 +641,6 @@ void SkLiteDL::drawPosTextH(const void* text, size_t bytes,
     int n = paint.countText(text, bytes);
     void* pod = this->push<DrawPosTextH>(n*sizeof(SkScalar)+bytes, bytes, y, paint, n);
     copy_v(pod, xs,n, (const char*)text,bytes);
-}
-void SkLiteDL::drawTextOnPath(const void* text, size_t bytes,
-                              const SkPath& path, const SkMatrix* matrix, const SkPaint& paint) {
-    void* pod = this->push<DrawTextOnPath>(bytes, bytes, path, matrix, paint);
-    copy_v(pod, (const char*)text,bytes);
 }
 void SkLiteDL::drawTextRSXform(const void* text, size_t bytes,
                                const SkRSXform xforms[], const SkRect* cull, const SkPaint& paint) {
@@ -660,9 +661,9 @@ void SkLiteDL::drawPoints(SkCanvas::PointMode mode, size_t count, const SkPoint 
     void* pod = this->push<DrawPoints>(count*sizeof(SkPoint), mode, count, paint);
     copy_v(pod, points,count);
 }
-void SkLiteDL::drawVertices(const SkVertices* vertices, const SkMatrix* bones, int boneCount,
-                            SkBlendMode mode, const SkPaint& paint) {
-    void* pod = this->push<DrawVertices>(boneCount * sizeof(SkMatrix),
+void SkLiteDL::drawVertices(const SkVertices* vertices, const SkVertices::Bone bones[],
+                            int boneCount, SkBlendMode mode, const SkPaint& paint) {
+    void* pod = this->push<DrawVertices>(boneCount * sizeof(SkVertices::Bone),
                                          vertices,
                                          boneCount,
                                          mode,

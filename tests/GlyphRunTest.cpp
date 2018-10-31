@@ -8,8 +8,10 @@
 #include "SkGlyphRun.h"
 
 #include "SkTextBlob.h"
-
 #include "Test.h"
+
+#include <algorithm>
+#include <memory>
 
 DEF_TEST(GlyphRunGlyphIDSetBasic, reporter) {
     SkGlyphID glyphs[] = {100, 3, 240, 3, 234};
@@ -59,7 +61,6 @@ DEF_TEST(GlyphRunBlob, reporter) {
     SkPaint font;
     font.setTypeface(tf);
     font.setTextEncoding(SkPaint::kGlyphID_TextEncoding);
-    font.setTextAlign(SkPaint::kLeft_Align);
     font.setStyle(SkPaint::kFill_Style);
     font.setHinting(SkPaint::kNormal_Hinting);
     font.setTextSize(1u);

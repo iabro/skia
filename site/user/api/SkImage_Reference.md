@@ -1,71 +1,177 @@
 SkImage Reference
 ===
 
-# <a name='Image'>Image</a>
 
-# <a name='SkImage'>Class SkImage</a>
+<a name='SkImage'></a>
 
-## <a name='Constant'>Constant</a>
+---
 
+<pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
+class <a href='#SkImage'>SkImage</a> : public <a href='undocumented#SkRefCnt'>SkRefCnt</a> {
+public:
+    typedef void* <a href='#SkImage_ReleaseContext'>ReleaseContext</a>;
 
-SkImage related constants are defined by <code>enum</code>, <code>enum class</code>,  <code>#define</code>, <code>const</code>, and <code>constexpr</code>.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_BitDepth_kF16'>BitDepth::kF16</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>uses 16-bit float per <a href='SkColor_Reference#Color'>Color</a> component</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_BitDepth_kU8'>BitDepth::kU8</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>uses 8-bit unsigned int per <a href='SkColor_Reference#Color'>Color</a> component</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_BitDepth'>BitDepth</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>options for <a href='#SkImage_MakeFromPicture'>MakeFromPicture</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_CachingHint'>CachingHint</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>options for <a href='#SkImage_readPixels'>readPixels</a> and <a href='#SkImage_scalePixels'>scalePixels</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_kAllow_CachingHint'>kAllow CachingHint</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>allows internally caching decoded and copied pixels</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_kDisallow_CachingHint'>kDisallow CachingHint</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>disallows internally caching decoded and copied pixels</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_kRO_LegacyBitmapMode'>kRO LegacyBitmapMode</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returned bitmap is read-only and immutable</td>
-  </tr>
-</table>
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeRasterCopy'>MakeRasterCopy</a>(const <a href='SkPixmap_Reference#SkPixmap'>SkPixmap</a>& pixmap);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeRasterData'>MakeRasterData</a>(const <a href='SkImageInfo_Reference#SkImageInfo'>SkImageInfo</a>& info, sk_sp<<a href='undocumented#SkData'>SkData</a>> pixels,
+                                         size_t rowBytes);
 
-## <a name='Typedef'>Typedef</a>
+    typedef void (*<a href='#SkImage_RasterReleaseProc'>RasterReleaseProc</a>)(const void* pixels, <a href='#SkImage_ReleaseContext'>ReleaseContext</a>);
 
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromRaster'>MakeFromRaster</a>(const <a href='SkPixmap_Reference#SkPixmap'>SkPixmap</a>& pixmap,
+                                         <a href='#SkImage_RasterReleaseProc'>RasterReleaseProc</a> rasterReleaseProc,
+                                         <a href='#SkImage_ReleaseContext'>ReleaseContext</a> releaseContext);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromBitmap'>MakeFromBitmap</a>(const <a href='SkBitmap_Reference#SkBitmap'>SkBitmap</a>& bitmap);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromGenerator'>MakeFromGenerator</a>(std::unique_ptr<<a href='undocumented#SkImageGenerator'>SkImageGenerator</a>> imageGenerator,
+                                            const <a href='SkIRect_Reference#SkIRect'>SkIRect</a>* subset = nullptr);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromEncoded'>MakeFromEncoded</a>(sk_sp<<a href='undocumented#SkData'>SkData</a>> encoded, const <a href='SkIRect_Reference#SkIRect'>SkIRect</a>* subset = nullptr);
 
-SkImage  <code>typedef</code> define a data type.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_BackendTextureReleaseProc'>BackendTextureReleaseProc</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>parameter type for <a href='#SkImage_MakeBackendTextureFromSkImage'>MakeBackendTextureFromSkImage</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_RasterReleaseProc'>RasterReleaseProc</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>parameter type for <a href='#SkImage_MakeFromRaster'>MakeFromRaster</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_ReleaseContext'>ReleaseContext</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>parameter type for <a href='#SkImage_MakeFromRaster'>MakeFromRaster</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_TextureReleaseProc'>TextureReleaseProc</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>parameter type for <a href='#SkImage_MakeFromTexture'>MakeFromTexture</a></td>
-  </tr>
-</table>
+    typedef void (*<a href='#SkImage_TextureReleaseProc'>TextureReleaseProc</a>)(<a href='#SkImage_ReleaseContext'>ReleaseContext</a> releaseContext);
+
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromTexture'>MakeFromTexture</a>(<a href='undocumented#GrContext'>GrContext</a>* context,
+                                          const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a>& backendTexture,
+                                          <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> origin,
+                                          <a href='SkImageInfo_Reference#SkColorType'>SkColorType</a> colorType,
+                                          <a href='SkImageInfo_Reference#SkAlphaType'>SkAlphaType</a> alphaType,
+                                          sk_sp<<a href='undocumented#SkColorSpace'>SkColorSpace</a>> colorSpace);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromTexture_2'>MakeFromTexture</a>(<a href='undocumented#GrContext'>GrContext</a>* context,
+                                          const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a>& backendTexture,
+                                          <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> origin,
+                                          <a href='SkImageInfo_Reference#SkColorType'>SkColorType</a> colorType,
+                                          <a href='SkImageInfo_Reference#SkAlphaType'>SkAlphaType</a> alphaType,
+                                          sk_sp<<a href='undocumented#SkColorSpace'>SkColorSpace</a>> colorSpace,
+                                          <a href='#SkImage_TextureReleaseProc'>TextureReleaseProc</a> textureReleaseProc,
+                                          <a href='#SkImage_ReleaseContext'>ReleaseContext</a> releaseContext);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeCrossContextFromEncoded'>MakeCrossContextFromEncoded</a>(<a href='undocumented#GrContext'>GrContext</a>* context, sk_sp<<a href='undocumented#SkData'>SkData</a>> data,
+                                                      bool buildMips, <a href='undocumented#SkColorSpace'>SkColorSpace</a>* dstColorSpace,
+                                                      bool limitToMaxTextureSize = false);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeCrossContextFromPixmap'>MakeCrossContextFromPixmap</a>(<a href='undocumented#GrContext'>GrContext</a>* context, const <a href='SkPixmap_Reference#SkPixmap'>SkPixmap</a>& pixmap,
+                                                     bool buildMips, <a href='undocumented#SkColorSpace'>SkColorSpace</a>* dstColorSpace,
+                                                     bool limitToMaxTextureSize = false);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromAdoptedTexture'>MakeFromAdoptedTexture</a>(<a href='undocumented#GrContext'>GrContext</a>* context,
+                                                 const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a>& backendTexture,
+                                                 <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> surfaceOrigin,
+                                                 <a href='SkImageInfo_Reference#SkColorType'>SkColorType</a> colorType,
+                                                 <a href='SkImageInfo_Reference#SkAlphaType'>SkAlphaType</a> alphaType = <a href='SkImageInfo_Reference#kPremul_SkAlphaType'>kPremul_SkAlphaType</a>,
+                                                 sk_sp<<a href='undocumented#SkColorSpace'>SkColorSpace</a>> colorSpace = nullptr);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromYUVATexturesCopy'>MakeFromYUVATexturesCopy</a>(<a href='undocumented#GrContext'>GrContext</a>* context,
+                                                   <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace,
+                                                   const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> yuvaTextures[],
+                                                   const <a href='undocumented#SkYUVAIndex'>SkYUVAIndex</a> yuvaIndices[4],
+                                                   <a href='undocumented#SkISize'>SkISize</a> imageSize,
+                                                   <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin,
+                                                   sk_sp<<a href='undocumented#SkColorSpace'>SkColorSpace</a>> imageColorSpace = nullptr);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromYUVATextures'>MakeFromYUVATextures</a>(<a href='undocumented#GrContext'>GrContext</a>* context,
+                                               <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace,
+                                               const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> yuvaTextures[],
+                                               const <a href='undocumented#SkYUVAIndex'>SkYUVAIndex</a> yuvaIndices[4],
+                                               <a href='undocumented#SkISize'>SkISize</a> imageSize,
+                                               <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin,
+                                               sk_sp<<a href='undocumented#SkColorSpace'>SkColorSpace</a>> imageColorSpace = nullptr);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromYUVATexturesCopyWithExternalBackend'>MakeFromYUVATexturesCopyWithExternalBackend</a>(
+            <a href='undocumented#GrContext'>GrContext</a>* context,
+            <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace,
+            const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> yuvaTextures[],
+            const <a href='undocumented#SkYUVAIndex'>SkYUVAIndex</a> yuvaIndices[4],
+            <a href='undocumented#SkISize'>SkISize</a> imageSize,
+            <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin,
+            const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a>& backendTexture,
+            sk_sp<<a href='undocumented#SkColorSpace'>SkColorSpace</a>> imageColorSpace = nullptr);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromYUVTexturesCopy'>MakeFromYUVTexturesCopy</a>(<a href='undocumented#GrContext'>GrContext</a>* context, <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace,
+                                                  const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> yuvTextures[3],
+                                                  <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin,
+                                                  sk_sp<<a href='undocumented#SkColorSpace'>SkColorSpace</a>> imageColorSpace = nullptr);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromYUVTexturesCopyWithExternalBackend'>MakeFromYUVTexturesCopyWithExternalBackend</a>(
+            <a href='undocumented#GrContext'>GrContext</a>* context, <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace,
+            const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> yuvTextures[3], <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin,
+            const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a>& backendTexture, sk_sp<<a href='undocumented#SkColorSpace'>SkColorSpace</a>> imageColorSpace = nullptr);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromNV12TexturesCopy'>MakeFromNV12TexturesCopy</a>(<a href='undocumented#GrContext'>GrContext</a>* context,
+                                                   <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace,
+                                                   const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> nv12Textures[2],
+                                                   <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin,
+                                                   sk_sp<<a href='undocumented#SkColorSpace'>SkColorSpace</a>> imageColorSpace = nullptr);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromNV12TexturesCopyWithExternalBackend'>MakeFromNV12TexturesCopyWithExternalBackend</a>(
+            <a href='undocumented#GrContext'>GrContext</a>* context,
+            <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace,
+            const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> nv12Textures[2],
+            <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin,
+            const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a>& backendTexture,
+            sk_sp<<a href='undocumented#SkColorSpace'>SkColorSpace</a>> imageColorSpace = nullptr);
+
+    enum class <a href='#SkImage_BitDepth'>BitDepth</a> {
+        <a href='#SkImage_BitDepth_kU8'>kU8</a>,
+        <a href='#SkImage_BitDepth_kF16'>kF16</a>,
+    };
+
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromPicture'>MakeFromPicture</a>(sk_sp<<a href='SkPicture_Reference#SkPicture'>SkPicture</a>> picture, const <a href='undocumented#SkISize'>SkISize</a>& dimensions,
+                                          const <a href='SkMatrix_Reference#SkMatrix'>SkMatrix</a>* matrix, const <a href='SkPaint_Reference#SkPaint'>SkPaint</a>* paint,
+                                          <a href='#SkImage_BitDepth'>BitDepth</a> bitDepth,
+                                          sk_sp<<a href='undocumented#SkColorSpace'>SkColorSpace</a>> colorSpace);
+    static <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_MakeFromAHardwareBuffer'>MakeFromAHardwareBuffer</a>(
+            AHardwareBuffer* hardwareBuffer,
+            <a href='SkImageInfo_Reference#SkAlphaType'>SkAlphaType</a> alphaType = <a href='SkImageInfo_Reference#kPremul_SkAlphaType'>kPremul_SkAlphaType</a>,
+            sk_sp<<a href='undocumented#SkColorSpace'>SkColorSpace</a>> colorSpace = nullptr,
+            <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> surfaceOrigin = <a href='undocumented#kTopLeft_GrSurfaceOrigin'>kTopLeft_GrSurfaceOrigin</a>);
+    int <a href='#SkImage_width'>width</a>() const;
+    int <a href='#SkImage_height'>height</a>() const;
+    <a href='undocumented#SkISize'>SkISize</a> <a href='#SkImage_dimensions'>dimensions</a>() const;
+    <a href='SkIRect_Reference#SkIRect'>SkIRect</a> <a href='#SkImage_bounds'>bounds</a>() const;
+    uint32_t <a href='#SkImage_uniqueID'>uniqueID</a>() const;
+    <a href='SkImageInfo_Reference#SkAlphaType'>SkAlphaType</a> <a href='#SkImage_alphaType'>alphaType</a>() const;
+    <a href='SkImageInfo_Reference#SkColorType'>SkColorType</a> <a href='#SkImage_colorType'>colorType</a>() const;
+    <a href='undocumented#SkColorSpace'>SkColorSpace</a>* <a href='#SkImage_colorSpace'>colorSpace</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='undocumented#SkColorSpace'>SkColorSpace</a>> <a href='#SkImage_refColorSpace'>refColorSpace</a>() const;
+    bool <a href='#SkImage_isAlphaOnly'>isAlphaOnly</a>() const;
+    bool <a href='#SkImage_isOpaque'>isOpaque</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='undocumented#SkShader'>SkShader</a>> <a href='#SkImage_makeShader'>makeShader</a>(<a href='undocumented#SkShader_TileMode'>SkShader::TileMode</a> tileMode1, <a href='undocumented#SkShader_TileMode'>SkShader::TileMode</a> tileMode2,
+                               const <a href='SkMatrix_Reference#SkMatrix'>SkMatrix</a>* localMatrix = nullptr) const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='undocumented#SkShader'>SkShader</a>> <a href='#SkImage_makeShader_2'>makeShader</a>(const <a href='SkMatrix_Reference#SkMatrix'>SkMatrix</a>* localMatrix = nullptr) const;
+    bool <a href='#SkImage_peekPixels'>peekPixels</a>(<a href='SkPixmap_Reference#SkPixmap'>SkPixmap</a>* pixmap) const;
+    GrTexture* <a href='#SkImage_getTexture'>getTexture</a>() const;
+    bool <a href='#SkImage_isTextureBacked'>isTextureBacked</a>() const;
+    bool <a href='#SkImage_isValid'>isValid</a>(<a href='undocumented#GrContext'>GrContext</a>* context) const;
+    <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> <a href='#SkImage_getBackendTexture'>getBackendTexture</a>(bool flushPendingGrContextIO,
+                                       <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a>* origin = nullptr) const;
+
+    enum <a href='#SkImage_CachingHint'>CachingHint</a> {
+        <a href='#SkImage_kAllow_CachingHint'>kAllow_CachingHint</a>,
+        <a href='#SkImage_kDisallow_CachingHint'>kDisallow_CachingHint</a>,
+    };
+
+    bool <a href='#SkImage_readPixels'>readPixels</a>(const <a href='SkImageInfo_Reference#SkImageInfo'>SkImageInfo</a>& dstInfo, void* dstPixels, size_t dstRowBytes,
+                    int srcX, int srcY, <a href='#SkImage_CachingHint'>CachingHint</a> cachingHint = <a href='#SkImage_kAllow_CachingHint'>kAllow_CachingHint</a>) const;
+    bool <a href='#SkImage_readPixels_2'>readPixels</a>(const <a href='SkPixmap_Reference#SkPixmap'>SkPixmap</a>& dst, int srcX, int srcY,
+                    <a href='#SkImage_CachingHint'>CachingHint</a> cachingHint = <a href='#SkImage_kAllow_CachingHint'>kAllow_CachingHint</a>) const;
+    bool <a href='#SkImage_scalePixels'>scalePixels</a>(const <a href='SkPixmap_Reference#SkPixmap'>SkPixmap</a>& dst, <a href='undocumented#SkFilterQuality'>SkFilterQuality</a> filterQuality,
+                     <a href='#SkImage_CachingHint'>CachingHint</a> cachingHint = <a href='#SkImage_kAllow_CachingHint'>kAllow_CachingHint</a>) const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='undocumented#SkData'>SkData</a>> <a href='#SkImage_encodeToData'>encodeToData</a>(<a href='undocumented#SkEncodedImageFormat'>SkEncodedImageFormat</a> encodedImageFormat, int quality) const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='undocumented#SkData'>SkData</a>> <a href='#SkImage_encodeToData_2'>encodeToData</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='undocumented#SkData'>SkData</a>> <a href='#SkImage_refEncodedData'>refEncodedData</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_makeSubset'>makeSubset</a>(const <a href='SkIRect_Reference#SkIRect'>SkIRect</a>& subset) const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_makeTextureImage'>makeTextureImage</a>(<a href='undocumented#GrContext'>GrContext</a>* context, <a href='undocumented#SkColorSpace'>SkColorSpace</a>* dstColorSpace,
+                                    <a href='undocumented#GrMipMapped'>GrMipMapped</a> mipMapped = <a href='undocumented#GrMipMapped_kNo'>GrMipMapped::kNo</a>) const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_makeNonTextureImage'>makeNonTextureImage</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_makeRasterImage'>makeRasterImage</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_makeWithFilter'>makeWithFilter</a>(const <a href='undocumented#SkImageFilter'>SkImageFilter</a>* filter, const <a href='SkIRect_Reference#SkIRect'>SkIRect</a>& subset,
+                                  const <a href='SkIRect_Reference#SkIRect'>SkIRect</a>& clipBounds, <a href='SkIRect_Reference#SkIRect'>SkIRect</a>* outSubset,
+                                  <a href='SkIPoint_Reference#SkIPoint'>SkIPoint</a>* offset) const;
+
+    typedef std::function<void(GrBackendTexture)> <a href='#SkImage_BackendTextureReleaseProc'>BackendTextureReleaseProc</a>;
+
+    static bool <a href='#SkImage_MakeBackendTextureFromSkImage'>MakeBackendTextureFromSkImage</a>(<a href='undocumented#GrContext'>GrContext</a>* context,
+                                              sk_sp<<a href='#SkImage'>SkImage</a>> image,
+                                              <a href='undocumented#GrBackendTexture'>GrBackendTexture</a>* backendTexture,
+                                              <a href='#SkImage_BackendTextureReleaseProc'>BackendTextureReleaseProc</a>* backendTextureReleaseProc);
+
+    enum <a href='#SkImage_LegacyBitmapMode'>LegacyBitmapMode</a> {
+        <a href='#SkImage_kRO_LegacyBitmapMode'>kRO_LegacyBitmapMode</a>,
+    };
+
+    bool <a href='#SkImage_asLegacyBitmap'>asLegacyBitmap</a>(<a href='SkBitmap_Reference#SkBitmap'>SkBitmap</a>* bitmap,
+                        <a href='#SkImage_LegacyBitmapMode'>LegacyBitmapMode</a> legacyBitmapMode = <a href='#SkImage_kRO_LegacyBitmapMode'>kRO_LegacyBitmapMode</a>) const;
+    bool <a href='#SkImage_isLazyGenerated'>isLazyGenerated</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='#SkImage'>SkImage</a>> <a href='#SkImage_makeColorSpace'>makeColorSpace</a>(sk_sp<<a href='undocumented#SkColorSpace'>SkColorSpace</a>> target) const;
+};
+</pre>
 
 <a href='#Image'>Image</a> describes a two dimensional array of pixels to draw. The pixels may be
 decoded in a <a href='undocumented#Raster_Bitmap'>Raster Bitmap</a>, encoded in a <a href='SkPicture_Reference#Picture'>Picture</a> or compressed data stream,
@@ -82,386 +188,28 @@ or height returns <a href='#Image'>Image</a> equal to nullptr.
 include BMP, GIF, HEIF, ICO, JPEG, PNG, WBMP, WebP. Supported encoding details
 vary with platform.
 
-## <a name='Raster_Image'>Raster Image</a>
+<a name='Raster_Image'></a>
 
 <a href='#Raster_Image'>Raster Image</a> pixels are decoded in a <a href='undocumented#Raster_Bitmap'>Raster Bitmap</a>. These pixels may be read
 directly and in most cases written to, although edited pixels may not be drawn
 if <a href='#Image'>Image</a> has been copied internally.
 
-## <a name='Texture_Image'>Texture Image</a>
+<a name='Texture_Image'></a>
 
 <a href='#Texture_Image'>Texture Image</a> are located on GPU and pixels are not accessible. <a href='#Texture_Image'>Texture Image</a>
 are allocated optimally for best performance. <a href='#Raster_Image'>Raster Image</a> may
 be drawn to <a href='undocumented#GPU_Surface'>GPU Surface</a>, but pixels are uploaded from CPU to GPU downgrading
 performance.
 
-## <a name='Lazy_Image'>Lazy Image</a>
+<a name='Lazy_Image'></a>
 
 <a href='#Lazy_Image'>Lazy Image</a> defer allocating buffer for <a href='#Image'>Image</a> pixels and decoding stream until
 <a href='#Image'>Image</a> is drawn. <a href='#Lazy_Image'>Lazy Image</a> caches result if possible to speed up repeated
 drawing.
 
-## Overview
-
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Constant'>Constants</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>enum and enum class, and their const values</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Constructor'>Constructors</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>functions that construct <a href='#SkImage'>SkImage</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Member_Function'>Functions</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>global and class member functions</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Related_Function'>Related Functions</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>similar member functions grouped together</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Typedef'>Typedef Declarations</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>types defined by other types</td>
-  </tr>
-</table>
-
-
-## <a name='Related_Function'>Related Function</a>
-
-
-SkImage global, <code>struct</code>, and <code>class</code> related member functions share a topic.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Lazy_Image'>Lazy Image</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>deferred pixel buffer</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Pixels'>Pixels</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>read and write pixel values</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Property'>Property</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>values and attributes</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Raster_Image'>Raster Image</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>pixels decoded in <a href='undocumented#Raster_Bitmap'>Raster Bitmap</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Texture_Image'>Texture Image</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>pixels located on GPU</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Utility'>Utility</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>rarely called management functions</td>
-  </tr>
-</table>
-
-## <a name='Constructor'>Constructor</a>
-
-
-SkImage can be constructed or initialized by these functions, including C++ class constructors.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeBackendTextureFromSkImage'>MakeBackendTextureFromSkImage</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='undocumented#GPU_Texture'>GPU Texture</a> from <a href='#Image'>Image</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeCrossContextFromEncoded'>MakeCrossContextFromEncoded</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from encoded data, and uploads to GPU</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeCrossContextFromPixmap'>MakeCrossContextFromPixmap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkPixmap_Reference#Pixmap'>Pixmap</a>, and uploads to GPU</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromAHardwareBuffer'>MakeFromAHardwareBuffer</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from Android hardware buffer</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromAdoptedTexture'>MakeFromAdoptedTexture</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='undocumented#GPU_Texture'>GPU Texture</a>, managed internally</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromBitmap'>MakeFromBitmap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkBitmap_Reference#Bitmap'>Bitmap</a>, sharing or copying pixels</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromEncoded'>MakeFromEncoded</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from encoded data</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromGenerator'>MakeFromGenerator</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from a stream of data</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromNV12TexturesCopy'>MakeFromNV12TexturesCopy</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkImageInfo_Reference#YUV_ColorSpace'>YUV ColorSpace</a> data in three planes</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromPicture'>MakeFromPicture</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkPicture_Reference#Picture'>Picture</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromRaster'>MakeFromRaster</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkPixmap_Reference#Pixmap'>Pixmap</a>, with release</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromTexture'>MakeFromTexture</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='undocumented#GPU_Texture'>GPU Texture</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromTexture'>MakeFromTexture(GrContext* context, const GrBackendTexture& backendTexture, GrSurfaceOrigin origin, SkColorType colorType, SkAlphaType alphaType, sk sp&lt;SkColorSpace&gt; colorSpace)</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromTexture_2'>MakeFromTexture(GrContext* context, const GrBackendTexture& backendTexture, GrSurfaceOrigin origin, SkColorType colorType, SkAlphaType alphaType, sk sp&lt;SkColorSpace&gt; colorSpace, TextureReleaseProc textureReleaseProc, ReleaseContext releaseContext)</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromYUVTexturesCopy'>MakeFromYUVTexturesCopy</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkImageInfo_Reference#YUV_ColorSpace'>YUV ColorSpace</a> data in three planes</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeRasterCopy'>MakeRasterCopy</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkPixmap_Reference#Pixmap'>Pixmap</a> and copied pixels</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeRasterData'>MakeRasterData</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkImageInfo_Reference#Image_Info'>Image Info</a> and shared pixels</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_asLegacyBitmap'>asLegacyBitmap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns as <a href='undocumented#Raster_Bitmap'>Raster Bitmap</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeColorSpace'>makeColorSpace</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> matching <a href='undocumented#Color_Space'>Color Space</a> if possible</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeNonTextureImage'>makeNonTextureImage</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> without dependency on <a href='undocumented#GPU_Texture'>GPU Texture</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeRasterImage'>makeRasterImage</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> compatible with <a href='undocumented#Raster_Surface'>Raster Surface</a> if possible</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeShader'>makeShader</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='undocumented#Shader'>Shader</a>, <a href='SkPaint_Reference#Paint'>Paint</a> element that can tile <a href='#Image'>Image</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeShader'>makeShader(SkShader::TileMode tileMode1, SkShader::TileMode tileMode2, const SkMatrix* localMatrix = nullptr)</a> const</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeShader_2'>makeShader(const SkMatrix* localMatrix = nullptr)</a> const</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeSubset'>makeSubset</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> containing part of original</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeTextureImage'>makeTextureImage</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> matching <a href='undocumented#Color_Space'>Color Space</a> if possible</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeWithFilter'>makeWithFilter</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates filtered, clipped <a href='#Image'>Image</a></td>
-  </tr>
-</table>
-
-## <a name='Member_Function'>Member Function</a>
-
-
-SkImage member functions read and modify the structure properties.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeBackendTextureFromSkImage'>MakeBackendTextureFromSkImage</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='undocumented#GPU_Texture'>GPU Texture</a> from <a href='#Image'>Image</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeCrossContextFromEncoded'>MakeCrossContextFromEncoded</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from encoded data, and uploads to GPU</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeCrossContextFromPixmap'>MakeCrossContextFromPixmap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkPixmap_Reference#Pixmap'>Pixmap</a>, and uploads to GPU</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromAHardwareBuffer'>MakeFromAHardwareBuffer</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from Android hardware buffer</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromAdoptedTexture'>MakeFromAdoptedTexture</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='undocumented#GPU_Texture'>GPU Texture</a>, managed internally</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromBitmap'>MakeFromBitmap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkBitmap_Reference#Bitmap'>Bitmap</a>, sharing or copying pixels</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromEncoded'>MakeFromEncoded</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from encoded data</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromGenerator'>MakeFromGenerator</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from a stream of data</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromNV12TexturesCopy'>MakeFromNV12TexturesCopy</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkImageInfo_Reference#YUV_ColorSpace'>YUV ColorSpace</a> data in three planes</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromPicture'>MakeFromPicture</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkPicture_Reference#Picture'>Picture</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromRaster'>MakeFromRaster</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkPixmap_Reference#Pixmap'>Pixmap</a>, with release</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromTexture'>MakeFromTexture</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='undocumented#GPU_Texture'>GPU Texture</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeFromYUVTexturesCopy'>MakeFromYUVTexturesCopy</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkImageInfo_Reference#YUV_ColorSpace'>YUV ColorSpace</a> data in three planes</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeRasterCopy'>MakeRasterCopy</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkPixmap_Reference#Pixmap'>Pixmap</a> and copied pixels</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_MakeRasterData'>MakeRasterData</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> from <a href='SkImageInfo_Reference#Image_Info'>Image Info</a> and shared pixels</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_alphaType'>alphaType</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='SkImageInfo_Reference#Alpha_Type'>Alpha Type</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_asLegacyBitmap'>asLegacyBitmap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns as <a href='undocumented#Raster_Bitmap'>Raster Bitmap</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_bounds'>bounds</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='#SkImage_width'>width</a> and <a href='#SkImage_height'>height</a> as Rectangle</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_colorSpace'>colorSpace</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='undocumented#Color_Space'>Color Space</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_colorType'>colorType</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='SkImageInfo_Reference#Color_Type'>Color Type</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_dimensions'>dimensions</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='#SkImage_width'>width</a> and <a href='#SkImage_height'>height</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_encodeToData'>encodeToData</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns encoded <a href='#Image'>Image</a> as <a href='undocumented#SkData'>SkData</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_getBackendTexture'>getBackendTexture</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns GPU reference to <a href='#Image'>Image</a> as texture</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_height'>height</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns pixel row count</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_isAlphaOnly'>isAlphaOnly</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns if pixels represent a transparency mask</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_isLazyGenerated'>isLazyGenerated</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns if <a href='#Image'>Image</a> is created as needed</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_isOpaque'>isOpaque</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns if <a href='SkImageInfo_Reference#Alpha_Type'>Alpha Type</a> is <a href='SkImageInfo_Reference#kOpaque_SkAlphaType'>kOpaque_SkAlphaType</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_isTextureBacked'>isTextureBacked</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns if <a href='#Image'>Image</a> was created from <a href='undocumented#GPU_Texture'>GPU Texture</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_isValid'>isValid</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns if <a href='#Image'>Image</a> can draw to <a href='undocumented#Raster_Surface'>Raster Surface</a> or <a href='undocumented#GPU_Context'>GPU Context</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeColorSpace'>makeColorSpace</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> matching <a href='undocumented#Color_Space'>Color Space</a> if possible</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeNonTextureImage'>makeNonTextureImage</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> without dependency on <a href='undocumented#GPU_Texture'>GPU Texture</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeRasterImage'>makeRasterImage</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> compatible with <a href='undocumented#Raster_Surface'>Raster Surface</a> if possible</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeShader'>makeShader</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='undocumented#Shader'>Shader</a>, <a href='SkPaint_Reference#Paint'>Paint</a> element that can tile <a href='#Image'>Image</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeSubset'>makeSubset</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> containing part of original</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeTextureImage'>makeTextureImage</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates <a href='#Image'>Image</a> matching <a href='undocumented#Color_Space'>Color Space</a> if possible</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_makeWithFilter'>makeWithFilter</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>creates filtered, clipped <a href='#Image'>Image</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_peekPixels'>peekPixels</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='SkPixmap_Reference#Pixmap'>Pixmap</a> if possible</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_readPixels'>readPixels</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>copies and converts pixels</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_refColorSpace'>refColorSpace</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='SkImageInfo_Reference#Image_Info'>Image Info</a> <a href='undocumented#Color_Space'>Color Space</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_refEncodedData'>refEncodedData</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='#Image'>Image</a> encoded in <a href='undocumented#SkData'>SkData</a> if present</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_scalePixels'>scalePixels</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>scales and converts one <a href='#Image'>Image</a> to another</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_uniqueID'>uniqueID</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns identifier for <a href='#Image'>Image</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_width'>width</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns pixel column count</td>
-  </tr>
-</table>
-
 <a name='SkImage_MakeRasterCopy'></a>
-## MakeRasterCopy
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeRasterCopy'>MakeRasterCopy</a>(const <a href='SkPixmap_Reference#SkPixmap'>SkPixmap</a>& pixmap)
@@ -499,10 +247,9 @@ contains a copy of the pixels.
 
 <a href='#SkImage_MakeRasterData'>MakeRasterData</a> <a href='#SkImage_MakeFromGenerator'>MakeFromGenerator</a>
 
----
-
 <a name='SkImage_MakeRasterData'></a>
-## MakeRasterData
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeRasterData'>MakeRasterData</a>(const <a href='SkImageInfo_Reference#SkImageInfo'>SkImageInfo</a>& info, <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkData'>SkData</a>&gt; pixels, size_t rowBytes)
@@ -542,12 +289,12 @@ each dimension fits in 29 bits;
 
 <a href='#SkImage_MakeRasterCopy'>MakeRasterCopy</a> <a href='#SkImage_MakeFromGenerator'>MakeFromGenerator</a>
 
+<a name='SkImage_ReleaseContext'></a>
+
 ---
 
-## <a name='SkImage_ReleaseContext'>Typedef SkImage::ReleaseContext</a>
-
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
-typedef void* <a href='#SkImage_ReleaseContext'>ReleaseContext</a>;
+    typedef void* <a href='#SkImage_ReleaseContext'>ReleaseContext</a>;
 </pre>
 
 Caller data passed to <a href='#SkImage_RasterReleaseProc'>RasterReleaseProc</a>; may be nullptr.
@@ -556,10 +303,12 @@ Caller data passed to <a href='#SkImage_RasterReleaseProc'>RasterReleaseProc</a>
 
 <a href='#SkImage_MakeFromRaster'>MakeFromRaster</a> <a href='#SkImage_RasterReleaseProc'>RasterReleaseProc</a>
 
-## <a name='SkImage_RasterReleaseProc'>Typedef SkImage::RasterReleaseProc</a>
+<a name='SkImage_RasterReleaseProc'></a>
+
+---
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
-typedef void (*<a href='#SkImage_RasterReleaseProc'>RasterReleaseProc</a>)(const void* pixels, <a href='#SkImage_ReleaseContext'>ReleaseContext</a>);
+    typedef void (*<a href='#SkImage_RasterReleaseProc'>RasterReleaseProc</a>)(const void* pixels, <a href='#SkImage_ReleaseContext'>ReleaseContext</a>);
 </pre>
 
 Function called when <a href='#Image'>Image</a> no longer shares pixels. <a href='#SkImage_ReleaseContext'>ReleaseContext</a> is
@@ -570,7 +319,8 @@ provided by caller when <a href='#Image'>Image</a> is created, and may be nullpt
 <a href='#SkImage_ReleaseContext'>ReleaseContext</a> <a href='#SkImage_MakeFromRaster'>MakeFromRaster</a>
 
 <a name='SkImage_MakeFromRaster'></a>
-## MakeFromRaster
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromRaster'>MakeFromRaster</a>(const <a href='SkPixmap_Reference#SkPixmap'>SkPixmap</a>& pixmap, <a href='#SkImage_RasterReleaseProc'>RasterReleaseProc</a> rasterReleaseProc,
@@ -626,10 +376,9 @@ after reset: 1
 
 <a href='#SkImage_MakeRasterCopy'>MakeRasterCopy</a> <a href='#SkImage_MakeRasterData'>MakeRasterData</a> <a href='#SkImage_MakeFromGenerator'>MakeFromGenerator</a> <a href='#SkImage_RasterReleaseProc'>RasterReleaseProc</a> <a href='#SkImage_ReleaseContext'>ReleaseContext</a>
 
----
-
 <a name='SkImage_MakeFromBitmap'></a>
-## MakeFromBitmap
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromBitmap'>MakeFromBitmap</a>(const <a href='SkBitmap_Reference#SkBitmap'>SkBitmap</a>& bitmap)
@@ -669,10 +418,9 @@ memory does not alter the second <a href='#Image'>Image</a>.
 
 <a href='#SkImage_MakeFromRaster'>MakeFromRaster</a> <a href='#SkImage_MakeRasterCopy'>MakeRasterCopy</a> <a href='#SkImage_MakeFromGenerator'>MakeFromGenerator</a> <a href='#SkImage_MakeRasterData'>MakeRasterData</a>
 
----
-
 <a name='SkImage_MakeFromGenerator'></a>
-## MakeFromGenerator
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromGenerator'>MakeFromGenerator</a>(std::unique_ptr&lt;<a href='undocumented#SkImageGenerator'>SkImageGenerator</a>&gt; imageGenerator,
@@ -713,10 +461,9 @@ created <a href='#Image'>Image</a>, or nullptr
 
 <a href='#SkImage_MakeFromEncoded'>MakeFromEncoded</a>
 
----
-
 <a name='SkImage_MakeFromEncoded'></a>
-## MakeFromEncoded
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromEncoded'>MakeFromEncoded</a>(<a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkData'>SkData</a>&gt; encoded, const <a href='SkIRect_Reference#SkIRect'>SkIRect</a>* subset = nullptr)
@@ -751,12 +498,12 @@ created <a href='#Image'>Image</a>, or nullptr
 
 <a href='#SkImage_MakeFromGenerator'>MakeFromGenerator</a>
 
+<a name='SkImage_TextureReleaseProc'></a>
+
 ---
 
-## <a name='SkImage_TextureReleaseProc'>Typedef SkImage::TextureReleaseProc</a>
-
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
-typedef void (*<a href='#SkImage_TextureReleaseProc'>TextureReleaseProc</a>)(<a href='#SkImage_ReleaseContext'>ReleaseContext</a> releaseContext);
+    typedef void (*<a href='#SkImage_TextureReleaseProc'>TextureReleaseProc</a>)(<a href='#SkImage_ReleaseContext'>ReleaseContext</a> releaseContext);
 </pre>
 
 User function called when supplied texture may be deleted.
@@ -766,7 +513,8 @@ User function called when supplied texture may be deleted.
 <a href='#SkImage_MakeFromTexture'>MakeFromTexture</a><sup><a href='#SkImage_MakeFromTexture_2'>[2]</a></sup>
 
 <a name='SkImage_MakeFromTexture'></a>
-## MakeFromTexture
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromTexture'>MakeFromTexture</a>(<a href='undocumented#GrContext'>GrContext</a>* context, const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a>& backendTexture,
@@ -819,9 +567,9 @@ created <a href='#Image'>Image</a>, or nullptr
 
 <a href='#SkImage_MakeFromAdoptedTexture'>MakeFromAdoptedTexture</a> <a href='SkSurface_Reference#SkSurface_MakeFromBackendTexture'>SkSurface::MakeFromBackendTexture</a>
 
----
-
 <a name='SkImage_MakeFromTexture_2'></a>
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromTexture'>MakeFromTexture</a>(<a href='undocumented#GrContext'>GrContext</a>* context, const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a>& backendTexture,
@@ -876,16 +624,15 @@ created <a href='#Image'>Image</a>, or nullptr
 
 ### Example
 
-<div><fiddle-embed name="c7be9423f7c2ef819523ba4d607d17b8" gpu="true"></fiddle-embed></div>
+<div><fiddle-embed name="f40e1ebba6b067714062b81877b22fa1" gpu="true"></fiddle-embed></div>
 
 ### See Also
 
 <a href='#SkImage_MakeFromAdoptedTexture'>MakeFromAdoptedTexture</a> <a href='SkSurface_Reference#SkSurface_MakeFromBackendTexture'>SkSurface::MakeFromBackendTexture</a>
 
----
-
 <a name='SkImage_MakeCrossContextFromEncoded'></a>
-## MakeCrossContextFromEncoded
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeCrossContextFromEncoded'>MakeCrossContextFromEncoded</a>(<a href='undocumented#GrContext'>GrContext</a>* context, <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkData'>SkData</a>&gt; data,
@@ -942,10 +689,9 @@ created <a href='#Image'>Image</a>, or nullptr
 
 <a href='#SkImage_MakeCrossContextFromPixmap'>MakeCrossContextFromPixmap</a>
 
----
-
 <a name='SkImage_MakeCrossContextFromPixmap'></a>
-## MakeCrossContextFromPixmap
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeCrossContextFromPixmap'>MakeCrossContextFromPixmap</a>(<a href='undocumented#GrContext'>GrContext</a>* context, const <a href='SkPixmap_Reference#SkPixmap'>SkPixmap</a>& pixmap,
@@ -963,7 +709,7 @@ When <a href='#Image'>Image</a> is no longer referenced, <a href='#SkImage_MakeC
 asynchronously.
 
 <a href='undocumented#Texture'>Texture</a> created from <a href='#SkImage_MakeCrossContextFromPixmap_pixmap'>pixmap</a> is uploaded to match <a href='SkSurface_Reference#Surface'>Surface</a> created with
-<a href='#SkImage_MakeCrossContextFromPixmap_dstColorSpace'>dstColorSpace</a>. <a href='undocumented#Color_Space'>Color Space</a> of <a href='#Image'>Image</a> is determined by <a href='#SkImage_MakeCrossContextFromPixmap_pixmap'>pixmap</a>.<a href='#SkImage_colorSpace'>colorSpace</a>.
+<a href='#SkImage_MakeCrossContextFromPixmap_dstColorSpace'>dstColorSpace</a>. <a href='undocumented#Color_Space'>Color Space</a> of <a href='#Image'>Image</a> is determined by <a href='#SkImage_MakeCrossContextFromPixmap_pixmap'>pixmap</a>.<a href='#SkImage_colorSpace'>colorSpace</a>().
 
 <a href='#Image'>Image</a> is returned referring to GPU back-end if <a href='#SkImage_MakeCrossContextFromPixmap_context'>context</a> is not nullptr,
 format of data is recognized and supported, and if <a href='#SkImage_MakeCrossContextFromPixmap_context'>context</a> supports moving
@@ -1002,10 +748,9 @@ created <a href='#Image'>Image</a>, or nullptr
 
 <a href='#SkImage_MakeCrossContextFromEncoded'>MakeCrossContextFromEncoded</a>
 
----
-
 <a name='SkImage_MakeFromAdoptedTexture'></a>
-## MakeFromAdoptedTexture
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromAdoptedTexture'>MakeFromAdoptedTexture</a>(<a href='undocumented#GrContext'>GrContext</a>* context,
@@ -1059,16 +804,173 @@ created <a href='#Image'>Image</a>, or nullptr
 
 <a href='#SkImage_MakeFromTexture'>MakeFromTexture</a><sup><a href='#SkImage_MakeFromTexture_2'>[2]</a></sup> <a href='#SkImage_MakeFromYUVTexturesCopy'>MakeFromYUVTexturesCopy</a>
 
+<a name='SkImage_MakeFromYUVATexturesCopy'></a>
+
 ---
 
+<pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
+static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromYUVATexturesCopy'>MakeFromYUVATexturesCopy</a>(<a href='undocumented#GrContext'>GrContext</a>* context, <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace,
+                                               const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> yuvaTextures[],
+                                               const <a href='undocumented#SkYUVAIndex'>SkYUVAIndex</a> yuvaIndices[4], <a href='undocumented#SkISize'>SkISize</a> imageSize,
+                                               <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin,
+                                               <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorSpace'>SkColorSpace</a>&gt; imageColorSpace = nullptr)
+</pre>
+
+Creates an <a href='#SkImage'>SkImage</a> by flattening the specified YUVA planes into a single,
+interleaved RGBA image.
+<a href='#SkImage_MakeFromYUVATexturesCopy_yuvaTextures'>yuvaTextures</a> points to array of up to four YUVA textures which reside on GPU.
+YUVA textures contain YUVA planes which may be interleaved.
+
+### Parameters
+
+<table>  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopy_context'><code><strong>context</strong></code></a></td>
+    <td>GPU <a href='#SkImage_MakeFromYUVATexturesCopy_context'>context</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopy_yuvColorSpace'><code><strong>yuvColorSpace</strong></code></a></td>
+    <td>one of: <a href='SkImageInfo_Reference#kJPEG_SkYUVColorSpace'>kJPEG_SkYUVColorSpace</a>, <a href='SkImageInfo_Reference#kRec601_SkYUVColorSpace'>kRec601_SkYUVColorSpace</a>,
+<a href='SkImageInfo_Reference#kRec709_SkYUVColorSpace'>kRec709_SkYUVColorSpace</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopy_yuvaTextures'><code><strong>yuvaTextures</strong></code></a></td>
+    <td>array of YUVA textures</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopy_yuvaIndices'><code><strong>yuvaIndices</strong></code></a></td>
+    <td>array indicating <a href='#SkImage_MakeFromYUVATexturesCopy_yuvaTextures'>yuvaTextures</a> element and channel
+that map to Y, U, V, and A</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopy_imageSize'><code><strong>imageSize</strong></code></a></td>
+    <td>size of the resulting image</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopy_imageOrigin'><code><strong>imageOrigin</strong></code></a></td>
+    <td>one of: <a href='undocumented#kBottomLeft_GrSurfaceOrigin'>kBottomLeft GrSurfaceOrigin</a>, <a href='undocumented#kTopLeft_GrSurfaceOrigin'>kTopLeft GrSurfaceOrigin</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopy_imageColorSpace'><code><strong>imageColorSpace</strong></code></a></td>
+    <td>range of colors of the resulting image; may be nullptr</td>
+  </tr>
+</table>
+
+### Return Value
+
+created <a href='#SkImage'>SkImage</a>, or nullptr
+
+### See Also
+
+<a href='#SkImage_MakeFromYUVATexturesCopyWithExternalBackend'>MakeFromYUVATexturesCopyWithExternalBackend</a> <a href='#SkImage_MakeFromYUVATextures'>MakeFromYUVATextures</a>
+
+<a name='SkImage_MakeFromYUVATextures'></a>
+
+---
+
+<pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
+static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromYUVATextures'>MakeFromYUVATextures</a>(<a href='undocumented#GrContext'>GrContext</a>* context, <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace,
+                                           const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> yuvaTextures[],
+                                           const <a href='undocumented#SkYUVAIndex'>SkYUVAIndex</a> yuvaIndices[4], <a href='undocumented#SkISize'>SkISize</a> imageSize,
+                                           <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin,
+                                           <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorSpace'>SkColorSpace</a>&gt; imageColorSpace = nullptr) ;
+</pre>
+
+Creates an <a href='#SkImage'>SkImage</a> by storing the specified YUVA planes into an image, to be rendered
+via multitexturing.
+
+### Parameters
+
+<table>  <tr>    <td><a name='SkImage_MakeFromYUVATextures_context'><code><strong>context</strong></code></a></td>
+    <td>GPU <a href='#SkImage_MakeFromYUVATextures_context'>context</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATextures_yuvColorSpace'><code><strong>yuvColorSpace</strong></code></a></td>
+    <td>one of: <a href='SkImageInfo_Reference#kJPEG_SkYUVColorSpace'>kJPEG_SkYUVColorSpace</a>, <a href='SkImageInfo_Reference#kRec601_SkYUVColorSpace'>kRec601_SkYUVColorSpace</a>,
+<a href='SkImageInfo_Reference#kRec709_SkYUVColorSpace'>kRec709_SkYUVColorSpace</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATextures_yuvaTextures'><code><strong>yuvaTextures</strong></code></a></td>
+    <td>array of YUVA textures</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATextures_yuvaIndices'><code><strong>yuvaIndices</strong></code></a></td>
+    <td>array indicating <a href='#SkImage_MakeFromYUVATextures_yuvaTextures'>yuvaTextures</a> element and channel
+that map to Y, U, V, and A</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATextures_imageSize'><code><strong>imageSize</strong></code></a></td>
+    <td>size of the resulting image</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATextures_imageOrigin'><code><strong>imageOrigin</strong></code></a></td>
+    <td>one of: <a href='undocumented#kBottomLeft_GrSurfaceOrigin'>kBottomLeft GrSurfaceOrigin</a>, <a href='undocumented#kTopLeft_GrSurfaceOrigin'>kTopLeft GrSurfaceOrigin</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATextures_imageColorSpace'><code><strong>imageColorSpace</strong></code></a></td>
+    <td>range of colors of the resulting image; may be nullptr</td>
+  </tr>
+</table>
+
+### Return Value
+
+created <a href='#SkImage'>SkImage</a>, or nullptr
+
+### See Also
+
+<a href='#SkImage_MakeFromYUVATexturesCopy'>MakeFromYUVATexturesCopy</a> <a href='#SkImage_MakeFromYUVATexturesCopyWithExternalBackend'>MakeFromYUVATexturesCopyWithExternalBackend</a>
+
+<a name='SkImage_MakeFromYUVATexturesCopyWithExternalBackend'></a>
+
+---
+
+<pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
+static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromYUVATexturesCopyWithExternalBackend'>MakeFromYUVATexturesCopyWithExternalBackend</a>(
+            <a href='undocumented#GrContext'>GrContext</a>* context,
+                        <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace, const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> yuvaTextures[],
+                        const <a href='undocumented#SkYUVAIndex'>SkYUVAIndex</a> yuvaIndices[4], <a href='undocumented#SkISize'>SkISize</a> imageSize,
+                        <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin, const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a>& backendTexture,
+                        <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorSpace'>SkColorSpace</a>&gt; imageColorSpace = nullptr)
+</pre>
+
+Creates an <a href='#SkImage'>SkImage</a> by flattening the specified YUVA planes into a single,
+interleaved RGBA image. <a href='#SkImage_MakeFromYUVATexturesCopyWithExternalBackend_backendTexture'>backendTexture</a> is used to store the result of flattening.
+<a href='#SkImage_MakeFromYUVATexturesCopyWithExternalBackend_yuvaTextures'>yuvaTextures</a> points to array of up to four YUVA textures which reside on GPU.
+YUVA textures contain YUVA planes which may be interleaved.
+
+### Parameters
+
+<table>  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopyWithExternalBackend_context'><code><strong>context</strong></code></a></td>
+    <td>GPU <a href='#SkImage_MakeFromYUVATexturesCopyWithExternalBackend_context'>context</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopyWithExternalBackend_yuvColorSpace'><code><strong>yuvColorSpace</strong></code></a></td>
+    <td>one of: <a href='SkImageInfo_Reference#kJPEG_SkYUVColorSpace'>kJPEG_SkYUVColorSpace</a>, <a href='SkImageInfo_Reference#kRec601_SkYUVColorSpace'>kRec601_SkYUVColorSpace</a>,
+<a href='SkImageInfo_Reference#kRec709_SkYUVColorSpace'>kRec709_SkYUVColorSpace</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopyWithExternalBackend_yuvaTextures'><code><strong>yuvaTextures</strong></code></a></td>
+    <td>array of YUVA textures</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopyWithExternalBackend_yuvaIndices'><code><strong>yuvaIndices</strong></code></a></td>
+    <td>array indicating <a href='#SkImage_MakeFromYUVATexturesCopyWithExternalBackend_yuvaTextures'>yuvaTextures</a> element and channel
+that map to Y, U, V, and A</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopyWithExternalBackend_imageSize'><code><strong>imageSize</strong></code></a></td>
+    <td>size of the resulting image</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopyWithExternalBackend_imageOrigin'><code><strong>imageOrigin</strong></code></a></td>
+    <td>one of: <a href='undocumented#kBottomLeft_GrSurfaceOrigin'>kBottomLeft GrSurfaceOrigin</a>, <a href='undocumented#kTopLeft_GrSurfaceOrigin'>kTopLeft GrSurfaceOrigin</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopyWithExternalBackend_backendTexture'><code><strong>backendTexture</strong></code></a></td>
+    <td>resource that stores the final pixels</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVATexturesCopyWithExternalBackend_imageColorSpace'><code><strong>imageColorSpace</strong></code></a></td>
+    <td>range of colors of the resulting image; may be nullptr</td>
+  </tr>
+</table>
+
+### Return Value
+
+created <a href='#SkImage'>SkImage</a>, or nullptr
+
+### See Also
+
+<a href='#SkImage_MakeFromYUVATexturesCopy'>MakeFromYUVATexturesCopy</a> <a href='#SkImage_MakeFromYUVATextures'>MakeFromYUVATextures</a>
+
 <a name='SkImage_MakeFromYUVTexturesCopy'></a>
-## MakeFromYUVTexturesCopy
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromYUVTexturesCopy'>MakeFromYUVTexturesCopy</a>(<a href='undocumented#GrContext'>GrContext</a>* context, <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace,
                                               const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> yuvTextures[3],
-                                              <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> surfaceOrigin,
-                                              <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorSpace'>SkColorSpace</a>&gt; <a href='#SkImage_colorSpace'>colorSpace</a> = nullptr)
+                                              <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin,
+                                              <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorSpace'>SkColorSpace</a>&gt; imageColorSpace = nullptr)
 </pre>
 
 Creates <a href='#Image'>Image</a> from copy of <a href='#SkImage_MakeFromYUVTexturesCopy_yuvTextures'>yuvTextures</a>, an array of textures on GPU.
@@ -1087,10 +989,10 @@ Creates <a href='#Image'>Image</a> from copy of <a href='#SkImage_MakeFromYUVTex
   <tr>    <td><a name='SkImage_MakeFromYUVTexturesCopy_yuvTextures'><code><strong>yuvTextures</strong></code></a></td>
     <td>array of YUV textures on GPU</td>
   </tr>
-  <tr>    <td><a name='SkImage_MakeFromYUVTexturesCopy_surfaceOrigin'><code><strong>surfaceOrigin</strong></code></a></td>
+  <tr>    <td><a name='SkImage_MakeFromYUVTexturesCopy_imageOrigin'><code><strong>imageOrigin</strong></code></a></td>
     <td>one of: <a href='undocumented#kBottomLeft_GrSurfaceOrigin'>kBottomLeft GrSurfaceOrigin</a>, <a href='undocumented#kTopLeft_GrSurfaceOrigin'>kTopLeft GrSurfaceOrigin</a></td>
   </tr>
-  <tr>    <td><a name='SkImage_MakeFromYUVTexturesCopy_colorSpace'><code><strong>colorSpace</strong></code></a></td>
+  <tr>    <td><a name='SkImage_MakeFromYUVTexturesCopy_imageColorSpace'><code><strong>imageColorSpace</strong></code></a></td>
     <td>range of colors; may be nullptr</td>
   </tr>
 </table>
@@ -1101,18 +1003,65 @@ created <a href='#Image'>Image</a>, or nullptr
 
 ### See Also
 
-<a href='#SkImage_MakeFromNV12TexturesCopy'>MakeFromNV12TexturesCopy</a>
+<a href='#SkImage_MakeFromYUVTexturesCopyWithExternalBackend'>MakeFromYUVTexturesCopyWithExternalBackend</a> <a href='#SkImage_MakeFromNV12TexturesCopy'>MakeFromNV12TexturesCopy</a> <a href='#SkImage_MakeFromYUVATexturesCopy'>MakeFromYUVATexturesCopy</a>
+
+<a name='SkImage_MakeFromYUVTexturesCopyWithExternalBackend'></a>
 
 ---
 
+<pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
+static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromYUVTexturesCopyWithExternalBackend'>MakeFromYUVTexturesCopyWithExternalBackend</a>(
+        <a href='undocumented#GrContext'>GrContext</a>* context,
+                             <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace, const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> yuvTextures[3],
+                             <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin, const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a>& backendTexture,
+                             <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorSpace'>SkColorSpace</a>&gt; imageColorSpace = nullptr) ;
+</pre>
+
+Creates <a href='#Image'>Image</a> from copy of <a href='#SkImage_MakeFromYUVTexturesCopyWithExternalBackend_yuvTextures'>yuvTextures</a>, an array of textures on GPU.
+<a href='#SkImage_MakeFromYUVTexturesCopyWithExternalBackend_yuvTextures'>yuvTextures</a> contain pixels for YUV planes of <a href='#Image'>Image</a>. Returned <a href='#Image'>Image</a> has the dimensions
+<a href='#SkImage_MakeFromYUVTexturesCopyWithExternalBackend_yuvTextures'>yuvTextures</a>[0] and stores pixels in <a href='#SkImage_MakeFromYUVTexturesCopyWithExternalBackend_backendTexture'>backendTexture</a>. <a href='#SkImage_MakeFromYUVTexturesCopyWithExternalBackend_yuvColorSpace'>yuvColorSpace</a> describes how YUV colors
+convert to RGB colors.
+
+### Parameters
+
+<table>  <tr>    <td><a name='SkImage_MakeFromYUVTexturesCopyWithExternalBackend_context'><code><strong>context</strong></code></a></td>
+    <td><a href='undocumented#GPU_Context'>GPU Context</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVTexturesCopyWithExternalBackend_yuvColorSpace'><code><strong>yuvColorSpace</strong></code></a></td>
+    <td>one of: <a href='SkImageInfo_Reference#kJPEG_SkYUVColorSpace'>kJPEG_SkYUVColorSpace</a>, <a href='SkImageInfo_Reference#kRec601_SkYUVColorSpace'>kRec601_SkYUVColorSpace</a>,
+<a href='SkImageInfo_Reference#kRec709_SkYUVColorSpace'>kRec709_SkYUVColorSpace</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVTexturesCopyWithExternalBackend_yuvTextures'><code><strong>yuvTextures</strong></code></a></td>
+    <td>array of YUV textures on GPU</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVTexturesCopyWithExternalBackend_imageOrigin'><code><strong>imageOrigin</strong></code></a></td>
+    <td>one of: <a href='undocumented#kBottomLeft_GrSurfaceOrigin'>kBottomLeft GrSurfaceOrigin</a>, <a href='undocumented#kTopLeft_GrSurfaceOrigin'>kTopLeft GrSurfaceOrigin</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVTexturesCopyWithExternalBackend_backendTexture'><code><strong>backendTexture</strong></code></a></td>
+    <td>resource that stores final pixels</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromYUVTexturesCopyWithExternalBackend_imageColorSpace'><code><strong>imageColorSpace</strong></code></a></td>
+    <td>range of colors; may be nullptr</td>
+  </tr>
+</table>
+
+### Return Value
+
+created <a href='#SkImage'>SkImage</a>, or nullptr
+
+### See Also
+
+<a href='#SkImage_MakeFromYUVTexturesCopy'>MakeFromYUVTexturesCopy</a> <a href='#SkImage_MakeFromNV12TexturesCopy'>MakeFromNV12TexturesCopy</a> <a href='#SkImage_MakeFromYUVATexturesCopyWithExternalBackend'>MakeFromYUVATexturesCopyWithExternalBackend</a>
+
 <a name='SkImage_MakeFromNV12TexturesCopy'></a>
-## MakeFromNV12TexturesCopy
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromNV12TexturesCopy'>MakeFromNV12TexturesCopy</a>(<a href='undocumented#GrContext'>GrContext</a>* context, <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace,
                                                const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> nv12Textures[2],
-                                               <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> surfaceOrigin,
-                                               <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorSpace'>SkColorSpace</a>&gt; <a href='#SkImage_colorSpace'>colorSpace</a> = nullptr)
+                                               <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin,
+                                               <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorSpace'>SkColorSpace</a>&gt; imageColorSpace = nullptr)
 </pre>
 
 Creates <a href='#Image'>Image</a> from copy of <a href='#SkImage_MakeFromNV12TexturesCopy_nv12Textures'>nv12Textures</a>, an array of textures on GPU.
@@ -1134,10 +1083,10 @@ Returned <a href='#Image'>Image</a> has the dimensions <a href='#SkImage_MakeFro
   <tr>    <td><a name='SkImage_MakeFromNV12TexturesCopy_nv12Textures'><code><strong>nv12Textures</strong></code></a></td>
     <td>array of YUV textures on GPU</td>
   </tr>
-  <tr>    <td><a name='SkImage_MakeFromNV12TexturesCopy_surfaceOrigin'><code><strong>surfaceOrigin</strong></code></a></td>
+  <tr>    <td><a name='SkImage_MakeFromNV12TexturesCopy_imageOrigin'><code><strong>imageOrigin</strong></code></a></td>
     <td>one of: <a href='undocumented#kBottomLeft_GrSurfaceOrigin'>kBottomLeft GrSurfaceOrigin</a>, <a href='undocumented#kTopLeft_GrSurfaceOrigin'>kTopLeft GrSurfaceOrigin</a></td>
   </tr>
-  <tr>    <td><a name='SkImage_MakeFromNV12TexturesCopy_colorSpace'><code><strong>colorSpace</strong></code></a></td>
+  <tr>    <td><a name='SkImage_MakeFromNV12TexturesCopy_imageColorSpace'><code><strong>imageColorSpace</strong></code></a></td>
     <td>range of colors; may be nullptr</td>
   </tr>
 </table>
@@ -1148,11 +1097,61 @@ created <a href='#Image'>Image</a>, or nullptr
 
 ### See Also
 
-<a href='#SkImage_MakeFromYUVTexturesCopy'>MakeFromYUVTexturesCopy</a>
+<a href='#SkImage_MakeFromNV12TexturesCopyWithExternalBackend'>MakeFromNV12TexturesCopyWithExternalBackend</a> <a href='#SkImage_MakeFromYUVTexturesCopy'>MakeFromYUVTexturesCopy</a> <a href='#SkImage_MakeFromYUVATexturesCopy'>MakeFromYUVATexturesCopy</a>
+
+<a name='SkImage_MakeFromNV12TexturesCopyWithExternalBackend'></a>
 
 ---
 
-## <a name='SkImage_BitDepth'>Enum SkImage::BitDepth</a>
+<pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
+static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromNV12TexturesCopyWithExternalBackend'>MakeFromNV12TexturesCopyWithExternalBackend</a>(
+            <a href='undocumented#GrContext'>GrContext</a>* context,
+                        <a href='SkImageInfo_Reference#SkYUVColorSpace'>SkYUVColorSpace</a> yuvColorSpace, const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> nv12Textures[2],
+                        <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> imageOrigin, const <a href='undocumented#GrBackendTexture'>GrBackendTexture</a>& backendTexture,
+                        <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorSpace'>SkColorSpace</a>&gt; imageColorSpace = nullptr) ;
+</pre>
+
+Creates <a href='#Image'>Image</a> from copy of <a href='#SkImage_MakeFromNV12TexturesCopyWithExternalBackend_nv12Textures'>nv12Textures</a>, an array of textures on GPU.
+<a href='#SkImage_MakeFromNV12TexturesCopyWithExternalBackend_nv12Textures'>nv12Textures</a>[0] contains pixels for <a href='undocumented#YUV_Component_Y'>YUV Component Y</a> plane.
+<a href='#SkImage_MakeFromNV12TexturesCopyWithExternalBackend_nv12Textures'>nv12Textures</a>[1] contains pixels for <a href='undocumented#YUV_Component_U'>YUV Component U</a> plane,
+followed by pixels for <a href='undocumented#YUV_Component_V'>YUV Component V</a> plane.
+Returned <a href='#Image'>Image</a> has the dimensions <a href='#SkImage_MakeFromNV12TexturesCopyWithExternalBackend_nv12Textures'>nv12Textures</a>[2] and stores pixels in <a href='#SkImage_MakeFromNV12TexturesCopyWithExternalBackend_backendTexture'>backendTexture</a>.
+<a href='#SkImage_MakeFromNV12TexturesCopyWithExternalBackend_yuvColorSpace'>yuvColorSpace</a> describes how YUV colors convert to RGB colors.
+
+### Parameters
+
+<table>  <tr>    <td><a name='SkImage_MakeFromNV12TexturesCopyWithExternalBackend_context'><code><strong>context</strong></code></a></td>
+    <td><a href='undocumented#GPU_Context'>GPU Context</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromNV12TexturesCopyWithExternalBackend_yuvColorSpace'><code><strong>yuvColorSpace</strong></code></a></td>
+    <td>one of: <a href='SkImageInfo_Reference#kJPEG_SkYUVColorSpace'>kJPEG_SkYUVColorSpace</a>, <a href='SkImageInfo_Reference#kRec601_SkYUVColorSpace'>kRec601_SkYUVColorSpace</a>,
+<a href='SkImageInfo_Reference#kRec709_SkYUVColorSpace'>kRec709_SkYUVColorSpace</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromNV12TexturesCopyWithExternalBackend_nv12Textures'><code><strong>nv12Textures</strong></code></a></td>
+    <td>array of YUV textures on GPU</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromNV12TexturesCopyWithExternalBackend_imageOrigin'><code><strong>imageOrigin</strong></code></a></td>
+    <td>one of: <a href='undocumented#kBottomLeft_GrSurfaceOrigin'>kBottomLeft GrSurfaceOrigin</a>, <a href='undocumented#kTopLeft_GrSurfaceOrigin'>kTopLeft GrSurfaceOrigin</a></td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromNV12TexturesCopyWithExternalBackend_backendTexture'><code><strong>backendTexture</strong></code></a></td>
+    <td>resource that stores final pixels</td>
+  </tr>
+  <tr>    <td><a name='SkImage_MakeFromNV12TexturesCopyWithExternalBackend_imageColorSpace'><code><strong>imageColorSpace</strong></code></a></td>
+    <td>range of colors; may be nullptr</td>
+  </tr>
+</table>
+
+### Return Value
+
+created <a href='#Image'>Image</a>, or nullptr
+
+### See Also
+
+<a href='#SkImage_MakeFromNV12TexturesCopy'>MakeFromNV12TexturesCopy</a> <a href='#SkImage_MakeFromYUVTexturesCopy'>MakeFromYUVTexturesCopy</a> <a href='#SkImage_MakeFromYUVATexturesCopyWithExternalBackend'>MakeFromYUVATexturesCopyWithExternalBackend</a>
+
+<a name='SkImage_BitDepth'></a>
+
+---
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
     enum class <a href='#SkImage_BitDepth'>BitDepth</a> {
@@ -1188,7 +1187,8 @@ Use 16 bits per ARGB component using half-precision floating point format.
 <a href='#SkImage_MakeFromPicture'>MakeFromPicture</a>
 
 <a name='SkImage_MakeFromPicture'></a>
-## MakeFromPicture
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromPicture'>MakeFromPicture</a>(<a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='SkPicture_Reference#SkPicture'>SkPicture</a>&gt; picture, const <a href='undocumented#SkISize'>SkISize</a>& dimensions,
@@ -1236,15 +1236,16 @@ created <a href='#Image'>Image</a>, or nullptr
 
 <a href='SkCanvas_Reference#SkCanvas_drawPicture'>SkCanvas::drawPicture</a><sup><a href='SkCanvas_Reference#SkCanvas_drawPicture_2'>[2]</a></sup><sup><a href='SkCanvas_Reference#SkCanvas_drawPicture_3'>[3]</a></sup><sup><a href='SkCanvas_Reference#SkCanvas_drawPicture_4'>[4]</a></sup>
 
+<a name='SkImage_MakeFromAHardwareBuffer'></a>
+
 ---
 
-<a name='SkImage_MakeFromAHardwareBuffer'></a>
-## MakeFromAHardwareBuffer
-
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
-static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromAHardwareBuffer'>MakeFromAHardwareBuffer</a>(AHardwareBuffer* hardwareBuffer,
-                                            <a href='SkImageInfo_Reference#SkAlphaType'>SkAlphaType</a> <a href='#SkImage_alphaType'>alphaType</a> = <a href='SkImageInfo_Reference#kPremul_SkAlphaType'>kPremul_SkAlphaType</a>,
-                                            <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorSpace'>SkColorSpace</a>&gt; <a href='#SkImage_colorSpace'>colorSpace</a> = nullptr)
+static <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_MakeFromAHardwareBuffer'>MakeFromAHardwareBuffer</a>(
+        AHardwareBuffer* hardwareBuffer,
+                                   <a href='SkImageInfo_Reference#SkAlphaType'>SkAlphaType</a> <a href='#SkImage_alphaType'>alphaType</a> = <a href='SkImageInfo_Reference#kPremul_SkAlphaType'>kPremul_SkAlphaType</a>,
+                                   <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorSpace'>SkColorSpace</a>&gt; <a href='#SkImage_colorSpace'>colorSpace</a> = nullptr,
+                                   <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a> surfaceOrigin = <a href='undocumented#kTopLeft_GrSurfaceOrigin'>kTopLeft GrSurfaceOrigin</a>)
 </pre>
 
 Creates <a href='#Image'>Image</a> from Android hardware buffer.
@@ -1264,6 +1265,9 @@ Only available on Android, when __ANDROID_API__ is defined to be 26 or greater.
   <tr>    <td><a name='SkImage_MakeFromAHardwareBuffer_colorSpace'><code><strong>colorSpace</strong></code></a></td>
     <td>range of colors; may be nullptr</td>
   </tr>
+  <tr>    <td><a name='SkImage_MakeFromAHardwareBuffer_surfaceOrigin'><code><strong>surfaceOrigin</strong></code></a></td>
+    <td>one of: <a href='undocumented#kBottomLeft_GrSurfaceOrigin'>kBottomLeft GrSurfaceOrigin</a>, <a href='undocumented#kTopLeft_GrSurfaceOrigin'>kTopLeft GrSurfaceOrigin</a></td>
+  </tr>
 </table>
 
 ### Return Value
@@ -1274,78 +1278,11 @@ created <a href='#Image'>Image</a>, or nullptr
 
 <a href='#SkImage_MakeFromRaster'>MakeFromRaster</a>
 
----
-
-## <a name='Property'>Property</a>
-
-
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_alphaType'>alphaType</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='SkImageInfo_Reference#Alpha_Type'>Alpha Type</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_bounds'>bounds</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='#SkImage_width'>width</a> and <a href='#SkImage_height'>height</a> as Rectangle</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_colorSpace'>colorSpace</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='undocumented#Color_Space'>Color Space</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_colorType'>colorType</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='SkImageInfo_Reference#Color_Type'>Color Type</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_dimensions'>dimensions</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='#SkImage_width'>width</a> and <a href='#SkImage_height'>height</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_getBackendTexture'>getBackendTexture</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns GPU reference to <a href='#Image'>Image</a> as texture</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_height'>height</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns pixel row count</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_isAlphaOnly'>isAlphaOnly</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns if pixels represent a transparency mask</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_isLazyGenerated'>isLazyGenerated</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns if <a href='#Image'>Image</a> is created as needed</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_isOpaque'>isOpaque</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns if <a href='SkImageInfo_Reference#Alpha_Type'>Alpha Type</a> is <a href='SkImageInfo_Reference#kOpaque_SkAlphaType'>kOpaque_SkAlphaType</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_isTextureBacked'>isTextureBacked</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns if <a href='#Image'>Image</a> was created from <a href='undocumented#GPU_Texture'>GPU Texture</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_isValid'>isValid</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns if <a href='#Image'>Image</a> can draw to <a href='undocumented#Raster_Surface'>Raster Surface</a> or <a href='undocumented#GPU_Context'>GPU Context</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_refColorSpace'>refColorSpace</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='SkImageInfo_Reference#Image_Info'>Image Info</a> <a href='undocumented#Color_Space'>Color Space</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_uniqueID'>uniqueID</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns identifier for <a href='#Image'>Image</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_width'>width</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns pixel column count</td>
-  </tr>
-</table>
+<a name='Property'></a>
 
 <a name='SkImage_width'></a>
-## width
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 int <a href='#SkImage_width'>width</a>() const
@@ -1359,16 +1296,15 @@ pixel width in <a href='#Image'>Image</a>
 
 ### Example
 
-<div><fiddle-embed name="39a6d0bbeac6d957c2338e0bff865cf8"></fiddle-embed></div>
+<div><fiddle-embed name="9aec65fc252ffc9982fa8867433eca18"></fiddle-embed></div>
 
 ### See Also
 
-<a href='#SkImage_dimensions'>dimensions</a> <a href='#SkImage_height'>height</a>
-
----
+<a href='#SkImage_dimensions'>dimensions</a>() <a href='#SkImage_height'>height</a>()
 
 <a name='SkImage_height'></a>
-## height
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 int <a href='#SkImage_height'>height</a>() const
@@ -1382,26 +1318,25 @@ pixel height in <a href='#Image'>Image</a>
 
 ### Example
 
-<div><fiddle-embed name="6e563cb8351d34bd8af555a51bcd7a96"></fiddle-embed></div>
+<div><fiddle-embed name="a4f53a0b6ac85e7bc3887245b728530d"></fiddle-embed></div>
 
 ### See Also
 
-<a href='#SkImage_dimensions'>dimensions</a> <a href='#SkImage_width'>width</a>
-
----
+<a href='#SkImage_dimensions'>dimensions</a>() <a href='#SkImage_width'>width</a>()
 
 <a name='SkImage_dimensions'></a>
-## dimensions
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkISize'>SkISize</a> <a href='#SkImage_dimensions'>dimensions</a>() const
 </pre>
 
-Returns <a href='undocumented#ISize'>ISize</a> { <a href='#SkImage_width'>width</a>, <a href='#SkImage_height'>height</a> }.
+Returns <a href='undocumented#ISize'>ISize</a> { <a href='#SkImage_width'>width</a>(), <a href='#SkImage_height'>height</a>() }.
 
 ### Return Value
 
-integral size of <a href='#SkImage_width'>width</a> and <a href='#SkImage_height'>height</a>
+integral size of <a href='#SkImage_width'>width</a>() and <a href='#SkImage_height'>height</a>()
 
 ### Example
 
@@ -1417,22 +1352,21 @@ dimensionsAsBounds == bounds
 
 ### See Also
 
-<a href='#SkImage_height'>height</a> <a href='#SkImage_width'>width</a> <a href='#SkImage_bounds'>bounds</a>
-
----
+<a href='#SkImage_height'>height</a>() <a href='#SkImage_width'>width</a>() <a href='#SkImage_bounds'>bounds</a>()
 
 <a name='SkImage_bounds'></a>
-## bounds
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='SkIRect_Reference#SkIRect'>SkIRect</a> <a href='#SkImage_bounds'>bounds</a>() const
 </pre>
 
-Returns <a href='SkIRect_Reference#IRect'>IRect</a> { 0, 0, <a href='#SkImage_width'>width</a>, <a href='#SkImage_height'>height</a> }.
+Returns <a href='SkIRect_Reference#IRect'>IRect</a> { 0, 0, <a href='#SkImage_width'>width</a>(), <a href='#SkImage_height'>height</a>() }.
 
 ### Return Value
 
-integral rectangle from origin to <a href='#SkImage_width'>width</a> and <a href='#SkImage_height'>height</a>
+integral rectangle from origin to <a href='#SkImage_width'>width</a>() and <a href='#SkImage_height'>height</a>()
 
 ### Example
 
@@ -1440,12 +1374,11 @@ integral rectangle from origin to <a href='#SkImage_width'>width</a> and <a href
 
 ### See Also
 
-<a href='#SkImage_dimensions'>dimensions</a>
-
----
+<a href='#SkImage_dimensions'>dimensions</a>()
 
 <a name='SkImage_uniqueID'></a>
-## uniqueID
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 uint32_t <a href='#SkImage_uniqueID'>uniqueID</a>() const
@@ -1467,10 +1400,9 @@ unique identifier
 
 <a href='#SkImage_isLazyGenerated'>isLazyGenerated</a>
 
----
-
 <a name='SkImage_alphaType'></a>
-## alphaType
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='SkImageInfo_Reference#SkAlphaType'>SkAlphaType</a> <a href='#SkImage_alphaType'>alphaType</a>() const
@@ -1494,10 +1426,9 @@ or was parsed from encoded data.
 
 <a href='SkImageInfo_Reference#SkImageInfo_alphaType'>SkImageInfo::alphaType</a>
 
----
-
 <a name='SkImage_colorType'></a>
-## colorType
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='SkImageInfo_Reference#SkColorType'>SkColorType</a> <a href='#SkImage_colorType'>colorType</a>() const
@@ -1517,10 +1448,9 @@ Returns <a href='SkImageInfo_Reference#Color_Type'>Color Type</a> if known; othe
 
 <a href='SkImageInfo_Reference#SkImageInfo_colorType'>SkImageInfo::colorType</a>
 
----
-
 <a name='SkImage_colorSpace'></a>
-## colorSpace
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkColorSpace'>SkColorSpace</a>* <a href='#SkImage_colorSpace'>colorSpace</a>() const
@@ -1546,10 +1476,9 @@ is drawn, depending on the capabilities of the <a href='SkSurface_Reference#Surf
 
 <a href='#SkImage_refColorSpace'>refColorSpace</a> <a href='#SkImage_makeColorSpace'>makeColorSpace</a>
 
----
-
 <a name='SkImage_refColorSpace'></a>
-## refColorSpace
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorSpace'>SkColorSpace</a>&gt; <a href='#SkImage_refColorSpace'>refColorSpace</a>() const
@@ -1577,10 +1506,9 @@ is drawn, depending on the capabilities of the <a href='SkSurface_Reference#Surf
 
 <a href='#SkImage_colorSpace'>colorSpace</a> <a href='#SkImage_makeColorSpace'>makeColorSpace</a>
 
----
-
 <a name='SkImage_isAlphaOnly'></a>
-## isAlphaOnly
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkImage_isAlphaOnly'>isAlphaOnly</a>() const
@@ -1609,10 +1537,9 @@ alphaOnly = true
 
 <a href='#SkImage_alphaType'>alphaType</a> <a href='#SkImage_isOpaque'>isOpaque</a>
 
----
-
 <a name='SkImage_isOpaque'></a>
-## isOpaque
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkImage_isOpaque'>isOpaque</a>() const
@@ -1641,10 +1568,9 @@ isOpaque = true
 
 <a href='#SkImage_alphaType'>alphaType</a> <a href='#SkImage_isAlphaOnly'>isAlphaOnly</a>
 
----
-
 <a name='SkImage_makeShader'></a>
-## makeShader
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkShader'>SkShader</a>&gt; <a href='#SkImage_makeShader'>makeShader</a>(<a href='undocumented#SkShader_TileMode'>SkShader::TileMode</a> tileMode1, <a href='undocumented#SkShader_TileMode'>SkShader::TileMode</a> tileMode2,
@@ -1682,9 +1608,9 @@ transforming <a href='#Image'>Image</a> before <a href='SkCanvas_Reference#Matri
 
 <a href='#SkImage_scalePixels'>scalePixels</a>
 
----
-
 <a name='SkImage_makeShader_2'></a>
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkShader'>SkShader</a>&gt; <a href='#SkImage_makeShader'>makeShader</a>(const <a href='SkMatrix_Reference#SkMatrix'>SkMatrix</a>* localMatrix = nullptr) const
@@ -1713,38 +1639,11 @@ transforming <a href='#Image'>Image</a> before <a href='SkCanvas_Reference#Matri
 
 <a href='#SkImage_scalePixels'>scalePixels</a>
 
----
-
-## <a name='Pixels'>Pixels</a>
-
-
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_peekPixels'>peekPixels</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='SkPixmap_Reference#Pixmap'>Pixmap</a> if possible</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_readPixels'>readPixels</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>copies and converts pixels</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_readPixels'>readPixels(const SkImageInfo& dstInfo, void* dstPixels, size t dstRowBytes, int srcX, int srcY, CachingHint cachingHint = kAllow CachingHint)</a> const</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_readPixels_2'>readPixels(const SkPixmap& dst, int srcX, int srcY, CachingHint cachingHint = kAllow CachingHint)</a> const</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_scalePixels'>scalePixels</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>scales and converts one <a href='#Image'>Image</a> to another</td>
-  </tr>
-</table>
+<a name='Pixels'></a>
 
 <a name='SkImage_peekPixels'></a>
-## peekPixels
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkImage_peekPixels'>peekPixels</a>(<a href='SkPixmap_Reference#SkPixmap'>SkPixmap</a>* pixmap) const
@@ -1791,10 +1690,9 @@ true if <a href='#Image'>Image</a> has direct access to pixels
 
 <a href='#SkImage_readPixels'>readPixels</a><sup><a href='#SkImage_readPixels_2'>[2]</a></sup>
 
----
-
 <a name='SkImage_getTexture'></a>
-## getTexture
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 GrTexture* <a href='#SkImage_getTexture'>getTexture</a>() const
@@ -1802,10 +1700,9 @@ GrTexture* <a href='#SkImage_getTexture'>getTexture</a>() const
 
 Deprecated.
 
----
-
 <a name='SkImage_isTextureBacked'></a>
-## isTextureBacked
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkImage_isTextureBacked'>isTextureBacked</a>() const
@@ -1820,16 +1717,15 @@ true if <a href='#Image'>Image</a> is a <a href='undocumented#GPU_Texture'>GPU T
 
 ### Example
 
-<div><fiddle-embed name="27a0ab44659201f1aa2ac7fea73368c2" gpu="true"></fiddle-embed></div>
+<div><fiddle-embed name="9cf5c62a3d2243e6577ae563f360ea9d" gpu="true"></fiddle-embed></div>
 
 ### See Also
 
 <a href='#SkImage_MakeFromTexture'>MakeFromTexture</a><sup><a href='#SkImage_MakeFromTexture_2'>[2]</a></sup> <a href='#SkImage_isValid'>isValid</a>
 
----
-
 <a name='SkImage_isValid'></a>
-## isValid
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkImage_isValid'>isValid</a>(<a href='undocumented#GrContext'>GrContext</a>* context) const
@@ -1856,16 +1752,15 @@ true if <a href='#Image'>Image</a> can be drawn
 
 ### Example
 
-<div><fiddle-embed name="8f7281446008cf4a9910fe73f44fa8d6" gpu="true"></fiddle-embed></div>
+<div><fiddle-embed name="afc62f38aebc56af8e425297ec67dd37" gpu="true"></fiddle-embed></div>
 
 ### See Also
 
 <a href='#SkImage_isTextureBacked'>isTextureBacked</a> <a href='#SkImage_isLazyGenerated'>isLazyGenerated</a>
 
----
-
 <a name='SkImage_getBackendTexture'></a>
-## getBackendTexture
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> <a href='#SkImage_getBackendTexture'>getBackendTexture</a>(bool flushPendingGrContextIO, <a href='undocumented#GrSurfaceOrigin'>GrSurfaceOrigin</a>* origin = nullptr) const
@@ -1902,14 +1797,14 @@ back-end API texture handle; invalid on failure
 
 <a href='#SkImage_MakeFromTexture'>MakeFromTexture</a><sup><a href='#SkImage_MakeFromTexture_2'>[2]</a></sup> <a href='#SkImage_isTextureBacked'>isTextureBacked</a>
 
----
+<a name='SkImage_CachingHint'></a>
 
-## <a name='SkImage_CachingHint'>Enum SkImage::CachingHint</a>
+---
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
     enum <a href='#SkImage_CachingHint'>CachingHint</a> {
-        <a href='#SkImage_kAllow_CachingHint'>kAllow CachingHint</a>,
-        <a href='#SkImage_kDisallow_CachingHint'>kDisallow CachingHint</a>,
+        <a href='#SkImage_kAllow_CachingHint'>kAllow_CachingHint</a>,
+        <a href='#SkImage_kDisallow_CachingHint'>kDisallow_CachingHint</a>,
     };
 </pre>
 
@@ -1949,7 +1844,8 @@ disallows internally caching decoded and copied pixels</td>
 <a href='#SkImage_readPixels'>readPixels</a><sup><a href='#SkImage_readPixels_2'>[2]</a></sup> <a href='#SkImage_scalePixels'>scalePixels</a>
 
 <a name='SkImage_readPixels'></a>
-## readPixels
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkImage_readPixels'>readPixels</a>(const <a href='SkImageInfo_Reference#SkImageInfo'>SkImageInfo</a>& dstInfo, void* dstPixels, size_t dstRowBytes, int srcX, int srcY,
@@ -1957,7 +1853,7 @@ bool <a href='#SkImage_readPixels'>readPixels</a>(const <a href='SkImageInfo_Ref
 </pre>
 
 Copies <a href='SkRect_Reference#Rect'>Rect</a> of pixels from <a href='#Image'>Image</a> to <a href='#SkImage_readPixels_dstPixels'>dstPixels</a>. Copy starts at offset (<a href='#SkImage_readPixels_srcX'>srcX</a>, <a href='#SkImage_readPixels_srcY'>srcY</a>),
-and does not exceed <a href='#Image'>Image</a> (<a href='#SkImage_width'>width</a>, <a href='#SkImage_height'>height</a>).
+and does not exceed <a href='#Image'>Image</a> (<a href='#SkImage_width'>width</a>(), <a href='#SkImage_height'>height</a>()).
 
 <a href='#SkImage_readPixels_dstInfo'>dstInfo</a> specifies width, height, <a href='SkImageInfo_Reference#Color_Type'>Color Type</a>, <a href='SkImageInfo_Reference#Alpha_Type'>Alpha Type</a>, and <a href='undocumented#Color_Space'>Color Space</a> of
 destination. <a href='#SkImage_readPixels_dstRowBytes'>dstRowBytes</a> specifics the gap from one destination row to the next.
@@ -1980,9 +1876,8 @@ match. If <a href='#Image'>Image</a> <a href='undocumented#Color_Space'>Color Sp
 false if pixel conversion is not possible.
 
 <a href='#SkImage_readPixels_srcX'>srcX</a> and <a href='#SkImage_readPixels_srcY'>srcY</a> may be negative to copy only top or left of source. Returns
-false if <a href='#SkImage_width'>width</a> or <a href='#SkImage_height'>height</a> is zero or negative.
-Returns false ifabs(srcX) >= <a href='#Image'>Image</a> <a href='#SkImage_width'>width</a>,
-or ifabs(srcY) >= <a href='#Image'>Image</a> <a href='#SkImage_height'>height</a>.
+false if <a href='#SkImage_width'>width</a>() or <a href='#SkImage_height'>height</a>() is zero or negative.
+Returns false if <code>abs(srcX)&nbsp;>=&nbsp;<a href='#Image'>Image</a> <a href='#SkImage_width'>width</a>(\)</code>, or if <code>abs(srcY)&nbsp;>=&nbsp;<a href='#Image'>Image</a> <a href='#SkImage_height'>height</a>(\)</code>.
 
 If <a href='#SkImage_readPixels_cachingHint'>cachingHint</a> is <a href='#SkImage_kAllow_CachingHint'>kAllow CachingHint</a>, pixels may be retained locally.
 If <a href='#SkImage_readPixels_cachingHint'>cachingHint</a> is <a href='#SkImage_kDisallow_CachingHint'>kDisallow CachingHint</a>, pixels are not added to the local cache.
@@ -1999,10 +1894,10 @@ If <a href='#SkImage_readPixels_cachingHint'>cachingHint</a> is <a href='#SkImag
     <td>destination row length</td>
   </tr>
   <tr>    <td><a name='SkImage_readPixels_srcX'><code><strong>srcX</strong></code></a></td>
-    <td>column index whose absolute value is less than <a href='#SkImage_width'>width</a></td>
+    <td>column index whose absolute value is less than <a href='#SkImage_width'>width</a>()</td>
   </tr>
   <tr>    <td><a name='SkImage_readPixels_srcY'><code><strong>srcY</strong></code></a></td>
-    <td>row index whose absolute value is less than <a href='#SkImage_height'>height</a></td>
+    <td>row index whose absolute value is less than <a href='#SkImage_height'>height</a>()</td>
   </tr>
   <tr>    <td><a name='SkImage_readPixels_cachingHint'><code><strong>cachingHint</strong></code></a></td>
     <td>one of: <a href='#SkImage_kAllow_CachingHint'>kAllow CachingHint</a>, <a href='#SkImage_kDisallow_CachingHint'>kDisallow CachingHint</a></td>
@@ -2021,16 +1916,16 @@ true if pixels are copied to <a href='#SkImage_readPixels_dstPixels'>dstPixels</
 
 <a href='#SkImage_scalePixels'>scalePixels</a> <a href='SkBitmap_Reference#SkBitmap_readPixels'>SkBitmap::readPixels</a><sup><a href='SkBitmap_Reference#SkBitmap_readPixels_2'>[2]</a></sup><sup><a href='SkBitmap_Reference#SkBitmap_readPixels_3'>[3]</a></sup> <a href='SkPixmap_Reference#SkPixmap_readPixels'>SkPixmap::readPixels</a><sup><a href='SkPixmap_Reference#SkPixmap_readPixels_2'>[2]</a></sup><sup><a href='SkPixmap_Reference#SkPixmap_readPixels_3'>[3]</a></sup><sup><a href='SkPixmap_Reference#SkPixmap_readPixels_4'>[4]</a></sup> <a href='SkCanvas_Reference#SkCanvas_readPixels'>SkCanvas::readPixels</a><sup><a href='SkCanvas_Reference#SkCanvas_readPixels_2'>[2]</a></sup><sup><a href='SkCanvas_Reference#SkCanvas_readPixels_3'>[3]</a></sup> <a href='SkSurface_Reference#SkSurface_readPixels'>SkSurface::readPixels</a><sup><a href='SkSurface_Reference#SkSurface_readPixels_2'>[2]</a></sup><sup><a href='SkSurface_Reference#SkSurface_readPixels_3'>[3]</a></sup>
 
----
-
 <a name='SkImage_readPixels_2'></a>
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkImage_readPixels'>readPixels</a>(const <a href='SkPixmap_Reference#SkPixmap'>SkPixmap</a>& dst, int srcX, int srcY, <a href='#SkImage_CachingHint'>CachingHint</a> cachingHint = <a href='#SkImage_kAllow_CachingHint'>kAllow CachingHint</a>) const
 </pre>
 
 Copies a <a href='SkRect_Reference#Rect'>Rect</a> of pixels from <a href='#Image'>Image</a> to <a href='#SkImage_readPixels_2_dst'>dst</a>. Copy starts at (<a href='#SkImage_readPixels_2_srcX'>srcX</a>, <a href='#SkImage_readPixels_2_srcY'>srcY</a>), and
-does not exceed <a href='#Image'>Image</a> (<a href='#SkImage_width'>width</a>, <a href='#SkImage_height'>height</a>).
+does not exceed <a href='#Image'>Image</a> (<a href='#SkImage_width'>width</a>(), <a href='#SkImage_height'>height</a>()).
 
 <a href='#SkImage_readPixels_2_dst'>dst</a> specifies width, height, <a href='SkImageInfo_Reference#Color_Type'>Color Type</a>, <a href='SkImageInfo_Reference#Alpha_Type'>Alpha Type</a>, <a href='undocumented#Color_Space'>Color Space</a>, pixel storage,
 and row bytes of destination. <a href='#SkImage_readPixels_2_dst'>dst</a>.<a href='SkPixmap_Reference#SkPixmap'>rowBytes</a> specifics the gap from one destination
@@ -2053,9 +1948,8 @@ match. If <a href='#Image'>Image</a> <a href='undocumented#Color_Space'>Color Sp
 false if pixel conversion is not possible.
 
 <a href='#SkImage_readPixels_2_srcX'>srcX</a> and <a href='#SkImage_readPixels_2_srcY'>srcY</a> may be negative to copy only top or left of source. Returns
-false if <a href='#SkImage_width'>width</a> or <a href='#SkImage_height'>height</a> is zero or negative.
-Returns false ifabs(srcX) >= <a href='#Image'>Image</a> <a href='#SkImage_width'>width</a>,
-or ifabs(srcY) >= <a href='#Image'>Image</a> <a href='#SkImage_height'>height</a>.
+false if <a href='#SkImage_width'>width</a>() or <a href='#SkImage_height'>height</a>() is zero or negative.
+Returns false if <code>abs(srcX)&nbsp;>=&nbsp;<a href='#Image'>Image</a> <a href='#SkImage_width'>width</a>(\)</code>, or if <code>abs(srcY)&nbsp;>=&nbsp;<a href='#Image'>Image</a> <a href='#SkImage_height'>height</a>(\)</code>.
 
 If <a href='#SkImage_readPixels_2_cachingHint'>cachingHint</a> is <a href='#SkImage_kAllow_CachingHint'>kAllow CachingHint</a>, pixels may be retained locally.
 If <a href='#SkImage_readPixels_2_cachingHint'>cachingHint</a> is <a href='#SkImage_kDisallow_CachingHint'>kDisallow CachingHint</a>, pixels are not added to the local cache.
@@ -2066,10 +1960,10 @@ If <a href='#SkImage_readPixels_2_cachingHint'>cachingHint</a> is <a href='#SkIm
     <td>destination <a href='SkPixmap_Reference#Pixmap'>Pixmap</a>: <a href='SkImageInfo_Reference#Image_Info'>Image Info</a>, pixels, row bytes</td>
   </tr>
   <tr>    <td><a name='SkImage_readPixels_2_srcX'><code><strong>srcX</strong></code></a></td>
-    <td>column index whose absolute value is less than <a href='#SkImage_width'>width</a></td>
+    <td>column index whose absolute value is less than <a href='#SkImage_width'>width</a>()</td>
   </tr>
   <tr>    <td><a name='SkImage_readPixels_2_srcY'><code><strong>srcY</strong></code></a></td>
-    <td>row index whose absolute value is less than <a href='#SkImage_height'>height</a></td>
+    <td>row index whose absolute value is less than <a href='#SkImage_height'>height</a>()</td>
   </tr>
   <tr>    <td><a name='SkImage_readPixels_2_cachingHint'><code><strong>cachingHint</strong></code></a></td>
     <td>one of: <a href='#SkImage_kAllow_CachingHint'>kAllow CachingHint</a>, <a href='#SkImage_kDisallow_CachingHint'>kDisallow CachingHint</a></td>
@@ -2088,17 +1982,16 @@ true if pixels are copied to <a href='#SkImage_readPixels_2_dst'>dst</a>
 
 <a href='#SkImage_scalePixels'>scalePixels</a> <a href='SkBitmap_Reference#SkBitmap_readPixels'>SkBitmap::readPixels</a><sup><a href='SkBitmap_Reference#SkBitmap_readPixels_2'>[2]</a></sup><sup><a href='SkBitmap_Reference#SkBitmap_readPixels_3'>[3]</a></sup> <a href='SkPixmap_Reference#SkPixmap_readPixels'>SkPixmap::readPixels</a><sup><a href='SkPixmap_Reference#SkPixmap_readPixels_2'>[2]</a></sup><sup><a href='SkPixmap_Reference#SkPixmap_readPixels_3'>[3]</a></sup><sup><a href='SkPixmap_Reference#SkPixmap_readPixels_4'>[4]</a></sup> <a href='SkCanvas_Reference#SkCanvas_readPixels'>SkCanvas::readPixels</a><sup><a href='SkCanvas_Reference#SkCanvas_readPixels_2'>[2]</a></sup><sup><a href='SkCanvas_Reference#SkCanvas_readPixels_3'>[3]</a></sup> <a href='SkSurface_Reference#SkSurface_readPixels'>SkSurface::readPixels</a><sup><a href='SkSurface_Reference#SkSurface_readPixels_2'>[2]</a></sup><sup><a href='SkSurface_Reference#SkSurface_readPixels_3'>[3]</a></sup>
 
----
-
 <a name='SkImage_scalePixels'></a>
-## scalePixels
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkImage_scalePixels'>scalePixels</a>(const <a href='SkPixmap_Reference#SkPixmap'>SkPixmap</a>& dst, <a href='undocumented#SkFilterQuality'>SkFilterQuality</a> filterQuality,
                  <a href='#SkImage_CachingHint'>CachingHint</a> cachingHint = <a href='#SkImage_kAllow_CachingHint'>kAllow CachingHint</a>) const
 </pre>
 
-Copies <a href='#Image'>Image</a> to <a href='#SkImage_scalePixels_dst'>dst</a>, scaling pixels to fit <a href='#SkImage_scalePixels_dst'>dst</a>.<a href='#SkImage_width'>width</a> and <a href='#SkImage_scalePixels_dst'>dst</a>.<a href='#SkImage_height'>height</a>, and
+Copies <a href='#Image'>Image</a> to <a href='#SkImage_scalePixels_dst'>dst</a>, scaling pixels to fit <a href='#SkImage_scalePixels_dst'>dst</a>.<a href='#SkImage_width'>width</a>() and <a href='#SkImage_scalePixels_dst'>dst</a>.<a href='#SkImage_height'>height</a>(), and
 converting pixels to match <a href='#SkImage_scalePixels_dst'>dst</a>.<a href='#SkImage_colorType'>colorType</a> and <a href='#SkImage_scalePixels_dst'>dst</a>.<a href='#SkImage_alphaType'>alphaType</a>. Returns true if
 pixels are copied. Returns false if <a href='#SkImage_scalePixels_dst'>dst</a>.addr() is nullptr, or <a href='#SkImage_scalePixels_dst'>dst</a>.<a href='SkPixmap_Reference#SkPixmap'>rowBytes</a> is
 less than <a href='#SkImage_scalePixels_dst'>dst</a> <a href='SkImageInfo_Reference#SkImageInfo_minRowBytes'>SkImageInfo::minRowBytes</a>.
@@ -2110,7 +2003,7 @@ If <a href='#Image'>Image</a> <a href='SkImageInfo_Reference#Alpha_Type'>Alpha T
 match. If <a href='#Image'>Image</a> <a href='undocumented#Color_Space'>Color Space</a> is nullptr, <a href='#SkImage_scalePixels_dst'>dst</a>.<a href='#SkImage_colorSpace'>colorSpace</a> must match. Returns
 false if pixel conversion is not possible.
 
-Scales the image, with <a href='#SkImage_scalePixels_filterQuality'>filterQuality</a>, to match <a href='#SkImage_scalePixels_dst'>dst</a>.<a href='#SkImage_width'>width</a> and <a href='#SkImage_scalePixels_dst'>dst</a>.<a href='#SkImage_height'>height</a>.
+Scales the image, with <a href='#SkImage_scalePixels_filterQuality'>filterQuality</a>, to match <a href='#SkImage_scalePixels_dst'>dst</a>.<a href='#SkImage_width'>width</a>() and <a href='#SkImage_scalePixels_dst'>dst</a>.<a href='#SkImage_height'>height</a>().
 <a href='#SkImage_scalePixels_filterQuality'>filterQuality</a> <a href='undocumented#kNone_SkFilterQuality'>kNone_SkFilterQuality</a> is fastest, typically implemented with
 <a href='undocumented#Nearest_Neighbor'>Filter Quality Nearest Neighbor</a>. <a href='undocumented#kLow_SkFilterQuality'>kLow_SkFilterQuality</a> is typically implemented with
 <a href='undocumented#Bilerp'>Filter Quality Bilerp</a>. <a href='undocumented#kMedium_SkFilterQuality'>kMedium_SkFilterQuality</a> is typically implemented with
@@ -2146,10 +2039,9 @@ true if pixels are scaled to fit <a href='#SkImage_scalePixels_dst'>dst</a>
 
 <a href='SkCanvas_Reference#SkCanvas_drawImage'>SkCanvas::drawImage</a><sup><a href='SkCanvas_Reference#SkCanvas_drawImage_2'>[2]</a></sup> <a href='#SkImage_readPixels'>readPixels</a><sup><a href='#SkImage_readPixels_2'>[2]</a></sup> <a href='SkPixmap_Reference#SkPixmap_scalePixels'>SkPixmap::scalePixels</a>
 
----
-
 <a name='SkImage_encodeToData'></a>
-## encodeToData
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkData'>SkData</a>&gt; <a href='#SkImage_encodeToData'>encodeToData</a>(<a href='undocumented#SkEncodedImageFormat'>SkEncodedImageFormat</a> encodedImageFormat, int quality) const
@@ -2194,9 +2086,9 @@ encoded <a href='#Image'>Image</a>, or nullptr
 
 <a href='#SkImage_refEncodedData'>refEncodedData</a> <a href='#SkImage_MakeFromEncoded'>MakeFromEncoded</a>
 
----
-
 <a name='SkImage_encodeToData_2'></a>
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkData'>SkData</a>&gt; <a href='#SkImage_encodeToData'>encodeToData</a>() const
@@ -2221,10 +2113,9 @@ encoded <a href='#Image'>Image</a>, or nullptr
 
 <a href='#SkImage_refEncodedData'>refEncodedData</a> <a href='#SkImage_MakeFromEncoded'>MakeFromEncoded</a>
 
----
-
 <a name='SkImage_refEncodedData'></a>
-## refEncodedData
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkData'>SkData</a>&gt; <a href='#SkImage_refEncodedData'>refEncodedData</a>() const
@@ -2248,40 +2139,17 @@ encoded <a href='#Image'>Image</a>, or nullptr
 
 <a href='#SkImage_encodeToData'>encodeToData</a><sup><a href='#SkImage_encodeToData_2'>[2]</a></sup> <a href='#SkImage_MakeFromEncoded'>MakeFromEncoded</a>
 
----
-
-## <a name='Utility'>Utility</a>
-
-
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_encodeToData'>encodeToData</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns encoded <a href='#Image'>Image</a> as <a href='undocumented#SkData'>SkData</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_encodeToData'>encodeToData(SkEncodedImageFormat encodedImageFormat, int quality)</a> const</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_encodeToData_2'>encodeToData</a> const</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkImage_refEncodedData'>refEncodedData</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='#Image'>Image</a> encoded in <a href='undocumented#SkData'>SkData</a> if present</td>
-  </tr>
-</table>
+<a name='Utility'></a>
 
 <a name='SkImage_makeSubset'></a>
-## makeSubset
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_makeSubset'>makeSubset</a>(const <a href='SkIRect_Reference#SkIRect'>SkIRect</a>& subset) const
 </pre>
 
-Returns <a href='#SkImage_makeSubset_subset'>subset</a> of <a href='#Image'>Image</a>. <a href='#SkImage_makeSubset_subset'>subset</a> must be fully contained by <a href='#Image'>Image</a> <a href='#SkImage_dimensions'>dimensions</a>.
+Returns <a href='#SkImage_makeSubset_subset'>subset</a> of <a href='#Image'>Image</a>. <a href='#SkImage_makeSubset_subset'>subset</a> must be fully contained by <a href='#Image'>Image</a> <a href='#SkImage_dimensions'>dimensions</a>().
 The implementation may share pixels, or may copy them.
 
 Returns nullptr if <a href='#SkImage_makeSubset_subset'>subset</a> is empty, or <a href='#SkImage_makeSubset_subset'>subset</a> is not contained by bounds, or
@@ -2306,10 +2174,9 @@ partial or full <a href='#Image'>Image</a>, or nullptr
 
 <a href='#SkImage_MakeFromEncoded'>MakeFromEncoded</a>
 
----
-
 <a name='SkImage_makeTextureImage'></a>
-## makeTextureImage
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_makeTextureImage'>makeTextureImage</a>(<a href='undocumented#GrContext'>GrContext</a>* context, <a href='undocumented#SkColorSpace'>SkColorSpace</a>* dstColorSpace,
@@ -2344,16 +2211,15 @@ created <a href='#Image'>Image</a>, or nullptr
 
 ### Example
 
-<div><fiddle-embed name="b14d9debfe87295373b44a179992a999" gpu="true"></fiddle-embed></div>
+<div><fiddle-embed name="eeec9e07e604b44d0208899a2fe5bef5" gpu="true"></fiddle-embed></div>
 
 ### See Also
 
 <a href='#SkImage_MakeFromTexture'>MakeFromTexture</a><sup><a href='#SkImage_MakeFromTexture_2'>[2]</a></sup>
 
----
-
 <a name='SkImage_makeNonTextureImage'></a>
-## makeNonTextureImage
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_makeNonTextureImage'>makeNonTextureImage</a>() const
@@ -2371,16 +2237,15 @@ Returns nullptr if backed by <a href='undocumented#GPU_Texture'>GPU Texture</a> 
 
 ### Example
 
-<div><fiddle-embed name="c77bfb00fb82e378eea4b7f7c18a8b84" gpu="true"></fiddle-embed></div>
+<div><fiddle-embed name="ecdbaff44a02c310ef672b7d393c6dea" gpu="true"></fiddle-embed></div>
 
 ### See Also
 
 <a href='#SkImage_makeTextureImage'>makeTextureImage</a> <a href='#SkImage_makeRasterImage'>makeRasterImage</a> <a href='#SkImage_MakeBackendTextureFromSkImage'>MakeBackendTextureFromSkImage</a>
 
----
-
 <a name='SkImage_makeRasterImage'></a>
-## makeRasterImage
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_makeRasterImage'>makeRasterImage</a>() const
@@ -2398,16 +2263,15 @@ Returns nullptr if copy, decode, or pixel read fails.
 
 ### Example
 
-<div><fiddle-embed name="505a6d9458394b1deb5d2f6c44e1cd76" gpu="true"></fiddle-embed></div>
+<div><fiddle-embed name="aed5f399915d40bb5d133ab586e5bac3" gpu="true"></fiddle-embed></div>
 
 ### See Also
 
 <a href='#SkImage_isTextureBacked'>isTextureBacked</a> <a href='#SkImage_isLazyGenerated'>isLazyGenerated</a> <a href='#SkImage_MakeFromRaster'>MakeFromRaster</a>
 
----
-
 <a name='SkImage_makeWithFilter'></a>
-## makeWithFilter
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_makeWithFilter'>makeWithFilter</a>(const <a href='undocumented#SkImageFilter'>SkImageFilter</a>* filter, const <a href='SkIRect_Reference#SkIRect'>SkIRect</a>& subset,
@@ -2454,7 +2318,7 @@ filtered <a href='#Image'>Image</a>, or nullptr
 
 ### Example
 
-<div><fiddle-embed name="17547129251dd9607c381a3cc30cff15" gpu="true"><div>In each frame of the animation, filtered <a href='#Image'>Image</a> is drawn in a different location.
+<div><fiddle-embed name="85a76163138a2720ac003691d6363938" gpu="true"><div>In each frame of the animation, filtered <a href='#Image'>Image</a> is drawn in a different location.
 By translating canvas by returned <a href='#SkImage_makeWithFilter_offset'>offset</a>, <a href='#Image'>Image</a> appears stationary.
 </div></fiddle-embed></div>
 
@@ -2462,20 +2326,22 @@ By translating canvas by returned <a href='#SkImage_makeWithFilter_offset'>offse
 
 <a href='#SkImage_makeShader'>makeShader</a><sup><a href='#SkImage_makeShader_2'>[2]</a></sup> <a href='SkPaint_Reference#SkPaint_setImageFilter'>SkPaint::setImageFilter</a>
 
+<a name='SkImage_BackendTextureReleaseProc'></a>
+
 ---
 
-## <a name='SkImage_BackendTextureReleaseProc'>Typedef SkImage::BackendTextureReleaseProc</a>
 <a href='#SkImage_BackendTextureReleaseProc'>BackendTextureReleaseProc</a>
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
-typedef std::function<void(GrBackendTexture)> <a href='#SkImage_BackendTextureReleaseProc'>BackendTextureReleaseProc</a>;
+    typedef std::function<void(GrBackendTexture)> <a href='#SkImage_BackendTextureReleaseProc'>BackendTextureReleaseProc</a>;
 </pre>
 
 Defines a callback function, taking one parameter of type <a href='undocumented#GrBackendTexture'>GrBackendTexture</a> with
 no return value. Function is called when back-end texture is to be released.
 
 <a name='SkImage_MakeBackendTextureFromSkImage'></a>
-## MakeBackendTextureFromSkImage
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 static bool <a href='#SkImage_MakeBackendTextureFromSkImage'>MakeBackendTextureFromSkImage</a>(<a href='undocumented#GrContext'>GrContext</a>* context, <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; image,
@@ -2526,17 +2392,15 @@ true if back-end texture was created
 
 <a href='#SkImage_MakeFromTexture'>MakeFromTexture</a><sup><a href='#SkImage_MakeFromTexture_2'>[2]</a></sup> <a href='#SkImage_makeTextureImage'>makeTextureImage</a>
 
+<a name='SkImage_LegacyBitmapMode'></a>
+
 ---
 
-## <a name='SkImage_LegacyBitmapMode'>Enum SkImage::LegacyBitmapMode</a>
-
-Deprecated.
-
-soon
+To be deprecated soon.
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
     enum <a href='#SkImage_LegacyBitmapMode'>LegacyBitmapMode</a> {
-        <a href='#SkImage_kRO_LegacyBitmapMode'>kRO LegacyBitmapMode</a>,
+        <a href='#SkImage_kRO_LegacyBitmapMode'>kRO_LegacyBitmapMode</a>,
     };
 </pre>
 
@@ -2555,7 +2419,8 @@ returned bitmap is read-only and immutable</td>
 </table>
 
 <a name='SkImage_asLegacyBitmap'></a>
-## asLegacyBitmap
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkImage_asLegacyBitmap'>asLegacyBitmap</a>(<a href='SkBitmap_Reference#SkBitmap'>SkBitmap</a>* bitmap, <a href='#SkImage_LegacyBitmapMode'>LegacyBitmapMode</a> legacyBitmapMode = <a href='#SkImage_kRO_LegacyBitmapMode'>kRO LegacyBitmapMode</a>) const
@@ -2588,10 +2453,9 @@ true if <a href='SkBitmap_Reference#Bitmap'>Bitmap</a> was created
 
 <a href='#SkImage_MakeRasterData'>MakeRasterData</a> <a href='#SkImage_makeRasterImage'>makeRasterImage</a> <a href='#SkImage_makeNonTextureImage'>makeNonTextureImage</a>
 
----
-
 <a name='SkImage_isLazyGenerated'></a>
-## isLazyGenerated
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkImage_isLazyGenerated'>isLazyGenerated</a>() const
@@ -2610,16 +2474,15 @@ true if <a href='#Image'>Image</a> is created as needed
 
 ### Example
 
-<div><fiddle-embed name="25305461b916baf40d7d379e04a5589c" gpu="true"></fiddle-embed></div>
+<div><fiddle-embed name="f031c2a53f6a57833dc0127e674553da" gpu="true"></fiddle-embed></div>
 
 ### See Also
 
 <a href='#SkImage_isTextureBacked'>isTextureBacked</a> MakeNonTextureImage
 
----
-
 <a name='SkImage_makeColorSpace'></a>
-## makeColorSpace
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='#SkImage'>SkImage</a>&gt; <a href='#SkImage_makeColorSpace'>makeColorSpace</a>(<a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorSpace'>SkColorSpace</a>&gt; target) const
@@ -2650,6 +2513,4 @@ created <a href='#Image'>Image</a> in <a href='#SkImage_makeColorSpace_target'>t
 ### See Also
 
 MakeFromPixture <a href='#SkImage_MakeFromTexture'>MakeFromTexture</a><sup><a href='#SkImage_MakeFromTexture_2'>[2]</a></sup>
-
----
 

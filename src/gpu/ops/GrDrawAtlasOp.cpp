@@ -15,7 +15,7 @@
 
 static sk_sp<GrGeometryProcessor> make_gp(const GrShaderCaps* shaderCaps,
                                           bool hasColors,
-                                          GrColor color,
+                                          const GrColor4h& color,
                                           const SkMatrix& viewMatrix) {
     using namespace GrDefaultGeoProcFactory;
     Color gpColor(color);
@@ -27,7 +27,7 @@ static sk_sp<GrGeometryProcessor> make_gp(const GrShaderCaps* shaderCaps,
                                          LocalCoords::kHasExplicit_Type, viewMatrix);
 }
 
-GrDrawAtlasOp::GrDrawAtlasOp(const Helper::MakeArgs& helperArgs, GrColor color,
+GrDrawAtlasOp::GrDrawAtlasOp(const Helper::MakeArgs& helperArgs, const GrColor4h& color,
                              const SkMatrix& viewMatrix, GrAAType aaType, int spriteCount,
                              const SkRSXform* xforms, const SkRect* rects, const SkColor* colors)
         : INHERITED(ClassID()), fHelper(helperArgs, aaType), fColor(color) {
@@ -55,7 +55,8 @@ GrDrawAtlasOp::GrDrawAtlasOp(const Helper::MakeArgs& helperArgs, GrColor color,
     uint8_t* currVertex = installedGeo.fVerts.begin();
 
     SkRect bounds = SkRectPriv::MakeLargestInverted();
-    int paintAlpha = GrColorUnpackA(installedGeo.fColor);
+    // TODO4F: Preserve float colors
+    int paintAlpha = GrColorUnpackA(installedGeo.fColor.toGrColor());
     for (int spriteIndex = 0; spriteIndex < spriteCount; ++spriteIndex) {
         // Transform rect
         SkPoint strip[4];
@@ -111,7 +112,7 @@ GrDrawAtlasOp::GrDrawAtlasOp(const Helper::MakeArgs& helperArgs, GrColor color,
 SkString GrDrawAtlasOp::dumpInfo() const {
     SkString string;
     for (const auto& geo : fGeoData) {
-        string.appendf("Color: 0x%08x, Quads: %d\n", geo.fColor, geo.fVerts.count() / 4);
+        string.appendf("Color: 0x%08x, Quads: %d\n", geo.fColor.toGrColor(), geo.fVerts.count()/4);
     }
     string += fHelper.dumpInfo();
     string += INHERITED::dumpInfo();
@@ -130,9 +131,9 @@ void GrDrawAtlasOp::onPrepareDraws(Target* target) {
             sizeof(SkPoint) + sizeof(SkPoint) + (this->hasColors() ? sizeof(GrColor) : 0);
     SkASSERT(vertexStride == gp->debugOnly_vertexStride());
 
-    QuadHelper helper;
     int numQuads = this->quadCount();
-    void* verts = helper.init(target, vertexStride, numQuads);
+    QuadHelper helper(target, vertexStride, numQuads);
+    void* verts = helper.vertices();
     if (!verts) {
         SkDebugf("Could not allocate vertices\n");
         return;
@@ -150,31 +151,30 @@ void GrDrawAtlasOp::onPrepareDraws(Target* target) {
     helper.recordDraw(target, std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState);
 }
 
-bool GrDrawAtlasOp::onCombineIfPossible(GrOp* t, const GrCaps& caps) {
+GrOp::CombineResult GrDrawAtlasOp::onCombineIfPossible(GrOp* t, const GrCaps& caps) {
     GrDrawAtlasOp* that = t->cast<GrDrawAtlasOp>();
 
     if (!fHelper.isCompatible(that->fHelper, caps, this->bounds(), that->bounds())) {
-        return false;
+        return CombineResult::kCannotCombine;
     }
 
     // We currently use a uniform viewmatrix for this op.
     if (!this->viewMatrix().cheapEqualTo(that->viewMatrix())) {
-        return false;
+        return CombineResult::kCannotCombine;
     }
 
     if (this->hasColors() != that->hasColors()) {
-        return false;
+        return CombineResult::kCannotCombine;
     }
 
     if (!this->hasColors() && this->color() != that->color()) {
-        return false;
+        return CombineResult::kCannotCombine;
     }
 
     fGeoData.push_back_n(that->fGeoData.count(), that->fGeoData.begin());
     fQuadCount += that->quadCount();
 
-    this->joinBounds(*that);
-    return true;
+    return CombineResult::kMerged;
 }
 
 GrDrawOp::FixedFunctionFlags GrDrawAtlasOp::fixedFunctionFlags() const {

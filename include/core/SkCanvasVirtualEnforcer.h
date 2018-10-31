@@ -36,8 +36,6 @@ protected:
                        const SkPaint& paint) override = 0;
     void onDrawPosTextH(const void* text, size_t byteLength, const SkScalar xpos[],
                         SkScalar constY, const SkPaint& paint) override = 0;
-    void onDrawTextOnPath(const void* text, size_t byteLength, const SkPath& path,
-                          const SkMatrix* matrix, const SkPaint& paint) override = 0;
     void onDrawTextRSXform(const void* text, size_t byteLength, const SkRSXform xform[],
                            const SkRect* cullRect, const SkPaint& paint) override = 0;
     void onDrawTextBlob(const SkTextBlob* blob, SkScalar x, SkScalar y,
@@ -48,8 +46,8 @@ protected:
                      const SkPaint& paint) override = 0;
     void onDrawPoints(SkCanvas::PointMode mode, size_t count, const SkPoint pts[],
                       const SkPaint& paint) override = 0;
-    void onDrawVerticesObject(const SkVertices*, const SkMatrix* bones, int boneCount, SkBlendMode,
-                              const SkPaint&) override = 0;
+    void onDrawVerticesObject(const SkVertices*, const SkVertices::Bone bones[], int boneCount,
+                              SkBlendMode, const SkPaint&) override = 0;
 
     void onDrawImage(const SkImage* image, SkScalar dx, SkScalar dy,
                      const SkPaint* paint) override = 0;
@@ -59,6 +57,16 @@ protected:
                          const SkPaint* paint) override = 0;
     void onDrawImageLattice(const SkImage* image, const SkCanvas::Lattice& lattice,
                             const SkRect& dst, const SkPaint* paint) override = 0;
+
+#ifdef SK_BUILD_FOR_ANDROID_FRAMEWORK
+    // This is under active development for Chrome and not used in Android. Hold off on adding
+    // implementations in Android's SkCanvas subclasses until this stabilizes.
+    void onDrawImageSet(const SkCanvas::ImageSetEntry[], int count, float alpha, SkFilterQuality,
+                        SkBlendMode) override {};
+#else
+    void onDrawImageSet(const SkCanvas::ImageSetEntry[], int count, float alpha, SkFilterQuality,
+                        SkBlendMode) override = 0;
+#endif
 
     void onDrawBitmap(const SkBitmap& bitmap, SkScalar dx, SkScalar dy,
                       const SkPaint* paint) override = 0;

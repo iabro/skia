@@ -7,6 +7,7 @@
 
 #include "GrAtlasTextOp.h"
 
+#include "GrCaps.h"
 #include "GrContext.h"
 #include "GrContextPriv.h"
 #include "GrMemoryPool.h"
@@ -112,7 +113,7 @@ void GrAtlasTextOp::init() {
     this->setBounds(bounds, HasAABloat::kNo, IsZeroArea::kNo);
 }
 
-void GrAtlasTextOp::visitProxies(const VisitProxyFunc& func) const {
+void GrAtlasTextOp::visitProxies(const VisitProxyFunc& func, VisitorType) const {
     fProcessors.visitProxies(func);
 }
 
@@ -122,7 +123,7 @@ SkString GrAtlasTextOp::dumpInfo() const {
     for (int i = 0; i < fGeoCount; ++i) {
         str.appendf("%d: Color: 0x%08x Trans: %.2f,%.2f Runs: %d\n",
                     i,
-                    fGeoData[i].fColor,
+                    fGeoData[i].fColor.toGrColor(),
                     fGeoData[i].fX,
                     fGeoData[i].fY,
                     fGeoData[i].fBlob->runCount());
@@ -312,13 +313,14 @@ void GrAtlasTextOp::onPrepareDraws(Target* target) {
 
     bool vmPerspective = fGeoData[0].fViewMatrix.hasPerspective();
     if (this->usesDistanceFields()) {
-        flushInfo.fGeometryProcessor = this->setupDfProcessor(proxies, numActiveProxies);
+        flushInfo.fGeometryProcessor = this->setupDfProcessor(*target->caps().shaderCaps(),
+                                                              proxies, numActiveProxies);
     } else {
         GrSamplerState samplerState = fNeedsGlyphTransform ? GrSamplerState::ClampBilerp()
                                                            : GrSamplerState::ClampNearest();
         flushInfo.fGeometryProcessor = GrBitmapTextGeoProc::Make(
-            this->color(), proxies, numActiveProxies, samplerState, maskFormat,
-            localMatrix, vmPerspective);
+            *target->caps().shaderCaps(), this->color(), proxies, numActiveProxies, samplerState,
+            maskFormat, localMatrix, vmPerspective);
     }
 
     flushInfo.fGlyphsToFlush = 0;
@@ -344,9 +346,10 @@ void GrAtlasTextOp::onPrepareDraws(Target* target) {
     for (int i = 0; i < fGeoCount; i++) {
         const Geometry& args = fGeoData[i];
         Blob* blob = args.fBlob;
+        // TODO4F: Preserve float colors
         GrTextBlob::VertexRegenerator regenerator(
                 resourceProvider, blob, args.fRun, args.fSubRun, args.fViewMatrix, args.fX, args.fY,
-                args.fColor, target->deferredUploadTarget(), glyphCache, atlasManager,
+                args.fColor.toGrColor(), target->deferredUploadTarget(), glyphCache, atlasManager,
                 &autoGlyphCache);
         bool done = false;
         while (!done) {
@@ -425,61 +428,60 @@ void GrAtlasTextOp::flush(GrMeshDrawOp::Target* target, FlushInfo* flushInfo) co
                                                                       samplerState);
         }
     }
-    GrMesh mesh(GrPrimitiveType::kTriangles);
     int maxGlyphsPerDraw =
             static_cast<int>(flushInfo->fIndexBuffer->gpuMemorySize() / sizeof(uint16_t) / 6);
-    mesh.setIndexedPatterned(flushInfo->fIndexBuffer.get(), kIndicesPerGlyph, kVerticesPerGlyph,
-                             flushInfo->fGlyphsToFlush, maxGlyphsPerDraw);
-    mesh.setVertexData(flushInfo->fVertexBuffer.get(), flushInfo->fVertexOffset);
+    GrMesh* mesh = target->allocMesh(GrPrimitiveType::kTriangles);
+    mesh->setIndexedPatterned(flushInfo->fIndexBuffer.get(), kIndicesPerGlyph, kVerticesPerGlyph,
+                              flushInfo->fGlyphsToFlush, maxGlyphsPerDraw);
+    mesh->setVertexData(flushInfo->fVertexBuffer.get(), flushInfo->fVertexOffset);
     target->draw(flushInfo->fGeometryProcessor, flushInfo->fPipeline, flushInfo->fFixedDynamicState,
                  mesh);
     flushInfo->fVertexOffset += kVerticesPerGlyph * flushInfo->fGlyphsToFlush;
     flushInfo->fGlyphsToFlush = 0;
 }
 
-bool GrAtlasTextOp::onCombineIfPossible(GrOp* t, const GrCaps& caps) {
+GrOp::CombineResult GrAtlasTextOp::onCombineIfPossible(GrOp* t, const GrCaps& caps) {
     GrAtlasTextOp* that = t->cast<GrAtlasTextOp>();
     if (fProcessors != that->fProcessors) {
-        return false;
+        return CombineResult::kCannotCombine;
     }
 
     if (!fCanCombineOnTouchOrOverlap && GrRectsTouchOrOverlap(this->bounds(), that->bounds())) {
-        return false;
+        return CombineResult::kCannotCombine;
     }
 
     if (fMaskType != that->fMaskType) {
-        return false;
+        return CombineResult::kCannotCombine;
     }
 
     const SkMatrix& thisFirstMatrix = fGeoData[0].fViewMatrix;
     const SkMatrix& thatFirstMatrix = that->fGeoData[0].fViewMatrix;
 
     if (this->usesLocalCoords() && !thisFirstMatrix.cheapEqualTo(thatFirstMatrix)) {
-        return false;
+        return CombineResult::kCannotCombine;
     }
 
     if (fNeedsGlyphTransform != that->fNeedsGlyphTransform) {
-        return false;
+        return CombineResult::kCannotCombine;
     }
 
     if (fNeedsGlyphTransform &&
         (thisFirstMatrix.hasPerspective() != thatFirstMatrix.hasPerspective())) {
-        return false;
+        return CombineResult::kCannotCombine;
     }
 
     if (this->usesDistanceFields()) {
         if (fDFGPFlags != that->fDFGPFlags) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (fLuminanceColor != that->fLuminanceColor) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
     } else {
         if (kColorBitmapMask_MaskType == fMaskType && this->color() != that->color()) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
-
     }
 
     // Keep the batch vertex buffer size below 32K so we don't have to create a special one
@@ -487,7 +489,7 @@ bool GrAtlasTextOp::onCombineIfPossible(GrOp* t, const GrCaps& caps) {
     static const int kVertexSize = sizeof(SkPoint) + sizeof(SkColor) + 2 * sizeof(uint16_t);
     static const int kMaxGlyphs = 32768 / (kVerticesPerGlyph * kVertexSize);
     if (this->fNumGlyphs + that->fNumGlyphs > kMaxGlyphs) {
-        return false;
+        return CombineResult::kCannotCombine;
     }
 
     fNumGlyphs += that->numGlyphs();
@@ -516,13 +518,13 @@ bool GrAtlasTextOp::onCombineIfPossible(GrOp* t, const GrCaps& caps) {
     that->fGeoCount = 0;
     fGeoCount = newGeoCount;
 
-    this->joinBounds(*that);
-    return true;
+    return CombineResult::kMerged;
 }
 
 // TODO trying to figure out why lcd is so whack
 // (see comments in GrTextContext::ComputeCanonicalColor)
-sk_sp<GrGeometryProcessor> GrAtlasTextOp::setupDfProcessor(const sk_sp<GrTextureProxy>* proxies,
+sk_sp<GrGeometryProcessor> GrAtlasTextOp::setupDfProcessor(const GrShaderCaps& caps,
+                                                           const sk_sp<GrTextureProxy>* proxies,
                                                            unsigned int numActiveProxies) const {
     bool isLCD = this->isLCD();
 
@@ -547,7 +549,7 @@ sk_sp<GrGeometryProcessor> GrAtlasTextOp::setupDfProcessor(const sk_sp<GrTexture
         GrDistanceFieldLCDTextGeoProc::DistanceAdjust widthAdjust =
                 GrDistanceFieldLCDTextGeoProc::DistanceAdjust::Make(
                         redCorrection, greenCorrection, blueCorrection);
-        return GrDistanceFieldLCDTextGeoProc::Make(proxies, numActiveProxies,
+        return GrDistanceFieldLCDTextGeoProc::Make(caps, proxies, numActiveProxies,
                                                    GrSamplerState::ClampBilerp(), widthAdjust,
                                                    fDFGPFlags, localMatrix);
     } else {
@@ -559,11 +561,11 @@ sk_sp<GrGeometryProcessor> GrAtlasTextOp::setupDfProcessor(const sk_sp<GrTexture
             correction = fDistanceAdjustTable->getAdjustment(lum >> kDistanceAdjustLumShift,
                                                              fUseGammaCorrectDistanceTable);
         }
-        return GrDistanceFieldA8TextGeoProc::Make(proxies, numActiveProxies,
+        return GrDistanceFieldA8TextGeoProc::Make(caps, proxies, numActiveProxies,
                                                   GrSamplerState::ClampBilerp(),
                                                   correction, fDFGPFlags, localMatrix);
 #else
-        return GrDistanceFieldA8TextGeoProc::Make(proxies, numActiveProxies,
+        return GrDistanceFieldA8TextGeoProc::Make(caps, proxies, numActiveProxies,
                                                   GrSamplerState::ClampBilerp(),
                                                   fDFGPFlags, localMatrix);
 #endif

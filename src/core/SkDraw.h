@@ -11,25 +11,21 @@
 #define SkDraw_DEFINED
 
 #include "SkCanvas.h"
-#include "SkGlyphRun.h"
+#include "SkGlyphRunPainter.h"
 #include "SkMask.h"
 #include "SkPaint.h"
 #include "SkPixmap.h"
 #include "SkStrokeRec.h"
 #include "SkVertices.h"
-#include "SkScalerContext.h"
 
 class SkBitmap;
 class SkClipStack;
 class SkBaseDevice;
 class SkBlitter;
-class SkGlyphRun;
-class SkGlyphRunList;
 class SkMatrix;
 class SkPath;
 class SkRegion;
 class SkRasterClip;
-struct SkDrawProcs;
 struct SkRect;
 class SkRRect;
 
@@ -64,17 +60,14 @@ public:
     void    drawBitmap(const SkBitmap&, const SkMatrix&, const SkRect* dstOrNull,
                        const SkPaint&) const;
     void    drawSprite(const SkBitmap&, int x, int y, const SkPaint&) const;
-    void    drawPosText(const char text[], size_t byteLength,
-                        const SkScalar pos[], int scalarsPerPosition,
-                        const SkPoint& offset, const SkPaint&, const SkSurfaceProps*) const;
     void    drawGlyphRunList(const SkGlyphRunList& glyphRunList,
-                             SkGlyphRunListDrawer* glyphDraw) const;
+                             SkGlyphRunListPainter* glyphPainter) const;
     void    drawVertices(SkVertices::VertexMode mode, int vertexCount,
                          const SkPoint vertices[], const SkPoint textures[],
                          const SkColor colors[], const SkVertices::BoneIndices boneIndices[],
                          const SkVertices::BoneWeights boneWeights[], SkBlendMode bmode,
                          const uint16_t indices[], int ptCount,
-                         const SkPaint& paint, const SkMatrix* bones, int boneCount) const;
+                         const SkPaint& paint, const SkVertices::Bone bones[], int boneCount) const;
 
     /**
      *  Overwrite the target with the path's coverage (i.e. its mask).
@@ -88,6 +81,10 @@ public:
                           paint.getStrokeWidth() > 0;
         this->drawPath(src, paint, nullptr, false, !isHairline, customBlitter);
     }
+
+    static bool ComputeMaskBounds(const SkRect& devPathBounds, const SkIRect* clipBounds,
+                                  const SkMaskFilter* filter, const SkMatrix* filterMatrix,
+                                  SkIRect* bounds);
 
     /** Helper function that creates a mask from a path and an optional maskfilter.
         Note however, that the resulting mask will not have been actually filtered,
@@ -125,18 +122,25 @@ public:
                                     const SkPaint&, const SkSurfaceProps*) const;
     static SkScalar ComputeResScaleForStroking(const SkMatrix& );
 private:
-    void blitARGB32Mask(const SkMask& mask, const SkPaint& paint) const;
-    SkGlyphRunListDrawer::PerMask drawOneMaskCreator(
-            const SkPaint& paint, SkArenaAlloc* alloc) const;
-    void    drawBitmapAsMask(const SkBitmap&, const SkPaint&) const;
+    SkGlyphRunListPainter::PerMask drawOneMaskCreator(const SkPaint& paint,
+                                                      SkArenaAlloc* alloc) const;
 
-    void    drawPath(const SkPath&, const SkPaint&, const SkMatrix* preMatrix,
-                     bool pathIsMutable, bool drawCoverage,
-                     SkBlitter* customBlitter = nullptr) const;
+    void drawBitmapAsMask(const SkBitmap&, const SkPaint&) const;
+
+    void drawPath(const SkPath&,
+                  const SkPaint&,
+                  const SkMatrix* preMatrix,
+                  bool pathIsMutable,
+                  bool drawCoverage,
+                  SkBlitter* customBlitter = nullptr) const;
 
     void drawLine(const SkPoint[2], const SkPaint&) const;
-    void drawDevPath(const SkPath& devPath, const SkPaint& paint, bool drawCoverage,
-                     SkBlitter* customBlitter, bool doFill) const;
+
+    void drawDevPath(const SkPath& devPath,
+                     const SkPaint& paint,
+                     bool drawCoverage,
+                     SkBlitter* customBlitter,
+                     bool doFill) const;
     /**
      *  Return the current clip bounds, in local coordinates, with slop to account
      *  for antialiasing or hairlines (i.e. device-bounds outset by 1, and then
@@ -145,11 +149,7 @@ private:
      *  If the matrix cannot be inverted, or the current clip is empty, return
      *  false and ignore bounds parameter.
      */
-    bool SK_WARN_UNUSED_RESULT
-    computeConservativeLocalClipBounds(SkRect* bounds) const;
-
-    /** Returns the current setting for using fake gamma and contrast. */
-    SkScalerContextFlags SK_WARN_UNUSED_RESULT scalerContextFlags() const;
+    bool SK_WARN_UNUSED_RESULT computeConservativeLocalClipBounds(SkRect* bounds) const;
 
 public:
     SkPixmap        fDst;

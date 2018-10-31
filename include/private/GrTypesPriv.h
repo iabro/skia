@@ -11,6 +11,7 @@
 #include <chrono>
 #include "GrSharedEnums.h"
 #include "GrTypes.h"
+#include "SkCanvas.h"
 #include "SkImageInfo.h"
 #include "SkImageInfoPriv.h"
 #include "SkRefCnt.h"
@@ -202,6 +203,11 @@ enum GrClipType {
     kPath_ClipType
 };
 
+enum class GrScissorTest : bool {
+    kDisabled = false,
+    kEnabled = true
+};
+
 struct GrMipLevel {
     const void* fPixels;
     size_t fRowBytes;
@@ -282,9 +288,24 @@ enum class GrAllowMixedSamples : bool { kNo = false, kYes = true };
 
 GrAAType GrChooseAAType(GrAA, GrFSAAType, GrAllowMixedSamples, const GrCaps&);
 
+enum class GrQuadAAFlags {
+    kLeft   = SkCanvas::kLeft_QuadAAFlag,
+    kTop    = SkCanvas::kTop_QuadAAFlag,
+    kRight  = SkCanvas::kRight_QuadAAFlag,
+    kBottom = SkCanvas::kBottom_QuadAAFlag,
+
+    kNone = SkCanvas::kNone_QuadAAFlags,
+    kAll  = SkCanvas::kAll_QuadAAFlags
+};
+
+GR_MAKE_BITFIELD_CLASS_OPS(GrQuadAAFlags)
+
+static inline GrQuadAAFlags SkToGrQuadAAFlags(unsigned flags) {
+    return static_cast<GrQuadAAFlags>(flags);
+}
+
 /**
- * Types of shader-language-specific boxed variables we can create. (Currently only GrGLShaderVars,
- * but should be applicable to other shader languages.)
+ * Types of shader-language-specific boxed variables we can create.
  */
 enum GrSLType {
     kVoid_GrSLType,
@@ -706,6 +727,8 @@ enum GrVertexAttribType {
                                      // 255 -> 1.0f.
 
     kShort2_GrVertexAttribType,       // vector of 2 16-bit shorts.
+    kShort4_GrVertexAttribType,       // vector of 4 16-bit shorts.
+
     kUShort2_GrVertexAttribType,      // vector of 2 unsigned shorts. 0 -> 0, 65535 -> 65535.
     kUShort2_norm_GrVertexAttribType, // vector of 2 unsigned shorts. 0 -> 0.0f, 65535 -> 1.0f.
 
@@ -715,66 +738,6 @@ enum GrVertexAttribType {
     kLast_GrVertexAttribType = kUint_GrVertexAttribType
 };
 static const int kGrVertexAttribTypeCount = kLast_GrVertexAttribType + 1;
-
-/**
- * converts a GrVertexAttribType to a GrSLType
- */
-static inline GrSLType GrVertexAttribTypeToSLType(GrVertexAttribType type) {
-    switch (type) {
-        case kShort2_GrVertexAttribType:
-            return kShort2_GrSLType;
-        case kUShort2_GrVertexAttribType:
-            return kUShort2_GrSLType;
-        case kUShort2_norm_GrVertexAttribType:
-            return kFloat2_GrSLType;
-        case kUByte_norm_GrVertexAttribType:   // fall through
-        case kFloat_GrVertexAttribType:
-            return kFloat_GrSLType;
-        case kFloat2_GrVertexAttribType:
-            return kFloat2_GrSLType;
-        case kFloat3_GrVertexAttribType:
-            return kFloat3_GrSLType;
-        case kFloat4_GrVertexAttribType:
-            return kFloat4_GrSLType;
-        case kHalf_GrVertexAttribType:
-            return kHalf_GrSLType;
-        case kHalf2_GrVertexAttribType:
-            return kHalf2_GrSLType;
-        case kHalf3_GrVertexAttribType:
-            return kHalf3_GrSLType;
-        case kHalf4_GrVertexAttribType:
-        case kUByte4_norm_GrVertexAttribType:
-            return kHalf4_GrSLType;
-        case kInt2_GrVertexAttribType:
-            return kInt2_GrSLType;
-        case kInt3_GrVertexAttribType:
-            return kInt3_GrSLType;
-        case kInt4_GrVertexAttribType:
-            return kInt4_GrSLType;
-        case kByte_GrVertexAttribType:
-            return kByte_GrSLType;
-        case kByte2_GrVertexAttribType:
-            return kByte_GrSLType;
-        case kByte3_GrVertexAttribType:
-            return kByte_GrSLType;
-        case kByte4_GrVertexAttribType:
-            return kByte4_GrSLType;
-        case kUByte_GrVertexAttribType:
-            return kUByte_GrSLType;
-        case kUByte2_GrVertexAttribType:
-            return kUByte_GrSLType;
-        case kUByte3_GrVertexAttribType:
-            return kUByte_GrSLType;
-        case kUByte4_GrVertexAttribType:
-            return kUByte4_GrSLType;
-        case kInt_GrVertexAttribType:
-            return kInt_GrSLType;
-        case kUint_GrVertexAttribType:
-            return kUint_GrSLType;
-    }
-    SK_ABORT("Unsupported type conversion");
-    return kVoid_GrSLType;
-}
 
 //////////////////////////////////////////////////////////////////////////////
 

@@ -57,7 +57,7 @@ class GrGLConicEffect;
 
 class GrConicEffect : public GrGeometryProcessor {
 public:
-    static sk_sp<GrGeometryProcessor> Make(GrColor color,
+    static sk_sp<GrGeometryProcessor> Make(const GrColor4h& color,
                                            const SkMatrix& viewMatrix,
                                            const GrClipEdgeType edgeType,
                                            const GrCaps& caps,
@@ -98,7 +98,7 @@ public:
     inline bool isAntiAliased() const { return GrProcessorEdgeTypeIsAA(fEdgeType); }
     inline bool isFilled() const { return GrProcessorEdgeTypeIsFill(fEdgeType); }
     inline GrClipEdgeType getEdgeType() const { return fEdgeType; }
-    GrColor color() const { return fColor; }
+    const GrColor4h& color() const { return fColor; }
     const SkMatrix& viewMatrix() const { return fViewMatrix; }
     const SkMatrix& localMatrix() const { return fLocalMatrix; }
     bool usesLocalCoords() const { return fUsesLocalCoords; }
@@ -109,19 +109,21 @@ public:
     GrGLSLPrimitiveProcessor* createGLSLInstance(const GrShaderCaps&) const override;
 
 private:
-    GrConicEffect(GrColor, const SkMatrix& viewMatrix, uint8_t coverage, GrClipEdgeType,
+    GrConicEffect(const GrColor4h&, const SkMatrix& viewMatrix, uint8_t coverage, GrClipEdgeType,
                   const SkMatrix& localMatrix, bool usesLocalCoords);
 
     const Attribute& onVertexAttribute(int i) const override { return kAttributes[i]; }
 
-    GrColor             fColor;
+    GrColor4h           fColor;
     SkMatrix            fViewMatrix;
     SkMatrix            fLocalMatrix;
     bool                fUsesLocalCoords;
     uint8_t             fCoverageScale;
     GrClipEdgeType fEdgeType;
-    static constexpr Attribute kAttributes[] = {{"inPosition", kFloat2_GrVertexAttribType},
-                                                {"inConicCoeffs", kHalf4_GrVertexAttribType}};
+    static constexpr Attribute kAttributes[] = {
+        {"inPosition", kFloat2_GrVertexAttribType, kFloat2_GrSLType},
+        {"inConicCoeffs", kFloat4_GrVertexAttribType, kHalf4_GrSLType}
+    };
 
     GR_DECLARE_GEOMETRY_PROCESSOR_TEST
 
@@ -141,7 +143,7 @@ class GrGLQuadEffect;
 
 class GrQuadEffect : public GrGeometryProcessor {
 public:
-    static sk_sp<GrGeometryProcessor> Make(GrColor color,
+    static sk_sp<GrGeometryProcessor> Make(const GrColor4h& color,
                                            const SkMatrix& viewMatrix,
                                            const GrClipEdgeType edgeType,
                                            const GrCaps& caps,
@@ -182,7 +184,7 @@ public:
     inline bool isAntiAliased() const { return GrProcessorEdgeTypeIsAA(fEdgeType); }
     inline bool isFilled() const { return GrProcessorEdgeTypeIsFill(fEdgeType); }
     inline GrClipEdgeType getEdgeType() const { return fEdgeType; }
-    GrColor color() const { return fColor; }
+    const GrColor4h& color() const { return fColor; }
     const SkMatrix& viewMatrix() const { return fViewMatrix; }
     const SkMatrix& localMatrix() const { return fLocalMatrix; }
     bool usesLocalCoords() const { return fUsesLocalCoords; }
@@ -193,20 +195,22 @@ public:
     GrGLSLPrimitiveProcessor* createGLSLInstance(const GrShaderCaps&) const override;
 
 private:
-    GrQuadEffect(GrColor, const SkMatrix& viewMatrix, uint8_t coverage, GrClipEdgeType,
+    GrQuadEffect(const GrColor4h&, const SkMatrix& viewMatrix, uint8_t coverage, GrClipEdgeType,
                  const SkMatrix& localMatrix, bool usesLocalCoords);
 
     const Attribute& onVertexAttribute(int i) const override { return kAttributes[i]; }
 
-    GrColor fColor;
+    GrColor4h fColor;
     SkMatrix fViewMatrix;
     SkMatrix fLocalMatrix;
     bool fUsesLocalCoords;
     uint8_t fCoverageScale;
     GrClipEdgeType fEdgeType;
 
-    static constexpr Attribute kAttributes[] = {{"inPosition", kFloat2_GrVertexAttribType},
-                                                {"inHairQuadEdge", kHalf4_GrVertexAttribType}};
+    static constexpr Attribute kAttributes[] = {
+        {"inPosition", kFloat2_GrVertexAttribType, kFloat2_GrSLType},
+        {"inHairQuadEdge", kFloat4_GrVertexAttribType, kHalf4_GrSLType}
+    };
 
     GR_DECLARE_GEOMETRY_PROCESSOR_TEST
 
@@ -228,7 +232,7 @@ class GrGLCubicEffect;
 
 class GrCubicEffect : public GrGeometryProcessor {
 public:
-    static sk_sp<GrGeometryProcessor> Make(GrColor color,
+    static sk_sp<GrGeometryProcessor> Make(const GrColor4h& color,
                                            const SkMatrix& viewMatrix,
                                            const SkMatrix& klm,
                                            bool flipKL,
@@ -272,8 +276,8 @@ public:
     inline bool isAntiAliased() const { return GrProcessorEdgeTypeIsAA(fEdgeType); }
     inline bool isFilled() const { return GrProcessorEdgeTypeIsFill(fEdgeType); }
     inline GrClipEdgeType getEdgeType() const { return fEdgeType; }
-    GrColor color() const { return fColor; }
-    bool colorIgnored() const { return GrColor_ILLEGAL == fColor; }
+    const GrColor4h& color() const { return fColor; }
+    bool colorIgnored() const { return GrColor4h_ILLEGAL == fColor; }
     const SkMatrix& viewMatrix() const { return fViewMatrix; }
     const SkMatrix& devKLMMatrix() const { return fDevKLMMatrix; }
 
@@ -282,17 +286,18 @@ public:
     GrGLSLPrimitiveProcessor* createGLSLInstance(const GrShaderCaps&) const override;
 
 private:
-    GrCubicEffect(GrColor, const SkMatrix& viewMatrix, const SkMatrix& devKLMMatrix,
+    GrCubicEffect(const GrColor4h&, const SkMatrix& viewMatrix, const SkMatrix& devKLMMatrix,
                   GrClipEdgeType);
 
     const Attribute& onVertexAttribute(int) const override { return kInPosition; }
 
-    GrColor fColor;
+    GrColor4h fColor;
     SkMatrix fViewMatrix;
     SkMatrix fDevKLMMatrix;
     GrClipEdgeType fEdgeType;
 
-    static constexpr Attribute kInPosition = {"inPosition", kFloat2_GrVertexAttribType};
+    static constexpr Attribute kInPosition =
+            {"inPosition", kFloat2_GrVertexAttribType, kFloat2_GrSLType};
 
     GR_DECLARE_GEOMETRY_PROCESSOR_TEST
 

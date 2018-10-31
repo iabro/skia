@@ -109,6 +109,7 @@ template <> void Draw::draw(const DrawImageLattice& r) {
 
 DRAW(DrawImageRect, legacy_drawImageRect(r.image.get(), r.src, r.dst, r.paint, r.constraint));
 DRAW(DrawImageNine, drawImageNine(r.image.get(), r.center, r.dst, r.paint));
+DRAW(DrawImageSet, experimental_DrawImageSetV0(r.set.get(), r.count, r.alpha, r.quality, r.mode));
 DRAW(DrawOval, drawOval(r.oval, r.paint));
 DRAW(DrawPaint, drawPaint(r.paint));
 DRAW(DrawPath, drawPath(r.path, r.paint));
@@ -122,7 +123,6 @@ DRAW(DrawRect, drawRect(r.rect, r.paint));
 DRAW(DrawRegion, drawRegion(r.region, r.paint));
 DRAW(DrawText, drawText(r.text, r.byteLength, r.x, r.y, r.paint));
 DRAW(DrawTextBlob, drawTextBlob(r.blob.get(), r.x, r.y, r.paint));
-DRAW(DrawTextOnPath, drawTextOnPath(r.text, r.byteLength, r.path, &r.matrix, r.paint));
 DRAW(DrawTextRSXform, drawTextRSXform(r.text, r.byteLength, r.xforms, r.cull, r.paint));
 DRAW(DrawAtlas, drawAtlas(r.atlas.get(),
                           r.xforms, r.texs, r.colors, r.count, r.mode, r.cull, r.paint));
@@ -169,7 +169,7 @@ public:
         fCTM = SkMatrix::I();
 
         // We push an extra save block to track the bounds of any top-level control operations.
-        fSaveStack.push({ 0, Bounds::MakeEmpty(), nullptr, fCTM });
+        fSaveStack.push_back({ 0, Bounds::MakeEmpty(), nullptr, fCTM });
     }
 
     void cleanUp() {
@@ -275,7 +275,7 @@ private:
         sb.paint = paint;
         sb.ctm = this->fCTM;
 
-        fSaveStack.push(sb);
+        fSaveStack.push_back(sb);
         this->pushControl();
     }
 
@@ -329,7 +329,7 @@ private:
     }
 
     void pushControl() {
-        fControlIndices.push(fCurrentOp);
+        fControlIndices.push_back(fCurrentOp);
         if (!fSaveStack.isEmpty()) {
             fSaveStack.top().controlOps++;
         }
@@ -383,6 +383,13 @@ private:
     }
     Bounds bounds(const DrawImageNine& op) const {
         return this->adjustAndMap(op.dst, op.paint);
+    }
+    Bounds bounds(const DrawImageSet& op) const {
+        SkRect rect = SkRect::MakeEmpty();
+        for (int i = 0; i < op.count; ++i) {
+            rect.join(this->adjustAndMap(op.set[i].fDstRect, nullptr));
+        }
+        return rect;
     }
     Bounds bounds(const DrawPath& op) const {
         return op.path.isInverseFillType() ? fCullRect
@@ -453,21 +460,6 @@ private:
         }
         SkRect dst = { left, op.y, right, op.y };
         AdjustTextForFontMetrics(&dst, op.paint);
-        return this->adjustAndMap(dst, &op.paint);
-    }
-    Bounds bounds(const DrawTextOnPath& op) const {
-        SkRect dst = op.path.getBounds();
-
-        // Pad all sides by the maximum padding in any direction we'd normally apply.
-        SkRect pad = { 0, 0, 0, 0};
-        AdjustTextForFontMetrics(&pad, op.paint);
-
-        // That maximum padding happens to always be the right pad today.
-        SkASSERT(pad.fLeft == -pad.fRight);
-        SkASSERT(pad.fTop  == -pad.fBottom);
-        SkASSERT(pad.fRight > pad.fBottom);
-        dst.outset(pad.fRight, pad.fRight);
-
         return this->adjustAndMap(dst, &op.paint);
     }
 

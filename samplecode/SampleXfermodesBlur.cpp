@@ -5,8 +5,7 @@
  * found in the LICENSE file.
  */
 
-#include "SampleCode.h"
-#include "SkView.h"
+#include "Sample.h"
 #include "SkBitmap.h"
 #include "SkBlurMask.h"
 #include "SkCanvas.h"
@@ -17,9 +16,10 @@
 #include "SkRandom.h"
 #include "SkRegion.h"
 #include "SkShader.h"
-#include "SkUtils.h"
+#include "SkUTF.h"
 #include "SkColorPriv.h"
 #include "SkColorFilter.h"
+#include "SkTextUtils.h"
 #include "SkTime.h"
 #include "SkTypeface.h"
 
@@ -33,7 +33,7 @@ static void setNamedTypeface(SkPaint* paint, const char name[]) {
 
 static uint16_t gBG[] = { 0xFFFF, 0xCCCF, 0xCCCF, 0xFFFF };
 
-class XfermodesBlurView : public SampleView {
+class XfermodesBlurView : public Sample {
     SkBitmap    fBG;
     SkBitmap    fSrcB, fDstB;
 
@@ -72,10 +72,9 @@ public:
     }
 
 protected:
-    // overrides from SkEventSink
-    virtual bool onQuery(SkEvent* evt) {
-        if (SampleCode::TitleQ(*evt)) {
-            SampleCode::TitleR(evt, "XfermodesBlur");
+    virtual bool onQuery(Sample::Event* evt) {
+        if (Sample::TitleQ(*evt)) {
+            Sample::TitleR(evt, "XfermodesBlur");
             return true;
         }
         return this->INHERITED::onQuery(evt);
@@ -133,7 +132,6 @@ protected:
         SkPaint labelP;
         labelP.setAntiAlias(true);
         labelP.setLCDRenderText(true);
-        labelP.setTextAlign(SkPaint::kCenter_Align);
         setNamedTypeface(&labelP, "Menlo Regular");
 
         const int W = 5;
@@ -160,8 +158,8 @@ protected:
                 canvas->drawRect(r, p);
 
                 const char* label = SkBlendMode_Name(gModes[i]);
-                canvas->drawString(label,
-                                 x + w/2, y - labelP.getTextSize()/2, labelP);
+                SkTextUtils::DrawString(canvas, label, x + w/2, y - labelP.getTextSize()/2, labelP,
+                                        SkTextUtils::kCenter_Align);
                 x += w + SkIntToScalar(10);
                 if ((i % W) == W - 1) {
                     x = x0;
@@ -173,10 +171,9 @@ protected:
     }
 
 private:
-    typedef SampleView INHERITED;
+    typedef Sample INHERITED;
 };
 
 //////////////////////////////////////////////////////////////////////////////
 
-static SkView* MyFactory() { return new XfermodesBlurView; }
-static SkViewRegister reg(MyFactory);
+DEF_SAMPLE( return new XfermodesBlurView(); )

@@ -242,7 +242,7 @@ public:
                                                   stencilSettings);
     }
 
-    SmallPathOp(Helper::MakeArgs helperArgs, GrColor color, const GrShape& shape,
+    SmallPathOp(Helper::MakeArgs helperArgs, const GrColor4h& color, const GrShape& shape,
                 const SkMatrix& viewMatrix, GrDrawOpAtlas* atlas, ShapeCache* shapeCache,
                 ShapeDataList* shapeList, bool gammaCorrect,
                 const GrUserStencilSettings* stencilSettings)
@@ -271,7 +271,7 @@ public:
 
     const char* name() const override { return "SmallPathOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
 
         const sk_sp<GrTextureProxy>* proxies = fAtlas->getProxies();
@@ -284,7 +284,7 @@ public:
     SkString dumpInfo() const override {
         SkString string;
         for (const auto& geo : fShapes) {
-            string.appendf("Color: 0x%08x\n", geo.fColor);
+            string.appendf("Color: 0x%08x\n", geo.fColor.toGrColor());
         }
         string += fHelper.dumpInfo();
         string += INHERITED::dumpInfo();
@@ -348,8 +348,8 @@ private:
                 matrix = &SkMatrix::I();
             }
             flushInfo.fGeometryProcessor = GrDistanceFieldPathGeoProc::Make(
-                    *matrix, fAtlas->getProxies(), fAtlas->numActivePages(),
-                    GrSamplerState::ClampBilerp(), flags);
+                    *target->caps().shaderCaps(), *matrix, fAtlas->getProxies(),
+                    fAtlas->numActivePages(), GrSamplerState::ClampBilerp(), flags);
         } else {
             SkMatrix invert;
             if (fHelper.usesLocalCoords()) {
@@ -359,9 +359,9 @@ private:
             }
 
             flushInfo.fGeometryProcessor = GrBitmapTextGeoProc::Make(
-                    this->color(), fAtlas->getProxies(), fAtlas->numActivePages(),
-                    GrSamplerState::ClampNearest(), kA8_GrMaskFormat, invert,
-                    false);
+                    *target->caps().shaderCaps(), this->color(), fAtlas->getProxies(),
+                    fAtlas->numActivePages(), GrSamplerState::ClampNearest(), kA8_GrMaskFormat,
+                    invert, false);
         }
 
         // allocate vertices
@@ -491,8 +491,9 @@ private:
             auto uploadTarget = target->deferredUploadTarget();
             fAtlas->setLastUseToken(shapeData->fID, uploadTarget->tokenTracker()->nextDrawToken());
 
+            // TODO4F: Preserve float colors
             this->writePathVertices(
-                    fAtlas, offset, args.fColor, kVertexStride, args.fViewMatrix, shapeData);
+                    fAtlas, offset, args.fColor.toGrColor(), kVertexStride, args.fViewMatrix, shapeData);
             offset += kVerticesPerQuad * kVertexStride;
             flushInfo.fInstancesToFlush++;
         }
@@ -593,7 +594,6 @@ private:
             paint.setAntiAlias(true);
 
             SkDraw draw;
-            sk_bzero(&draw, sizeof(draw));
 
             SkRasterClip rasterClip;
             rasterClip.setRect(devPathBounds);
@@ -703,7 +703,6 @@ private:
         paint.setAntiAlias(true);
 
         SkDraw draw;
-        sk_bzero(&draw, sizeof(draw));
 
         SkRasterClip rasterClip;
         rasterClip.setRect(devPathBounds);
@@ -833,13 +832,13 @@ private:
         }
 
         if (flushInfo->fInstancesToFlush) {
-            GrMesh mesh(GrPrimitiveType::kTriangles);
+            GrMesh* mesh = target->allocMesh(GrPrimitiveType::kTriangles);
             int maxInstancesPerDraw =
                 static_cast<int>(flushInfo->fIndexBuffer->gpuMemorySize() / sizeof(uint16_t) / 6);
-            mesh.setIndexedPatterned(flushInfo->fIndexBuffer.get(), kIndicesPerQuad,
-                                     kVerticesPerQuad, flushInfo->fInstancesToFlush,
-                                     maxInstancesPerDraw);
-            mesh.setVertexData(flushInfo->fVertexBuffer.get(), flushInfo->fVertexOffset);
+            mesh->setIndexedPatterned(flushInfo->fIndexBuffer.get(), kIndicesPerQuad,
+                                      kVerticesPerQuad, flushInfo->fInstancesToFlush,
+                                      maxInstancesPerDraw);
+            mesh->setVertexData(flushInfo->fVertexBuffer.get(), flushInfo->fVertexOffset);
             target->draw(flushInfo->fGeometryProcessor, flushInfo->fPipeline,
                          flushInfo->fFixedDynamicState, mesh);
             flushInfo->fVertexOffset += kVerticesPerQuad * flushInfo->fInstancesToFlush;
@@ -847,52 +846,51 @@ private:
         }
     }
 
-    GrColor color() const { return fShapes[0].fColor; }
+    const GrColor4h& color() const { return fShapes[0].fColor; }
     bool usesDistanceField() const { return fUsesDistanceField; }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
         SmallPathOp* that = t->cast<SmallPathOp>();
         if (!fHelper.isCompatible(that->fHelper, caps, this->bounds(), that->bounds())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (this->usesDistanceField() != that->usesDistanceField()) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         const SkMatrix& thisCtm = this->fShapes[0].fViewMatrix;
         const SkMatrix& thatCtm = that->fShapes[0].fViewMatrix;
 
         if (thisCtm.hasPerspective() != thatCtm.hasPerspective()) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         // We can position on the cpu unless we're in perspective,
         // but also need to make sure local matrices are identical
         if ((thisCtm.hasPerspective() || fHelper.usesLocalCoords()) &&
             !thisCtm.cheapEqualTo(thatCtm)) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         // Depending on the ctm we may have a different shader for SDF paths
         if (this->usesDistanceField()) {
             if (thisCtm.isScaleTranslate() != thatCtm.isScaleTranslate() ||
                 thisCtm.isSimilarity() != thatCtm.isSimilarity()) {
-                return false;
+                return CombineResult::kCannotCombine;
             }
         }
 
         fShapes.push_back_n(that->fShapes.count(), that->fShapes.begin());
-        this->joinBounds(*that);
-        return true;
+        return CombineResult::kMerged;
     }
 
     bool fUsesDistanceField;
 
     struct Entry {
-        GrColor  fColor;
-        GrShape  fShape;
-        SkMatrix fViewMatrix;
+        GrColor4h fColor;
+        GrShape   fShape;
+        SkMatrix  fViewMatrix;
     };
 
     SkSTArray<1, Entry> fShapes;

@@ -23,9 +23,7 @@ public:
 
     const char* name() const override { return "CopySurface"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
-        func(fSrc.get());
-    }
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override { func(fSrc.get()); }
 
     SkString dumpInfo() const override {
         SkString string;
@@ -52,8 +50,6 @@ private:
                                  SkIntToScalar(srcRect.width()), SkIntToScalar(srcRect.height()));
         this->setBounds(bounds, HasAABloat::kNo, IsZeroArea::kNo);
     }
-
-    bool onCombineIfPossible(GrOp* that, const GrCaps& caps) override { return false; }
 
     void onPrepare(GrOpFlushState*) override {}
 

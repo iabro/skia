@@ -9,7 +9,7 @@
 
 #include "SkGlyphRun.h"
 #include "SkTo.h"
-#include "SkUtils.h"
+#include "SkUTF.h"
 
 static bool is_reversed(const uint32_t* clusters, uint32_t count) {
     // "ReversedChars" is how PDF deals with RTL text.
@@ -28,10 +28,9 @@ static bool is_reversed(const uint32_t* clusters, uint32_t count) {
 SkClusterator::SkClusterator(const SkGlyphRun& run)
     : fClusters(run.clusters().data())
     , fUtf8Text(run.text().data())
-    , fGlyphCount(SkToU32(run.shuntGlyphsIDs().size()))
+    , fGlyphCount(SkToU32(run.glyphsIDs().size()))
     , fTextByteLength(SkToU32(run.text().size()))
 {
-    SkASSERT(SkPaint::kGlyphID_TextEncoding == run.paint().getTextEncoding());
     if (fClusters) {
         SkASSERT(fUtf8Text && fTextByteLength > 0 && fGlyphCount > 0);
         fReversedChars = is_reversed(fClusters, fGlyphCount);

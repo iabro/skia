@@ -10,6 +10,7 @@
 
 #include "SkAtomics.h"
 #include "SkMatrix.h"
+#include "SkMutex.h"
 #include "SkPoint.h"
 #include "SkRRect.h"
 #include "SkRect.h"
@@ -308,12 +309,27 @@ public:
      */
     uint32_t genID() const;
 
-    struct GenIDChangeListener : SkRefCnt {
+    class GenIDChangeListener : public SkRefCnt {
+    public:
+        GenIDChangeListener() : fShouldUnregisterFromPath(false) {}
         virtual ~GenIDChangeListener() {}
+
         virtual void onChange() = 0;
+
+        // The caller can use this method to notify the path that it no longer needs to listen. Once
+        // called, the path will remove this listener from the list at some future point.
+        void markShouldUnregisterFromPath() {
+            fShouldUnregisterFromPath.store(true, std::memory_order_relaxed);
+        }
+        bool shouldUnregisterFromPath() {
+            return fShouldUnregisterFromPath.load(std::memory_order_acquire);
+        }
+
+    private:
+        std::atomic<bool> fShouldUnregisterFromPath;
     };
 
-    void addGenIDChangeListener(sk_sp<GenIDChangeListener>);
+    void addGenIDChangeListener(sk_sp<GenIDChangeListener>);  // Threadsafe.
 
     bool isValid() const;
     SkDEBUGCODE(void validate() const { SkASSERT(this->isValid()); } )
@@ -407,7 +423,7 @@ private:
             fFreeSpace = 0;
             fVerbCnt = 0;
             fPointCnt = 0;
-            this->makeSpace(minSize);
+            this->makeSpace(minSize, true);
             fVerbCnt = verbCount;
             fPointCnt = pointCount;
             fFreeSpace -= newSize;
@@ -437,24 +453,28 @@ private:
 
     /**
      * Ensures that the free space available in the path ref is >= size. The verb and point counts
-     * are not changed.
+     * are not changed. May allocate extra capacity, unless |exact| is true.
      */
-    void makeSpace(size_t size) {
+    void makeSpace(size_t size, bool exact = false) {
         SkDEBUGCODE(this->validate();)
         if (size <= fFreeSpace) {
             return;
         }
         size_t growSize = size - fFreeSpace;
         size_t oldSize = this->currSize();
-        // round to next multiple of 8 bytes
-        growSize = (growSize + 7) & ~static_cast<size_t>(7);
-        // we always at least double the allocation
-        if (growSize < oldSize) {
-            growSize = oldSize;
+
+        if (!exact) {
+            // round to next multiple of 8 bytes
+            growSize = (growSize + 7) & ~static_cast<size_t>(7);
+            // we always at least double the allocation
+            if (growSize < oldSize) {
+                growSize = oldSize;
+            }
+            if (growSize < kMinSize) {
+                growSize = kMinSize;
+            }
         }
-        if (growSize < kMinSize) {
-            growSize = kMinSize;
-        }
+
         constexpr size_t maxSize = std::numeric_limits<size_t>::max();
         size_t newSize;
         if (growSize <= maxSize - oldSize) {
@@ -540,6 +560,7 @@ private:
     mutable uint32_t    fGenerationID;
     SkDEBUGCODE(int32_t fEditorsAttached;) // assert that only one editor in use at any time.
 
+    SkMutex                         fGenIDChangeListenersMutex;
     SkTDArray<GenIDChangeListener*> fGenIDChangeListeners;  // pointers are reffed
 
     mutable uint8_t  fBoundsIsDirty;
@@ -555,6 +576,7 @@ private:
 
     friend class PathRefTest_Private;
     friend class ForceIsRRect_Private; // unit test isRRect
+    friend class SkPath;
 };
 
 #endif

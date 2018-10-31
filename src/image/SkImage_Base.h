@@ -8,20 +8,22 @@
 #ifndef SkImage_Base_DEFINED
 #define SkImage_Base_DEFINED
 
-#include "SkAtomics.h"
 #include "SkImage.h"
 #include "SkSurface.h"
+#include <atomic>
 
 #if SK_SUPPORT_GPU
-    #include "GrTextureProxy.h"
+#include "GrTextureProxy.h"
+#include "SkTDArray.h"
 
-    class GrTexture;
+class GrTexture;
 #endif
 
 #include <new>
 
 class GrSamplerState;
-class SkImageCacherator;
+class SkCachedData;
+struct SkYUVASizeInfo;
 
 enum {
     kNeedNewImageUniqueID = 0
@@ -35,8 +37,6 @@ public:
     // Implementors: if you can not return the value, return an invalid ImageInfo with w=0 & h=0
     // & unknown color space.
     virtual SkImageInfo onImageInfo() const = 0;
-    virtual SkColorType onColorType() const = 0;
-    virtual SkAlphaType onAlphaType() const = 0;
 
     virtual SkIRect onGetSubset() const {
         return { 0, 0, this->width(), this->height() };
@@ -54,7 +54,6 @@ public:
     virtual GrTextureProxy* peekProxy() const { return nullptr; }
     virtual sk_sp<GrTextureProxy> asTextureProxyRef() const { return nullptr; }
     virtual sk_sp<GrTextureProxy> asTextureProxyRef(GrContext*, const GrSamplerState&,
-                                                    SkColorSpace*, sk_sp<SkColorSpace>*,
                                                     SkScalar scaleAdjust[2]) const = 0;
     virtual sk_sp<GrTextureProxy> refPinnedTextureProxy(uint32_t* uniqueID) const {
         return nullptr;
@@ -65,15 +64,14 @@ public:
     virtual GrBackendTexture onGetBackendTexture(bool flushPendingGrContextIO,
                                                  GrSurfaceOrigin* origin) const;
 
-    virtual SkImageCacherator* peekCacherator() const { return nullptr; }
-
     // return a read-only copy of the pixels. We promise to not modify them,
     // but only inspect them (or encode them).
-    virtual bool getROPixels(SkBitmap*, SkColorSpace* dstColorSpace,
-                             CachingHint = kAllow_CachingHint) const = 0;
+    virtual bool getROPixels(SkBitmap*, CachingHint = kAllow_CachingHint) const = 0;
 
     virtual sk_sp<SkImage> onMakeSubset(const SkIRect&) const = 0;
 
+    virtual sk_sp<SkCachedData> getPlanes(SkYUVASizeInfo*, SkYUVAIndex[4],
+                                          SkYUVColorSpace*, const void* planes[4]);
     virtual sk_sp<SkData> onRefEncoded() const { return nullptr; }
 
     virtual bool onAsLegacyBitmap(SkBitmap*) const;
@@ -81,12 +79,12 @@ public:
     // True for picture-backed and codec-backed
     virtual bool onIsLazyGenerated() const { return false; }
 
-    // True only for generators that operate directly on gpu (e.g. picture-generators)
-    virtual bool onCanLazyGenerateOnGPU() const { return false; }
+    // True for images instantiated in GPU memory
+    virtual bool onIsTextureBacked() const { return false; }
 
     // Call when this image is part of the key to a resourcecache entry. This allows the cache
     // to know automatically those entries can be purged when this SkImage deleted.
-    void notifyAddedToRasterCache() const {
+    virtual void notifyAddedToRasterCache() const {
         fAddedToRasterCache.store(true);
     }
 
@@ -95,13 +93,13 @@ public:
     virtual bool onPinAsTexture(GrContext*) const { return false; }
     virtual void onUnpinAsTexture(GrContext*) const {}
 
-    virtual sk_sp<SkImage> onMakeColorSpace(sk_sp<SkColorSpace>, SkColorType) const = 0;
+    virtual sk_sp<SkImage> onMakeColorSpace(sk_sp<SkColorSpace>) const = 0;
 protected:
     SkImage_Base(int width, int height, uint32_t uniqueID);
 
 private:
     // Set true by caches when they cache content that's derived from the current pixels.
-    mutable SkAtomic<bool> fAddedToRasterCache;
+    mutable std::atomic<bool> fAddedToRasterCache;
 
     typedef SkImage INHERITED;
 };

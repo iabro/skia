@@ -9,7 +9,6 @@
 
 #include "SkBitmap.h"
 #include "SkColorSpaceXformer.h"
-#include "SkFlattenablePriv.h"
 #include "SkImageFilterPriv.h"
 #include "SkReadBuffer.h"
 #include "SkSpecialImage.h"
@@ -306,7 +305,8 @@ sk_sp<SkSpecialImage> SkDisplacementMapEffect::onFilterImage(SkSpecialImage* sou
                                               offsetMatrix,
                                               std::move(colorProxy),
                                               SkISize::Make(color->width(), color->height()));
-        fp = GrColorSpaceXformEffect::Make(std::move(fp), color->getColorSpace(), colorSpace);
+        fp = GrColorSpaceXformEffect::Make(std::move(fp), color->getColorSpace(),
+                                           color->alphaType(), colorSpace);
 
         GrPaint paint;
         paint.addColorFragmentProcessor(std::move(fp));
@@ -551,7 +551,7 @@ void GrGLDisplacementMapEffect::emitCode(EmitArgs& args) {
 
     // Unpremultiply the displacement
     fragBuilder->codeAppendf(
-        "\t\t%s.rgb = (%s.a < %s) ? half3(0.0) : clamp(%s.rgb / %s.a, 0.0, 1.0);",
+        "\t\t%s.rgb = (%s.a < %s) ? half3(0.0) : saturate(%s.rgb / %s.a);",
         dColor, dColor, nearZero, dColor, dColor);
     SkString coords2D = fragBuilder->ensureCoords2D(args.fTransformedCoords[1]);
     fragBuilder->codeAppendf("\t\tfloat2 %s = %s + %s*(%s.",

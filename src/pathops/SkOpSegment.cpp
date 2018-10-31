@@ -165,7 +165,9 @@ bool SkOpSegment::activeWinding(SkOpSpanBase* start, SkOpSpanBase* end, int* sum
 
 bool SkOpSegment::addCurveTo(const SkOpSpanBase* start, const SkOpSpanBase* end,
         SkPathWriter* path) const {
-    FAIL_IF(start->starter(end)->alreadyAdded());
+    const SkOpSpan* spanStart = start->starter(end);
+    FAIL_IF(spanStart->alreadyAdded());
+    const_cast<SkOpSpan*>(spanStart)->markAdded();
     SkDCurveSweep curvePart;
     start->segment()->subDivide(start, end, &curvePart.fCurve);
     curvePart.setCurveHullSweep(fVerb);
@@ -894,7 +896,11 @@ bool SkOpSegment::markAndChaseWinding(SkOpSpanBase* start, SkOpSpanBase* end, in
     bool success = markWinding(spanStart, winding);
     SkOpSpanBase* last = nullptr;
     SkOpSegment* other = this;
+    int safetyNet = 100000;
     while ((other = other->nextChase(&start, &step, &spanStart, &last))) {
+        if (!--safetyNet) {
+            return false;
+        }
         if (spanStart->windSum() != SK_MinS32) {
 //            SkASSERT(spanStart->windSum() == winding);   // FIXME: is this assert too aggressive?
             SkASSERT(!last);
@@ -915,7 +921,11 @@ bool SkOpSegment::markAndChaseWinding(SkOpSpanBase* start, SkOpSpanBase* end,
     bool success = markWinding(spanStart, winding, oppWinding);
     SkOpSpanBase* last = nullptr;
     SkOpSegment* other = this;
+    int safetyNet = 100000;
     while ((other = other->nextChase(&start, &step, &spanStart, &last))) {
+        if (!--safetyNet) {
+            return false;
+        }
         if (spanStart->windSum() != SK_MinS32) {
             if (this->operand() == other->operand()) {
                 if (spanStart->windSum() != winding || spanStart->oppSum() != oppWinding) {
@@ -951,6 +961,7 @@ bool SkOpSegment::markAngle(int maxWinding, int sumWinding, const SkOpAngle* ang
         return false;
     }
 #if DEBUG_WINDING
+    SkOpSpanBase* last = *result;
     if (last) {
         SkDebugf("%s last seg=%d span=%d", __FUNCTION__,
                 last->segment()->debugID(), last->debugID());
@@ -978,14 +989,17 @@ bool SkOpSegment::markAngle(int maxWinding, int sumWinding, int oppMaxWinding,
         return false;
     }
 #if DEBUG_WINDING
-    if (last) {
-        SkDebugf("%s last segment=%d span=%d", __FUNCTION__,
-                last->segment()->debugID(), last->debugID());
-        if (!last->final()) {
-            SkDebugf(" windSum=");
-            SkPathOpsDebug::WindingPrintf(last->upCast()->windSum());
+    if (result) {
+        SkOpSpanBase* last = *result;
+        if (last) {
+            SkDebugf("%s last segment=%d span=%d", __FUNCTION__,
+                    last->segment()->debugID(), last->debugID());
+            if (!last->final()) {
+                SkDebugf(" windSum=");
+                SkPathOpsDebug::WindingPrintf(last->upCast()->windSum());
+            }
+            SkDebugf(" \n");
         }
-        SkDebugf(" \n");
     }
 #endif
     return true;
@@ -1145,10 +1159,14 @@ bool SkOpSegment::missingCoincidence() {
     SkOpSpan* prior = nullptr;
     SkOpSpanBase* spanBase = &fHead;
     bool result = false;
+    int safetyNet = 100000;
     do {
         SkOpPtT* ptT = spanBase->ptT(), * spanStopPtT = ptT;
         SkOPASSERT(ptT->span() == spanBase);
         while ((ptT = ptT->next()) != spanStopPtT) {
+            if (!--safetyNet) {
+                return false;
+            }
             if (ptT->deleted()) {
                 continue;
             }

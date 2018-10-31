@@ -1,9 +1,245 @@
 SkPaint Reference
 ===
 
-# <a name='Paint'>Paint</a>
 
-# <a name='SkPaint'>Class SkPaint</a>
+<a name='SkPaint'></a>
+
+---
+
+<pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
+class <a href='#SkPaint'>SkPaint</a> {
+public:
+    <a href='#SkPaint_empty_constructor'>SkPaint()</a>;
+    <a href='#SkPaint_copy_const_SkPaint'>SkPaint(const SkPaint& paint)</a>;
+    <a href='#SkPaint_move_SkPaint'>SkPaint(SkPaint&& paint)</a>;
+    <a href='#SkPaint_destructor'>~SkPaint()</a>;
+    <a href='#SkPaint'>SkPaint</a>& <a href='#SkPaint_copy_operator'>operator=(const SkPaint& paint)</a>;
+    <a href='#SkPaint'>SkPaint</a>& <a href='#SkPaint_move_operator'>operator=(SkPaint&& paint)</a>;
+    friend bool <a href='#SkPaint_equal_operator'>operator==(const SkPaint& a, const SkPaint& b)</a>;
+    friend bool <a href='#SkPaint_notequal_operator'>operator!=(const SkPaint& a, const SkPaint& b)</a>;
+    uint32_t <a href='#SkPaint_getHash'>getHash</a>() const;
+    void <a href='#SkPaint_reset'>reset</a>();
+
+    enum <a href='#SkPaint_Hinting'>Hinting</a> {
+        <a href='#SkPaint_kNo_Hinting'>kNo_Hinting</a> = 0,
+        <a href='#SkPaint_kSlight_Hinting'>kSlight_Hinting</a> = 1,
+        <a href='#SkPaint_kNormal_Hinting'>kNormal_Hinting</a> = 2,
+        <a href='#SkPaint_kFull_Hinting'>kFull_Hinting</a> = 3,
+    };
+
+    <a href='#SkPaint_Hinting'>Hinting</a> <a href='#SkPaint_getHinting'>getHinting</a>() const;
+    void <a href='#SkPaint_setHinting'>setHinting</a>(<a href='#SkPaint_Hinting'>Hinting</a> hintingLevel);
+
+    enum <a href='#SkPaint_Flags'>Flags</a> {
+        <a href='#SkPaint_kAntiAlias_Flag'>kAntiAlias_Flag</a> = 0x01,
+        <a href='#SkPaint_kDither_Flag'>kDither_Flag</a> = 0x04,
+        <a href='#SkPaint_kFakeBoldText_Flag'>kFakeBoldText_Flag</a> = 0x20,
+        <a href='#SkPaint_kLinearText_Flag'>kLinearText_Flag</a> = 0x40,
+        <a href='#SkPaint_kSubpixelText_Flag'>kSubpixelText_Flag</a> = 0x80,
+        <a href='#SkPaint_kLCDRenderText_Flag'>kLCDRenderText_Flag</a> = 0x200,
+        <a href='#SkPaint_kEmbeddedBitmapText_Flag'>kEmbeddedBitmapText_Flag</a> = 0x400,
+        <a href='#SkPaint_kAutoHinting_Flag'>kAutoHinting_Flag</a> = 0x800,
+        <a href='#SkPaint_kAllFlags'>kAllFlags</a> = 0xFFFF,
+    };
+
+    enum <a href='#SkPaint_ReserveFlags'>ReserveFlags</a> {
+        <a href='#SkPaint_kUnderlineText_ReserveFlag'>kUnderlineText_ReserveFlag</a> = 0x08,
+        <a href='#SkPaint_kStrikeThruText_ReserveFlag'>kStrikeThruText_ReserveFlag</a> = 0x10,
+    };
+
+    uint32_t <a href='#SkPaint_getFlags'>getFlags</a>() const;
+    void <a href='#SkPaint_setFlags'>setFlags</a>(uint32_t flags);
+    bool <a href='#SkPaint_isAntiAlias'>isAntiAlias</a>() const;
+    void <a href='#SkPaint_setAntiAlias'>setAntiAlias</a>(bool aa);
+    bool <a href='#SkPaint_isDither'>isDither</a>() const;
+    void <a href='#SkPaint_setDither'>setDither</a>(bool dither);
+    bool <a href='#SkPaint_isLinearText'>isLinearText</a>() const;
+    void <a href='#SkPaint_setLinearText'>setLinearText</a>(bool linearText);
+    bool <a href='#SkPaint_isSubpixelText'>isSubpixelText</a>() const;
+    void <a href='#SkPaint_setSubpixelText'>setSubpixelText</a>(bool subpixelText);
+    bool <a href='#SkPaint_isLCDRenderText'>isLCDRenderText</a>() const;
+    void <a href='#SkPaint_setLCDRenderText'>setLCDRenderText</a>(bool lcdText);
+    bool <a href='#SkPaint_isEmbeddedBitmapText'>isEmbeddedBitmapText</a>() const;
+    void <a href='#SkPaint_setEmbeddedBitmapText'>setEmbeddedBitmapText</a>(bool useEmbeddedBitmapText);
+    bool <a href='#SkPaint_isAutohinted'>isAutohinted</a>() const;
+    void <a href='#SkPaint_setAutohinted'>setAutohinted</a>(bool useAutohinter);
+    bool <a href='#SkPaint_isFakeBoldText'>isFakeBoldText</a>() const;
+    void <a href='#SkPaint_setFakeBoldText'>setFakeBoldText</a>(bool fakeBoldText);
+    bool <a href='#SkPaint_isDevKernText'>isDevKernText</a>() const;
+    void <a href='#SkPaint_setDevKernText'>setDevKernText</a>(bool);
+    <a href='undocumented#SkFilterQuality'>SkFilterQuality</a> <a href='#SkPaint_getFilterQuality'>getFilterQuality</a>() const;
+    void <a href='#SkPaint_setFilterQuality'>setFilterQuality</a>(<a href='undocumented#SkFilterQuality'>SkFilterQuality</a> quality);
+
+    enum <a href='#SkPaint_Style'>Style</a> {
+        <a href='#SkPaint_kFill_Style'>kFill_Style</a>,
+        <a href='#SkPaint_kStroke_Style'>kStroke_Style</a>,
+        <a href='#SkPaint_kStrokeAndFill_Style'>kStrokeAndFill_Style</a>,
+    };
+
+    static constexpr int <a href='#SkPaint_kStyleCount'>kStyleCount</a> = <a href='#SkPaint_kStrokeAndFill_Style'>kStrokeAndFill_Style</a> + 1;
+
+    <a href='#SkPaint_Style'>Style</a> <a href='#SkPaint_getStyle'>getStyle</a>() const;
+    void <a href='#SkPaint_setStyle'>setStyle</a>(<a href='#SkPaint_Style'>Style</a> style);
+    <a href='SkColor_Reference#SkColor'>SkColor</a> <a href='#SkPaint_getColor'>getColor</a>() const;
+    <a href='SkColor4f_Reference#SkColor4f'>SkColor4f</a> <a href='#SkPaint_getColor4f'>getColor4f</a>() const;
+    void <a href='#SkPaint_setColor'>setColor</a>(<a href='SkColor_Reference#SkColor'>SkColor</a> color);
+    void <a href='#SkPaint_setColor4f'>setColor4f</a>(const <a href='SkColor4f_Reference#SkColor4f'>SkColor4f</a>& color, <a href='undocumented#SkColorSpace'>SkColorSpace</a>* colorSpace);
+    uint8_t <a href='#SkPaint_getAlpha'>getAlpha</a>() const;
+    void <a href='#SkPaint_setAlpha'>setAlpha</a>(<a href='undocumented#U8CPU'>U8CPU</a> a);
+    void <a href='#SkPaint_setARGB'>setARGB</a>(<a href='undocumented#U8CPU'>U8CPU</a> a, <a href='undocumented#U8CPU'>U8CPU</a> r, <a href='undocumented#U8CPU'>U8CPU</a> g, <a href='undocumented#U8CPU'>U8CPU</a> b);
+    <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getStrokeWidth'>getStrokeWidth</a>() const;
+    void <a href='#SkPaint_setStrokeWidth'>setStrokeWidth</a>(<a href='undocumented#SkScalar'>SkScalar</a> width);
+    <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getStrokeMiter'>getStrokeMiter</a>() const;
+    void <a href='#SkPaint_setStrokeMiter'>setStrokeMiter</a>(<a href='undocumented#SkScalar'>SkScalar</a> miter);
+
+    enum <a href='#SkPaint_Cap'>Cap</a> {
+        <a href='#SkPaint_kButt_Cap'>kButt_Cap</a>,
+        <a href='#SkPaint_kRound_Cap'>kRound_Cap</a>,
+        <a href='#SkPaint_kSquare_Cap'>kSquare_Cap</a>,
+        <a href='#SkPaint_kLast_Cap'>kLast_Cap</a> = <a href='#SkPaint_kSquare_Cap'>kSquare_Cap</a>,
+        <a href='#SkPaint_kDefault_Cap'>kDefault_Cap</a> = <a href='#SkPaint_kButt_Cap'>kButt_Cap</a>,
+    };
+
+    static constexpr int <a href='#SkPaint_kCapCount'>kCapCount</a> = <a href='#SkPaint_kLast_Cap'>kLast_Cap</a> + 1;
+
+    enum <a href='#SkPaint_Join'>Join</a> {
+        <a href='#SkPaint_kMiter_Join'>kMiter_Join</a>,
+        <a href='#SkPaint_kRound_Join'>kRound_Join</a>,
+        <a href='#SkPaint_kBevel_Join'>kBevel_Join</a>,
+        <a href='#SkPaint_kLast_Join'>kLast_Join</a> = <a href='#SkPaint_kBevel_Join'>kBevel_Join</a>,
+        <a href='#SkPaint_kDefault_Join'>kDefault_Join</a> = <a href='#SkPaint_kMiter_Join'>kMiter_Join</a>,
+    };
+
+    static constexpr int <a href='#SkPaint_kJoinCount'>kJoinCount</a> = <a href='#SkPaint_kLast_Join'>kLast_Join</a> + 1;
+
+    <a href='#SkPaint_Cap'>Cap</a> <a href='#SkPaint_getStrokeCap'>getStrokeCap</a>() const;
+    void <a href='#SkPaint_setStrokeCap'>setStrokeCap</a>(<a href='#SkPaint_Cap'>Cap</a> cap);
+    <a href='#SkPaint_Join'>Join</a> <a href='#SkPaint_getStrokeJoin'>getStrokeJoin</a>() const;
+    void <a href='#SkPaint_setStrokeJoin'>setStrokeJoin</a>(<a href='#SkPaint_Join'>Join</a> join);
+    bool <a href='#SkPaint_getFillPath'>getFillPath</a>(const <a href='SkPath_Reference#SkPath'>SkPath</a>& src, <a href='SkPath_Reference#SkPath'>SkPath</a>* dst, const <a href='SkRect_Reference#SkRect'>SkRect</a>* cullRect,
+                     <a href='undocumented#SkScalar'>SkScalar</a> resScale = 1) const;
+    bool <a href='#SkPaint_getFillPath_2'>getFillPath</a>(const <a href='SkPath_Reference#SkPath'>SkPath</a>& src, <a href='SkPath_Reference#SkPath'>SkPath</a>* dst) const;
+    <a href='undocumented#SkShader'>SkShader</a>* <a href='#SkPaint_getShader'>getShader</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='undocumented#SkShader'>SkShader</a>> <a href='#SkPaint_refShader'>refShader</a>() const;
+    void <a href='#SkPaint_setShader'>setShader</a>(sk_sp<<a href='undocumented#SkShader'>SkShader</a>> shader);
+    <a href='undocumented#SkColorFilter'>SkColorFilter</a>* <a href='#SkPaint_getColorFilter'>getColorFilter</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='undocumented#SkColorFilter'>SkColorFilter</a>> <a href='#SkPaint_refColorFilter'>refColorFilter</a>() const;
+    void <a href='#SkPaint_setColorFilter'>setColorFilter</a>(sk_sp<<a href='undocumented#SkColorFilter'>SkColorFilter</a>> colorFilter);
+    <a href='SkBlendMode_Reference#SkBlendMode'>SkBlendMode</a> <a href='#SkPaint_getBlendMode'>getBlendMode</a>() const;
+    bool <a href='#SkPaint_isSrcOver'>isSrcOver</a>() const;
+    void <a href='#SkPaint_setBlendMode'>setBlendMode</a>(<a href='SkBlendMode_Reference#SkBlendMode'>SkBlendMode</a> mode);
+    <a href='undocumented#SkPathEffect'>SkPathEffect</a>* <a href='#SkPaint_getPathEffect'>getPathEffect</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='undocumented#SkPathEffect'>SkPathEffect</a>> <a href='#SkPaint_refPathEffect'>refPathEffect</a>() const;
+    void <a href='#SkPaint_setPathEffect'>setPathEffect</a>(sk_sp<<a href='undocumented#SkPathEffect'>SkPathEffect</a>> pathEffect);
+    <a href='undocumented#SkMaskFilter'>SkMaskFilter</a>* <a href='#SkPaint_getMaskFilter'>getMaskFilter</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='undocumented#SkMaskFilter'>SkMaskFilter</a>> <a href='#SkPaint_refMaskFilter'>refMaskFilter</a>() const;
+    void <a href='#SkPaint_setMaskFilter'>setMaskFilter</a>(sk_sp<<a href='undocumented#SkMaskFilter'>SkMaskFilter</a>> maskFilter);
+    <a href='undocumented#SkTypeface'>SkTypeface</a>* <a href='#SkPaint_getTypeface'>getTypeface</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='undocumented#SkTypeface'>SkTypeface</a>> <a href='#SkPaint_refTypeface'>refTypeface</a>() const;
+    void <a href='#SkPaint_setTypeface'>setTypeface</a>(sk_sp<<a href='undocumented#SkTypeface'>SkTypeface</a>> typeface);
+    <a href='undocumented#SkImageFilter'>SkImageFilter</a>* <a href='#SkPaint_getImageFilter'>getImageFilter</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='undocumented#SkImageFilter'>SkImageFilter</a>> <a href='#SkPaint_refImageFilter'>refImageFilter</a>() const;
+    void <a href='#SkPaint_setImageFilter'>setImageFilter</a>(sk_sp<<a href='undocumented#SkImageFilter'>SkImageFilter</a>> imageFilter);
+    <a href='undocumented#SkDrawLooper'>SkDrawLooper</a>* <a href='#SkPaint_getDrawLooper'>getDrawLooper</a>() const;
+    <a href='undocumented#sk_sp'>sk_sp</a><<a href='undocumented#SkDrawLooper'>SkDrawLooper</a>> <a href='#SkPaint_refDrawLooper'>refDrawLooper</a>() const;
+    <a href='undocumented#SkDrawLooper'>SkDrawLooper</a>* <a href='#SkPaint_getLooper'>getLooper</a>() const;
+    void <a href='#SkPaint_setDrawLooper'>setDrawLooper</a>(sk_sp<<a href='undocumented#SkDrawLooper'>SkDrawLooper</a>> drawLooper);
+    void <a href='#SkPaint_setLooper'>setLooper</a>(sk_sp<<a href='undocumented#SkDrawLooper'>SkDrawLooper</a>> drawLooper);
+
+    enum <a href='#SkPaint_Align'>Align</a> {
+        <a href='#SkPaint_kLeft_Align'>kLeft_Align</a>,
+        <a href='#SkPaint_kCenter_Align'>kCenter_Align</a>,
+        <a href='#SkPaint_kRight_Align'>kRight_Align</a>,
+    };
+
+    static constexpr int <a href='#SkPaint_kAlignCount'>kAlignCount</a> = 3;
+
+    <a href='#SkPaint_Align'>Align</a> <a href='#SkPaint_getTextAlign'>getTextAlign</a>() const;
+    void <a href='#SkPaint_setTextAlign'>setTextAlign</a>(<a href='#SkPaint_Align'>Align</a> align);
+    <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getTextSize'>getTextSize</a>() const;
+    void <a href='#SkPaint_setTextSize'>setTextSize</a>(<a href='undocumented#SkScalar'>SkScalar</a> textSize);
+    <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getTextScaleX'>getTextScaleX</a>() const;
+    void <a href='#SkPaint_setTextScaleX'>setTextScaleX</a>(<a href='undocumented#SkScalar'>SkScalar</a> scaleX);
+    <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getTextSkewX'>getTextSkewX</a>() const;
+    void <a href='#SkPaint_setTextSkewX'>setTextSkewX</a>(<a href='undocumented#SkScalar'>SkScalar</a> skewX);
+
+    enum <a href='#SkPaint_TextEncoding'>TextEncoding</a> {
+        <a href='#SkPaint_kUTF8_TextEncoding'>kUTF8_TextEncoding</a>,
+        <a href='#SkPaint_kUTF16_TextEncoding'>kUTF16_TextEncoding</a>,
+        <a href='#SkPaint_kUTF32_TextEncoding'>kUTF32_TextEncoding</a>,
+        <a href='#SkPaint_kGlyphID_TextEncoding'>kGlyphID_TextEncoding</a>,
+    };
+
+    <a href='#SkPaint_TextEncoding'>TextEncoding</a> <a href='#SkPaint_getTextEncoding'>getTextEncoding</a>() const;
+    void <a href='#SkPaint_setTextEncoding'>setTextEncoding</a>(<a href='#SkPaint_TextEncoding'>TextEncoding</a> encoding);
+
+    struct <a href='#SkPaint_FontMetrics'>FontMetrics</a> {
+
+        enum <a href='#SkPaint_FontMetrics_FontMetricsFlags'>FontMetricsFlags</a> {
+            <a href='#SkPaint_FontMetrics_kUnderlineThicknessIsValid_Flag'>kUnderlineThicknessIsValid_Flag</a> = 1 << 0,
+            <a href='#SkPaint_FontMetrics_kUnderlinePositionIsValid_Flag'>kUnderlinePositionIsValid_Flag</a> = 1 << 1,
+            <a href='#SkPaint_FontMetrics_kStrikeoutThicknessIsValid_Flag'>kStrikeoutThicknessIsValid_Flag</a> = 1 << 2,
+            <a href='#SkPaint_FontMetrics_kStrikeoutPositionIsValid_Flag'>kStrikeoutPositionIsValid_Flag</a> = 1 << 3,
+        };
+
+        uint32_t <a href='#SkPaint_FontMetrics_fFlags'>fFlags</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fTop'>fTop</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fAscent'>fAscent</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fDescent'>fDescent</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fBottom'>fBottom</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fLeading'>fLeading</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fAvgCharWidth'>fAvgCharWidth</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fMaxCharWidth'>fMaxCharWidth</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fXMin'>fXMin</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fXMax'>fXMax</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fXHeight'>fXHeight</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fCapHeight'>fCapHeight</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fUnderlineThickness'>fUnderlineThickness</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fUnderlinePosition'>fUnderlinePosition</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fStrikeoutThickness'>fStrikeoutThickness</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fStrikeoutPosition'>fStrikeoutPosition</a>;
+        bool <a href='#SkPaint_FontMetrics_hasUnderlineThickness'>hasUnderlineThickness</a>(<a href='undocumented#SkScalar'>SkScalar</a>* thickness) const;
+        bool <a href='#SkPaint_FontMetrics_hasUnderlinePosition'>hasUnderlinePosition</a>(<a href='undocumented#SkScalar'>SkScalar</a>* position) const;
+        bool <a href='#SkPaint_FontMetrics_hasStrikeoutThickness'>hasStrikeoutThickness</a>(<a href='undocumented#SkScalar'>SkScalar</a>* thickness) const;
+        bool <a href='#SkPaint_FontMetrics_hasStrikeoutPosition'>hasStrikeoutPosition</a>(<a href='undocumented#SkScalar'>SkScalar</a>* position) const;
+    };
+
+    <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getFontMetrics'>getFontMetrics</a>(<a href='#SkPaint_FontMetrics'>FontMetrics</a>* metrics, <a href='undocumented#SkScalar'>SkScalar</a> scale = 0) const;
+    <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getFontSpacing'>getFontSpacing</a>() const;
+    int <a href='#SkPaint_textToGlyphs'>textToGlyphs</a>(const void* text, size_t byteLength,
+                     <a href='undocumented#SkGlyphID'>SkGlyphID</a> glyphs[]) const;
+    bool <a href='#SkPaint_containsText'>containsText</a>(const void* text, size_t byteLength) const;
+    void <a href='#SkPaint_glyphsToUnichars'>glyphsToUnichars</a>(const <a href='undocumented#SkGlyphID'>SkGlyphID</a> glyphs[], int count, <a href='undocumented#SkUnichar'>SkUnichar</a> text[]) const;
+    int <a href='#SkPaint_countText'>countText</a>(const void* text, size_t byteLength) const;
+    <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_measureText'>measureText</a>(const void* text, size_t length, <a href='SkRect_Reference#SkRect'>SkRect</a>* bounds) const;
+    <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_measureText_2'>measureText</a>(const void* text, size_t length) const;
+    size_t <a href='#SkPaint_breakText'>breakText</a>(const void* text, size_t length, <a href='undocumented#SkScalar'>SkScalar</a> maxWidth,
+                      <a href='undocumented#SkScalar'>SkScalar</a>* measuredWidth = nullptr) const;
+    int <a href='#SkPaint_getTextWidths'>getTextWidths</a>(const void* text, size_t byteLength, <a href='undocumented#SkScalar'>SkScalar</a> widths[],
+                      <a href='SkRect_Reference#SkRect'>SkRect</a> bounds[] = nullptr) const;
+    void <a href='#SkPaint_getTextPath'>getTextPath</a>(const void* text, size_t length, <a href='undocumented#SkScalar'>SkScalar</a> x, <a href='undocumented#SkScalar'>SkScalar</a> y,
+                     <a href='SkPath_Reference#SkPath'>SkPath</a>* path) const;
+    void <a href='#SkPaint_getPosTextPath'>getPosTextPath</a>(const void* text, size_t length,
+                        const <a href='SkPoint_Reference#SkPoint'>SkPoint</a> pos[], <a href='SkPath_Reference#SkPath'>SkPath</a>* path) const;
+    int <a href='#SkPaint_getTextIntercepts'>getTextIntercepts</a>(const void* text, size_t length, <a href='undocumented#SkScalar'>SkScalar</a> x, <a href='undocumented#SkScalar'>SkScalar</a> y,
+                          const <a href='undocumented#SkScalar'>SkScalar</a> bounds[2], <a href='undocumented#SkScalar'>SkScalar</a>* intervals) const;
+    int <a href='#SkPaint_getPosTextIntercepts'>getPosTextIntercepts</a>(const void* text, size_t length, const <a href='SkPoint_Reference#SkPoint'>SkPoint</a> pos[],
+                             const <a href='undocumented#SkScalar'>SkScalar</a> bounds[2], <a href='undocumented#SkScalar'>SkScalar</a>* intervals) const;
+    int <a href='#SkPaint_getPosTextHIntercepts'>getPosTextHIntercepts</a>(const void* text, size_t length, const <a href='undocumented#SkScalar'>SkScalar</a> xpos[],
+                              <a href='undocumented#SkScalar'>SkScalar</a> constY, const <a href='undocumented#SkScalar'>SkScalar</a> bounds[2], <a href='undocumented#SkScalar'>SkScalar</a>* intervals) const;
+    int <a href='#SkPaint_getTextBlobIntercepts'>getTextBlobIntercepts</a>(const <a href='SkTextBlob_Reference#SkTextBlob'>SkTextBlob</a>* blob, const <a href='undocumented#SkScalar'>SkScalar</a> bounds[2],
+                              <a href='undocumented#SkScalar'>SkScalar</a>* intervals) const;
+    <a href='SkRect_Reference#SkRect'>SkRect</a> <a href='#SkPaint_getFontBounds'>getFontBounds</a>() const;
+    bool <a href='#SkPaint_nothingToDraw'>nothingToDraw</a>() const;
+    bool <a href='#SkPaint_canComputeFastBounds'>canComputeFastBounds</a>() const;
+    const <a href='SkRect_Reference#SkRect'>SkRect</a>& <a href='#SkPaint_computeFastBounds'>computeFastBounds</a>(const <a href='SkRect_Reference#SkRect'>SkRect</a>& orig, <a href='SkRect_Reference#SkRect'>SkRect</a>* storage) const;
+    const <a href='SkRect_Reference#SkRect'>SkRect</a>& <a href='#SkPaint_computeFastStrokeBounds'>computeFastStrokeBounds</a>(const <a href='SkRect_Reference#SkRect'>SkRect</a>& orig,
+                                          <a href='SkRect_Reference#SkRect'>SkRect</a>* storage) const;
+    const <a href='SkRect_Reference#SkRect'>SkRect</a>& <a href='#SkPaint_doComputeFastBounds'>doComputeFastBounds</a>(const <a href='SkRect_Reference#SkRect'>SkRect</a>& orig, <a href='SkRect_Reference#SkRect'>SkRect</a>* storage,
+                                      <a href='#SkPaint_Style'>Style</a> style) const;
+};
+</pre>
+
 <a href='#Paint'>Paint</a> controls options applied when drawing and measuring. <a href='#Paint'>Paint</a> collects all
 options outside of the <a href='SkCanvas_Reference#Clip'>Canvas Clip</a> and <a href='SkCanvas_Reference#Matrix'>Canvas Matrix</a>.
 
@@ -30,884 +266,9 @@ is set in <a href='#Paint'>Paint</a>.
 Multiple colors are drawn either by using multiple paints or with objects like
 <a href='undocumented#Shader'>Shader</a> attached to <a href='#Paint'>Paint</a>.
 
-## Overview
-
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Constant'>Constants</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>enum and enum class, and their const values</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Constructor'>Constructors</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>functions that construct <a href='#SkPaint'>SkPaint</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Member_Function'>Functions</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>global and class member functions</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Operator'>Operators</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>operator overloading methods</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Related_Function'>Related Functions</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>similar member functions grouped together</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Struct'>Struct Declarations</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>embedded struct members</td>
-  </tr>
-</table>
-
-
-## <a name='Related_Function'>Related Function</a>
-
-
-SkPaint global, <code>struct</code>, and <code>class</code> related member functions share a topic.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Alpha_Methods'>Alpha Methods</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>get and set <a href='SkColor_Reference#Alpha'>Alpha</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Anti_Alias'>Anti Alias</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>approximating coverage with transparency</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Automatic_Hinting'>Automatic Hinting</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>always adjust glyph paths</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Blend_Mode_Methods'>Blend Mode Methods</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>get and set <a href='SkBlendMode_Reference#Blend_Mode'>Blend Mode</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Color_Filter_Methods'>Color Filter Methods</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>get and set <a href='undocumented#Color_Filter'>Color Filter</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Color_Methods'>Color Methods</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>get and set <a href='SkColor_Reference#Color'>Color</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Device_Text'>Device Text</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>increase precision of glyph position</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Dither'>Dither</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>distributing color error</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Draw_Looper_Methods'>Draw Looper Methods</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>get and set <a href='undocumented#Draw_Looper'>Draw Looper</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Fake_Bold'>Fake Bold</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>approximate font styles</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Fast_Bounds'>Fast Bounds</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>approximate area required by <a href='#Paint'>Paint</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Fill_Path'>Fill Path</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>make <a href='SkPath_Reference#Path'>Path</a> from <a href='undocumented#Path_Effect'>Path Effect</a>, stroking</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Filter_Quality_Methods'>Filter Quality Methods</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>get and set <a href='undocumented#Filter_Quality'>Filter Quality</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_Flags'>Flags</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>attributes represented by single bits</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Font_Embedded_Bitmaps'>Font Embedded Bitmaps</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>custom sized bitmap <a href='undocumented#Glyph'>Glyphs</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Font_Metrics'>Font Metrics</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>common glyph dimensions</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Full_Hinting_Spacing'>Full Hinting Spacing</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>glyph spacing affected by hinting</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_Hinting'>Hinting</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>glyph outline adjustment</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Image_Filter_Methods'>Image Filter Methods</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>get and set <a href='undocumented#Image_Filter'>Image Filter</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Initializers'>Initializers</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>constructors and initialization</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#LCD_Text'>LCD Text</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>text relying on the order of RGB stripes</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Linear_Text'>Linear Text</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>selects text rendering as <a href='undocumented#Glyph'>Glyph</a> or <a href='SkPath_Reference#Path'>Path</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Management'>Management</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>paint copying, moving, comparing</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Mask_Filter_Methods'>Mask Filter Methods</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>get and set <a href='undocumented#Mask_Filter'>Mask Filter</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Measure_Text'>Measure Text</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>width, height, bounds of text</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Miter_Limit'>Miter Limit</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>maximum length of stroked corners</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Path_Effect_Methods'>Path Effect Methods</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>get and set <a href='undocumented#Path_Effect'>Path Effect</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Shader_Methods'>Shader Methods</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>get and set <a href='undocumented#Shader'>Shader</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Stroke_Cap'>Stroke Cap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>decorations at ends of open strokes</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Stroke_Join'>Stroke Join</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>decoration at corners of strokes</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Stroke_Width'>Stroke Width</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>thickness perpendicular to geometry</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_Style'>Style</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>geometry filling, stroking</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Style_Fill'>Style Fill</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>fill and stroke</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Style_Hairline'>Style Hairline</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>lines and curves with minimal width</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Style_Stroke'>Style Stroke</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>lines and curves with width</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Subpixel_Text'>Subpixel Text</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>uses pixel transparency to represent fractional offset</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Text_Align'>Text Align</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>text placement relative to position</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Text_Encoding'>Text Encoding</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>text encoded as characters or <a href='undocumented#Glyph'>Glyphs</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Text_Intercepts'>Text Intercepts</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>advanced underline, strike through</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Text_Path'>Text Path</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>geometry of <a href='undocumented#Glyph'>Glyphs</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Text_Scale_X'>Text Scale X</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>text horizontal scale</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Text_Size'>Text Size</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>overall height in points</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Text_Skew_X'>Text Skew X</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>text horizontal slant</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Typeface_Methods'>Typeface Methods</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>get and set <a href='undocumented#Typeface'>Typeface</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Utility'>Utility</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>rarely called management functions</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#Vertical_Text'>Vertical Text</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>orient text from top to bottom</td>
-  </tr>
-</table>
-
-## <a name='Constant'>Constant</a>
-
-
-SkPaint related constants are defined by <code>enum</code>, <code>enum class</code>,  <code>#define</code>, <code>const</code>, and <code>constexpr</code>.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_Align'>Align</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>glyph locations relative to text position</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_Cap'>Cap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>start and end geometry on stroked shapes</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_Flags'>Flags</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>values described by bits and masks</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_Hinting'>Hinting</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>level of glyph outline adjustment</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_Join'>Join</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>corner geometry on stroked shapes</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_Style'>Style</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>stroke, fill, or both</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_TextEncoding'>TextEncoding</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>character or glyph encoded size</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kAlignCount'>kAlignCount</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>number of different <a href='#Text_Align'>Text Align</a> values defined</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kAllFlags'>kAllFlags</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>mask of all <a href='#SkPaint_Flags'>Flags</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kAntiAlias_Flag'>kAntiAlias Flag</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>mask for setting <a href='#Anti_Alias'>Anti Alias</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kAutoHinting_Flag'>kAutoHinting Flag</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>mask for setting <a href='#Automatic_Hinting'>Automatic Hinting</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kBevel_Join'>kBevel Join</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>connects outside edges</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kButt_Cap'>kButt Cap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>no stroke extension</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kCapCount'>kCapCount</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>number of different <a href='#Stroke_Cap'>Stroke Cap</a> values defined</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kCenter_Align'>kCenter Align</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>centers line of glyphs by its width or height</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kDefault_Cap'>kDefault Cap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>equivalent to <a href='#SkPaint_kButt_Cap'>kButt Cap</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kDefault_Join'>kDefault Join</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>equivalent to <a href='#SkPaint_kMiter_Join'>kMiter Join</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kDither_Flag'>kDither Flag</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>mask for setting <a href='#Dither'>Dither</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kEmbeddedBitmapText_Flag'>kEmbeddedBitmapText Flag</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>mask for setting <a href='#Font_Embedded_Bitmaps'>Font Embedded Bitmaps</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kFakeBoldText_Flag'>kFakeBoldText Flag</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>mask for setting <a href='#Fake_Bold'>Fake Bold</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kFill_Style'>kFill Style</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>set to fill geometry</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kFull_Hinting'>kFull Hinting</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>modifies glyph outlines for maximum constrast</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kGlyphID_TextEncoding'>kGlyphID TextEncoding</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>uses two byte words to represent glyph indices</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kJoinCount'>kJoinCount</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>number of different <a href='#Stroke_Join'>Stroke Join</a> values defined</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kLCDRenderText_Flag'>kLCDRenderText Flag</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>mask for setting <a href='#LCD_Text'>LCD Text</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kLast_Cap'>kLast Cap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>largest <a href='#Stroke_Cap'>Stroke Cap</a> value</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kLast_Join'>kLast Join</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>equivalent to the largest value for <a href='#Stroke_Join'>Stroke Join</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kLeft_Align'>kLeft Align</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>positions glyph by computed font offset</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kLinearText_Flag'>kLinearText Flag</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>mask for setting <a href='#Linear_Text'>Linear Text</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kMiter_Join'>kMiter Join</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>extends to <a href='#Miter_Limit'>Miter Limit</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kNo_Hinting'>kNo Hinting</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>glyph outlines unchanged</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kNormal_Hinting'>kNormal Hinting</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>glyph outlines modified to improve constrast</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kRight_Align'>kRight Align</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>moves lines of glyphs by its width or height</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kRound_Cap'>kRound Cap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>adds circle</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kRound_Join'>kRound Join</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>adds circle</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kSlight_Hinting'>kSlight Hinting</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>minimal modification to improve constrast</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kSquare_Cap'>kSquare Cap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>adds square</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kStrokeAndFill_Style'>kStrokeAndFill Style</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets to stroke and fill geometry</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kStroke_Style'>kStroke Style</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>set to stroke geometry</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kStyleCount'>kStyleCount</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>number of different <a href='#SkPaint_Style'>Style</a> values defined</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kSubpixelText_Flag'>kSubpixelText Flag</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>mask for setting <a href='#Subpixel_Text'>Subpixel Text</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kUTF16_TextEncoding'>kUTF16 TextEncoding</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>uses two byte words to represent most of Unicode</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kUTF32_TextEncoding'>kUTF32 TextEncoding</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>uses four byte words to represent all of Unicode</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kUTF8_TextEncoding'>kUTF8 TextEncoding</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>uses bytes to represent UTF-8 or ASCII</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>mask for setting <a href='#Vertical_Text'>Vertical Text</a></td>
-  </tr>
-</table>
-
-## <a name='Struct'>Struct</a>
-
-
-SkPaint uses C++ structs to declare the public data structures and interfaces.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics'>FontMetrics</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>values computed by <a href='undocumented#Font_Manager'>Font Manager</a> using <a href='undocumented#Typeface'>Typeface</a></td>
-  </tr>
-</table>
-
-## <a name='Constructor'>Constructor</a>
-
-
-SkPaint can be constructed or initialized by these functions, including C++ class constructors.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_empty_constructor'>SkPaint()</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>constructs with default values</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_move_SkPaint'>SkPaint(SkPaint&& paint)</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>moves paint without copying it</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_copy_const_SkPaint'>SkPaint(const SkPaint& paint)</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>makes a shallow copy</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_destructor'>~SkPaint()</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>decreases <a href='undocumented#Reference_Count'>Reference Count</a> of owned objects</td>
-  </tr>
-</table>
-
-## <a name='Operator'>Operator</a>
-
-
-SkPaint operators inline class member functions with arithmetic equivalents.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_notequal_operator'>operator!=(const SkPaint& a, const SkPaint& b)</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>compares paints for inequality</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_move_operator'>operator=(SkPaint&& paint)</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>moves paint without copying it</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_copy_operator'>operator=(const SkPaint& paint)</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>makes a shallow copy</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_equal_operator'>operator==(const SkPaint& a, const SkPaint& b)</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>compares paints for equality</td>
-  </tr>
-</table>
-
-## <a name='Member_Function'>Member Function</a>
-
-
-SkPaint member functions read and modify the structure properties.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_breakText'>breakText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns text that fits in a width</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_canComputeFastBounds'>canComputeFastBounds</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns true if settings allow for fast bounds computation</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_computeFastBounds'>computeFastBounds</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns fill bounds for quick reject tests</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_computeFastStrokeBounds'>computeFastStrokeBounds</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns stroke bounds for quick reject tests</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_containsText'>containsText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns if all text corresponds to <a href='undocumented#Glyph'>Glyphs</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_countText'>countText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns number of <a href='undocumented#Glyph'>Glyphs</a> in text</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_doComputeFastBounds'>doComputeFastBounds</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns bounds for quick reject tests</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getAlpha'>getAlpha</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='SkColor_Reference#Alpha'>Color Alpha</a>, color opacity</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getBlendMode'>getBlendMode</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='SkBlendMode_Reference#Blend_Mode'>Blend Mode</a>, how colors combine with <a href='undocumented#Device'>Device</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getColor'>getColor</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='SkColor_Reference#Alpha'>Color Alpha</a> and RGB, one drawing color</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getColorFilter'>getColorFilter</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='undocumented#Color_Filter'>Color Filter</a>, how colors are altered</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getDrawLooper'>getDrawLooper</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='undocumented#Draw_Looper'>Draw Looper</a>, multiple layers</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getFillPath'>getFillPath</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns fill path equivalent to stroke</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getFilterQuality'>getFilterQuality</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='undocumented#Filter_Quality'>Filter Quality</a>, image filtering level</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getFlags'>getFlags</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='#SkPaint_Flags'>Flags</a> stored in a bit field</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getFontBounds'>getFontBounds</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns union all glyph bounds</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getFontMetrics'>getFontMetrics</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='undocumented#Typeface'>Typeface</a> metrics scaled by text size</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getFontSpacing'>getFontSpacing</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns recommended spacing between lines</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getHash'>getHash</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns a shallow hash for equality checks</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getHinting'>getHinting</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='#SkPaint_Hinting'>Hinting</a>, glyph outline adjustment level</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getImageFilter'>getImageFilter</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='undocumented#Image_Filter'>Image Filter</a>, alter pixels; blur</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getMaskFilter'>getMaskFilter</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='undocumented#Mask_Filter'>Mask Filter</a>, alterations to <a href='undocumented#Mask_Alpha'>Mask Alpha</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getPathEffect'>getPathEffect</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='undocumented#Path_Effect'>Path Effect</a>, modifications to path geometry; dashing</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getPosTextHIntercepts'>getPosTextHIntercepts</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns where lines intersect horizontally positioned text; underlines</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getPosTextIntercepts'>getPosTextIntercepts</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns where lines intersect positioned text; underlines</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getPosTextPath'>getPosTextPath</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='SkPath_Reference#Path'>Path</a> equivalent to positioned text</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getShader'>getShader</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='undocumented#Shader'>Shader</a>, multiple drawing colors; gradients</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getStrokeCap'>getStrokeCap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='#SkPaint_Cap'>Cap</a>, the area drawn at path ends</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getStrokeJoin'>getStrokeJoin</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='#SkPaint_Join'>Join</a>, geometry on path corners</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getStrokeMiter'>getStrokeMiter</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='#Miter_Limit'>Miter Limit</a>, angles with sharp corners</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getStrokeWidth'>getStrokeWidth</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns thickness of the stroke</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getStyle'>getStyle</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='#SkPaint_Style'>Style</a>: stroke, fill, or both</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getTextAlign'>getTextAlign</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='#SkPaint_Align'>Align</a>: left, center, or right</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getTextBlobIntercepts'>getTextBlobIntercepts</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns where lines intersect <a href='undocumented#Text_Blob'>Text Blob</a>; underlines</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getTextEncoding'>getTextEncoding</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns character or glyph encoded size</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getTextIntercepts'>getTextIntercepts</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns where lines intersect text; underlines</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getTextPath'>getTextPath</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='SkPath_Reference#Path'>Path</a> equivalent to text</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getTextScaleX'>getTextScaleX</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns the text horizontal scale; condensed text</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getTextSize'>getTextSize</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns text size in points</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getTextSkewX'>getTextSkewX</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns the text horizontal skew; oblique text</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getTextWidths'>getTextWidths</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns advance and bounds for each glyph in text</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_getTypeface'>getTypeface</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns <a href='undocumented#Typeface'>Typeface</a>, font description</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_glyphsToUnichars'>glyphsToUnichars</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>converts <a href='undocumented#Glyph'>Glyphs</a> into text</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_isAntiAlias'>isAntiAlias</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns true if <a href='#Anti_Alias'>Anti Alias</a> is set</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_isAutohinted'>isAutohinted</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns true if <a href='undocumented#Glyph'>Glyphs</a> are always hinted</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_isDither'>isDither</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns true if <a href='#Dither'>Dither</a> is set</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_isEmbeddedBitmapText'>isEmbeddedBitmapText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns true if <a href='#Font_Embedded_Bitmaps'>Font Embedded Bitmaps</a> is set</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_isFakeBoldText'>isFakeBoldText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns true if <a href='#Fake_Bold'>Fake Bold</a> is set</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_isLCDRenderText'>isLCDRenderText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns true if <a href='#LCD_Text'>LCD Text</a> is set</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_isLinearText'>isLinearText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns true if text is converted to <a href='SkPath_Reference#Path'>Path</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_isSrcOver'>isSrcOver</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns true if <a href='SkBlendMode_Reference#Blend_Mode'>Blend Mode</a> is <a href='SkBlendMode_Reference#SkBlendMode_kSrcOver'>SkBlendMode::kSrcOver</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_isSubpixelText'>isSubpixelText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns true if <a href='#Subpixel_Text'>Subpixel Text</a> is set</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_isVerticalText'>isVerticalText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns true if <a href='#Vertical_Text'>Vertical Text</a> is set</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_measureText'>measureText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns advance width and bounds of text</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_nothingToDraw'>nothingToDraw</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns true if <a href='#Paint'>Paint</a> prevents all drawing</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_refColorFilter'>refColorFilter</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>references <a href='undocumented#Color_Filter'>Color Filter</a>, how colors are altered</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_refDrawLooper'>refDrawLooper</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>references <a href='undocumented#Draw_Looper'>Draw Looper</a>, multiple layers</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_refImageFilter'>refImageFilter</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>references <a href='undocumented#Image_Filter'>Image Filter</a>, alter pixels; blur</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_refMaskFilter'>refMaskFilter</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>references <a href='undocumented#Mask_Filter'>Mask Filter</a>, alterations to <a href='undocumented#Mask_Alpha'>Mask Alpha</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_refPathEffect'>refPathEffect</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>references <a href='undocumented#Path_Effect'>Path Effect</a>, modifications to path geometry; dashing</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_refShader'>refShader</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>references <a href='undocumented#Shader'>Shader</a>, multiple drawing colors; gradients</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_refTypeface'>refTypeface</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>references <a href='undocumented#Typeface'>Typeface</a>, font description</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_reset'>reset</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets to default values</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setARGB'>setARGB</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets color by component</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setAlpha'>setAlpha</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='SkColor_Reference#Alpha'>Color Alpha</a>, color opacity</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setAntiAlias'>setAntiAlias</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets or clears <a href='#Anti_Alias'>Anti Alias</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setAutohinted'>setAutohinted</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='undocumented#Glyph'>Glyphs</a> to always be hinted</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setBlendMode'>setBlendMode</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='SkBlendMode_Reference#Blend_Mode'>Blend Mode</a>, how colors combine with destination</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setColor'>setColor</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='SkColor_Reference#Alpha'>Color Alpha</a> and RGB, one drawing color</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setColorFilter'>setColorFilter</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='undocumented#Color_Filter'>Color Filter</a>, alters color</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setDither'>setDither</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets or clears <a href='#Dither'>Dither</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setDrawLooper'>setDrawLooper</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='undocumented#Draw_Looper'>Draw Looper</a>, multiple layers</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setEmbeddedBitmapText'>setEmbeddedBitmapText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets or clears <a href='#Font_Embedded_Bitmaps'>Font Embedded Bitmaps</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setFakeBoldText'>setFakeBoldText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets or clears <a href='#Fake_Bold'>Fake Bold</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setFilterQuality'>setFilterQuality</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='undocumented#Filter_Quality'>Filter Quality</a>, the image filtering level</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setFlags'>setFlags</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets multiple <a href='#SkPaint_Flags'>Flags</a> in a bit field</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setHinting'>setHinting</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='#SkPaint_Hinting'>Hinting</a>, glyph outline adjustment level</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setImageFilter'>setImageFilter</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='undocumented#Image_Filter'>Image Filter</a>, alter pixels; blur</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setLCDRenderText'>setLCDRenderText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets or clears <a href='#LCD_Text'>LCD Text</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setLinearText'>setLinearText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>converts to <a href='SkPath_Reference#Path'>Path</a> before draw or measure</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setMaskFilter'>setMaskFilter</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='undocumented#Mask_Filter'>Mask Filter</a>, alterations to <a href='undocumented#Mask_Alpha'>Mask Alpha</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setPathEffect'>setPathEffect</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='undocumented#Path_Effect'>Path Effect</a>, modifications to path geometry; dashing</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setShader'>setShader</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='undocumented#Shader'>Shader</a>, multiple drawing colors; gradients</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setStrokeCap'>setStrokeCap</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='#SkPaint_Cap'>Cap</a>, the area drawn at path ends</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setStrokeJoin'>setStrokeJoin</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='#SkPaint_Join'>Join</a>, geometry on path corners</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setStrokeMiter'>setStrokeMiter</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='#Miter_Limit'>Miter Limit</a>, angles with sharp corners</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setStrokeWidth'>setStrokeWidth</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets thickness of the stroke</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setStyle'>setStyle</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='#SkPaint_Style'>Style</a>: stroke, fill, or both</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setSubpixelText'>setSubpixelText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets or clears <a href='#Subpixel_Text'>Subpixel Text</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setTextAlign'>setTextAlign</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='#SkPaint_Align'>Align</a>: left, center, or right</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setTextEncoding'>setTextEncoding</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets character or glyph encoded size</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setTextScaleX'>setTextScaleX</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets the text horizontal scale; condensed text</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setTextSize'>setTextSize</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets text size in points</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setTextSkewX'>setTextSkewX</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets the text horizontal skew; oblique text</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setTypeface'>setTypeface</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets <a href='undocumented#Typeface'>Typeface</a>, font description</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_setVerticalText'>setVerticalText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>sets or clears <a href='#Vertical_Text'>Vertical Text</a></td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_textToGlyphs'>textToGlyphs</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>converts text into glyph indices</td>
-  </tr>
-</table>
-
-## <a name='Initializers'>Initializers</a>
-
 <a name='SkPaint_empty_constructor'></a>
-## SkPaint
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='#SkPaint'>SkPaint</a>()
@@ -938,7 +299,6 @@ Constructs <a href='#Paint'>Paint</a> with default values.
 | <a href='undocumented#Path_Effect'>Path Effect</a> | nullptr |
 | <a href='undocumented#Shader'>Shader</a> | nullptr |
 | <a href='#SkPaint_Style'>Style</a> | <a href='#SkPaint_kFill_Style'>kFill Style</a> |
-| <a href='#Text_Align'>Text Align</a> | <a href='#SkPaint_kLeft_Align'>kLeft Align</a> |
 | <a href='#Text_Encoding'>Text Encoding</a> | <a href='#SkPaint_kUTF8_TextEncoding'>kUTF8 TextEncoding</a> |
 | <a href='#Text_Scale_X'>Text Scale X</a> | 1 |
 | <a href='#Text_Size'>Text Size</a> | 12 |
@@ -948,7 +308,6 @@ Constructs <a href='#Paint'>Paint</a> with default values.
 | <a href='#Stroke_Join'>Stroke Join</a> | <a href='#SkPaint_kMiter_Join'>kMiter Join</a> |
 | <a href='#Stroke_Width'>Stroke Width</a> | 0 |
 | <a href='#Subpixel_Text'>Subpixel Text</a> | false |
-| <a href='#Vertical_Text'>Vertical Text</a> | false |
 
 The flags, text size, hinting, and miter limit may be overridden at compile time by defining
 paint default values. The overrides may be included in "SkUserConfig.h" or predefined by the
@@ -962,10 +321,9 @@ default initialized <a href='#Paint'>Paint</a>
 
 <div><fiddle-embed name="c4b2186d85c142a481298f7144295ffd"></fiddle-embed></div>
 
----
-
 <a name='SkPaint_copy_const_SkPaint'></a>
-## SkPaint
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='#SkPaint'>SkPaint</a>(const <a href='#SkPaint'>SkPaint</a>& paint)
@@ -1004,10 +362,9 @@ SK_ColorBLUE == paint2.getColor()
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_move_SkPaint'></a>
-## SkPaint
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='#SkPaint'>SkPaint</a>(<a href='#SkPaint'>SkPaint</a>&& paint)
@@ -1041,10 +398,9 @@ path effect unique: true
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_reset'></a>
-## reset
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_reset'>reset</a>()
@@ -1065,10 +421,9 @@ paint1 == paint2
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_destructor'></a>
-## ~SkPaint
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='#SkPaint_destructor'>~SkPaint</a>()
@@ -1078,12 +433,11 @@ Decreases <a href='#Paint'>Paint</a> <a href='undocumented#Reference_Count'>Refe
 <a href='undocumented#Mask_Filter'>Mask Filter</a>, <a href='undocumented#Color_Filter'>Color Filter</a>, <a href='undocumented#Draw_Looper'>Draw Looper</a>, and <a href='undocumented#Image_Filter'>Image Filter</a>. If the
 objects containing <a href='undocumented#Reference_Count'>Reference Count</a> go to zero, they are deleted.
 
----
-
-## <a name='Management'>Management</a>
+<a name='Management'></a>
 
 <a name='SkPaint_copy_operator'></a>
-## operator=
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='#SkPaint'>SkPaint</a>& <a href='#SkPaint_copy_operator'>operator=(const SkPaint& paint)</a>
@@ -1120,10 +474,9 @@ SK_ColorRED == paint2.getColor()
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_move_operator'></a>
-## operator=
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='#SkPaint'>SkPaint</a>& <a href='#SkPaint_move_operator'>operator=(SkPaint&& paint)</a>
@@ -1159,10 +512,9 @@ SK_ColorRED == paint2.getColor()
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_equal_operator'></a>
-## operator==
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_equal_operator'>operator==(const SkPaint& a, const SkPaint& b)</a>
@@ -1203,10 +555,9 @@ paint1 != paint2
 
 <a href='#SkPaint_notequal_operator'>operator!=(const SkPaint& a, const SkPaint& b)</a>
 
----
-
 <a name='SkPaint_notequal_operator'></a>
-## operator!=
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_notequal_operator'>operator!=(const SkPaint& a, const SkPaint& b)</a>
@@ -1247,10 +598,9 @@ paint1 == paint2
 
 <a href='#SkPaint_equal_operator'>operator==(const SkPaint& a, const SkPaint& b)</a>
 
----
-
 <a name='SkPaint_getHash'></a>
-## getHash
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 uint32_t <a href='#SkPaint_getHash'>getHash</a>() const
@@ -1283,18 +633,18 @@ paint1.getHash() == paint2.getHash()
 
 </fiddle-embed></div>
 
+<a name='Hinting'></a>
+
+<a name='SkPaint_Hinting'></a>
+
 ---
-
-## <a name='Hinting'>Hinting</a>
-
-## <a name='SkPaint_Hinting'>Enum SkPaint::Hinting</a>
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
     enum <a href='#SkPaint_Hinting'>Hinting</a> {
-        <a href='#SkPaint_kNo_Hinting'>kNo Hinting</a>            = 0,
-        <a href='#SkPaint_kSlight_Hinting'>kSlight Hinting</a>        = 1,
-        <a href='#SkPaint_kNormal_Hinting'>kNormal Hinting</a>        = 2,
-        <a href='#SkPaint_kFull_Hinting'>kFull Hinting</a>          = 3,
+        <a href='#SkPaint_kNo_Hinting'>kNo_Hinting</a> = 0,
+        <a href='#SkPaint_kSlight_Hinting'>kSlight_Hinting</a> = 1,
+        <a href='#SkPaint_kNormal_Hinting'>kNormal_Hinting</a> = 2,
+        <a href='#SkPaint_kFull_Hinting'>kFull_Hinting</a> = 3,
     };
 </pre>
 
@@ -1367,7 +717,8 @@ On Windows with DirectWrite, <a href='#SkPaint_Hinting'>Hinting</a> has no effec
 Set <a href='undocumented#SkPaintDefaults_Hinting'>SkPaintDefaults Hinting</a> at compile time to change the default setting.
 
 <a name='SkPaint_getHinting'></a>
-## getHinting
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='#SkPaint_Hinting'>Hinting</a> <a href='#SkPaint_getHinting'>getHinting</a>() const
@@ -1391,10 +742,9 @@ SkPaint::kNormal_Hinting == paint.getHinting()
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setHinting'></a>
-## setHinting
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setHinting'>setHinting</a>(<a href='#SkPaint_Hinting'>Hinting</a> hintingLevel)
@@ -1429,27 +779,24 @@ paint1 == paint2
 
 </fiddle-embed></div>
 
+<a name='Flags'></a>
+
+<a name='SkPaint_Flags'></a>
+
 ---
-
-## <a name='Flags'>Flags</a>
-
-## <a name='SkPaint_Flags'>Enum SkPaint::Flags</a>
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
     enum <a href='#SkPaint_Flags'>Flags</a> {
-        <a href='#SkPaint_kAntiAlias_Flag'>kAntiAlias Flag</a>       = 0x01,
-        <a href='#SkPaint_kDither_Flag'>kDither Flag</a>          = 0x04,
-        <a href='#SkPaint_kFakeBoldText_Flag'>kFakeBoldText Flag</a>    = 0x20,
-        <a href='#SkPaint_kLinearText_Flag'>kLinearText Flag</a>      = 0x40,
-        <a href='#SkPaint_kSubpixelText_Flag'>kSubpixelText Flag</a>    = 0x80,
-        <a href='#SkPaint_kLCDRenderText_Flag'>kLCDRenderText Flag</a>   = 0x200,
-        <a href='#SkPaint_kEmbeddedBitmapText_Flag'>kEmbeddedBitmapText Flag</a> = 0x400,
-        <a href='#SkPaint_kAutoHinting_Flag'>kAutoHinting Flag</a>     = 0x800,
-        <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a>    = 0x1000,
-
+        <a href='#SkPaint_kAntiAlias_Flag'>kAntiAlias_Flag</a> = 0x01,
+        <a href='#SkPaint_kDither_Flag'>kDither_Flag</a> = 0x04,
+        <a href='#SkPaint_kFakeBoldText_Flag'>kFakeBoldText_Flag</a> = 0x20,
+        <a href='#SkPaint_kLinearText_Flag'>kLinearText_Flag</a> = 0x40,
+        <a href='#SkPaint_kSubpixelText_Flag'>kSubpixelText_Flag</a> = 0x80,
+        <a href='#SkPaint_kLCDRenderText_Flag'>kLCDRenderText_Flag</a> = 0x200,
+        <a href='#SkPaint_kEmbeddedBitmapText_Flag'>kEmbeddedBitmapText_Flag</a> = 0x400,
+        <a href='#SkPaint_kAutoHinting_Flag'>kAutoHinting_Flag</a> = 0x800,
         <a href='#SkPaint_kAllFlags'>kAllFlags</a> = 0xFFFF,
     };
-
 </pre>
 
 The bit values stored in <a href='#SkPaint_Flags'>Flags</a>.
@@ -1513,12 +860,6 @@ mask for setting Font_Embedded_Bitmaps</td>
 mask for setting Automatic_Hinting</td>
   </tr>
   <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a name='SkPaint_kVerticalText_Flag'><code>SkPaint::kVerticalText_Flag</code></a></td>
-    <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>0x1000</td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>
-mask for setting Vertical_Text</td>
-  </tr>
-  <tr>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a name='SkPaint_kAllFlags'><code>SkPaint::kAllFlags</code></a></td>
     <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>0xFFFF</td>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>
@@ -1527,16 +868,18 @@ mask of all <a href='#SkPaint_Flags'>Flags</a>, including private flags and flag
 <a href='#SkPaint_Flags'>Flags</a> default to all flags clear, disabling the associated feature.
 </table>
 
-## <a name='SkPaint_ReserveFlags'>Enum SkPaint::ReserveFlags</a>
+<a name='SkPaint_ReserveFlags'></a>
 
-Deprecated.
+---
 
-soonOnly valid for Android framework.
+To be deprecated soon.
+
+Only valid for Android framework.
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
     enum <a href='#SkPaint_ReserveFlags'>ReserveFlags</a> {
-        <a href='#SkPaint_kUnderlineText_ReserveFlag'>kUnderlineText ReserveFlag</a>   = 0x08,
-        <a href='#SkPaint_kStrikeThruText_ReserveFlag'>kStrikeThruText ReserveFlag</a>  = 0x10,
+        <a href='#SkPaint_kUnderlineText_ReserveFlag'>kUnderlineText_ReserveFlag</a> = 0x08,
+        <a href='#SkPaint_kStrikeThruText_ReserveFlag'>kStrikeThruText_ReserveFlag</a> = 0x10,
     };
 </pre>
 
@@ -1550,22 +893,23 @@ soonOnly valid for Android framework.
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a name='SkPaint_kUnderlineText_ReserveFlag'><code>SkPaint::kUnderlineText_ReserveFlag</code></a></td>
     <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>0x0008</td>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>
-Deprecated.
+To be deprecated soon.
 
-soon</td>
+</td>
   </tr>
   <tr>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a name='SkPaint_kStrikeThruText_ReserveFlag'><code>SkPaint::kStrikeThruText_ReserveFlag</code></a></td>
     <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>0x0010</td>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>
-Deprecated.
+To be deprecated soon.
 
-soon</td>
+</td>
   </tr>
 </table>
 
 <a name='SkPaint_getFlags'></a>
-## getFlags
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 uint32_t <a href='#SkPaint_getFlags'>getFlags</a>() const
@@ -1590,10 +934,9 @@ zero, one, or more bits described by <a href='#SkPaint_Flags'>Flags</a>
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setFlags'></a>
-## setFlags
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setFlags'>setFlags</a>(uint32_t flags)
@@ -1622,9 +965,9 @@ paint.isDither()
 
 </fiddle-embed></div>
 
----
+<a name='Anti_Alias'></a>
 
-## <a name='Anti_Alias'>Anti Alias</a>
+---
 
 <a href='#Anti_Alias'>Anti Alias</a> drawing approximates partial pixel coverage with transparency.
 If <a href='#SkPaint_kAntiAlias_Flag'>kAntiAlias Flag</a> is clear, pixel centers contained by the shape edge are drawn opaque.
@@ -1655,7 +998,8 @@ The lines are drawn into <a href='SkBitmap_Reference#Bitmap'>Bitmap</a>, then dr
 </div></fiddle-embed></div>
 
 <a name='SkPaint_isAntiAlias'></a>
-## isAntiAlias
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_isAntiAlias'>isAntiAlias</a>() const
@@ -1682,10 +1026,9 @@ paint.isAntiAlias() == !!(paint.getFlags() & SkPaint::kAntiAlias_Flag)
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setAntiAlias'></a>
-## setAntiAlias
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setAntiAlias'>setAntiAlias</a>(bool aa)
@@ -1716,9 +1059,9 @@ paint1 == paint2
 
 </fiddle-embed></div>
 
----
+<a name='Dither'></a>
 
-## <a name='Dither'>Dither</a>
+---
 
 <a href='#Dither'>Dither</a> increases fidelity by adjusting the color of adjacent pixels.
 This can help to smooth color transitions and reducing banding in gradients.
@@ -1735,7 +1078,7 @@ Dithering is always enabled for linear gradients drawing into
 <a href='#Dither'>Dither</a> can be enabled by default by setting <a href='undocumented#SkPaintDefaults_Flags'>SkPaintDefaults Flags</a> to <a href='#SkPaint_kDither_Flag'>kDither Flag</a>
 at compile time.
 
-Some platform implementations may ignore dithering. SetSK_IGNORE_GPU_DITHERto ignore <a href='#Dither'>Dither</a> on <a href='undocumented#GPU_Surface'>GPU Surface</a>.
+Some platform implementations may ignore dithering. Set <code>SK_IGNORE_GPU_DITHER</code>to ignore <a href='#Dither'>Dither</a> on <a href='undocumented#GPU_Surface'>GPU Surface</a>.
 
 ### Example
 
@@ -1750,8 +1093,13 @@ Drawing the gradient repeatedly with <a href='SkBlendMode_Reference#SkBlendMode_
 dither, making it easier to see.
 </div></fiddle-embed></div>
 
+### See Also
+
+Gradient <a href='SkImageInfo_Reference#kRGB_565_SkColorType'>kRGB_565_SkColorType</a>
+
 <a name='SkPaint_isDither'></a>
-## isDither
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_isDither'>isDither</a>() const
@@ -1778,10 +1126,9 @@ paint.isDither() == !!(paint.getFlags() & SkPaint::kDither_Flag)
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setDither'></a>
-## setDither
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setDither'>setDither</a>(bool dither)
@@ -1815,13 +1162,9 @@ paint1 == paint2
 
 <a href='SkImageInfo_Reference#kRGB_565_SkColorType'>kRGB_565_SkColorType</a>
 
+<a name='Device_Text'></a>
+
 ---
-
-### See Also
-
-Gradient <a href='SkImageInfo_Reference#kRGB_565_SkColorType'>kRGB_565_SkColorType</a>
-
-## <a name='Device_Text'>Device Text</a>
 
 <a href='#LCD_Text'>LCD Text</a> and <a href='#Subpixel_Text'>Subpixel Text</a> increase the precision of glyph position.
 
@@ -1847,14 +1190,15 @@ When <a href='#Subpixel_Text'>Subpixel Text</a> is disabled, the comma <a href='
 When <a href='#Subpixel_Text'>Subpixel Text</a> is enabled, the comma <a href='undocumented#Glyph'>Glyphs</a> are unique, but appear evenly spaced.
 </div></fiddle-embed></div>
 
-## <a name='Linear_Text'>Linear Text</a>
+<a name='Linear_Text'></a>
 
 <a href='#Linear_Text'>Linear Text</a> selects whether text is rendered as a <a href='undocumented#Glyph'>Glyph</a> or as a <a href='SkPath_Reference#Path'>Path</a>.
 If <a href='#SkPaint_kLinearText_Flag'>kLinearText Flag</a> is set, it has the same effect as setting <a href='#SkPaint_Hinting'>Hinting</a> to <a href='#SkPaint_kNormal_Hinting'>kNormal Hinting</a>.
 If <a href='#SkPaint_kLinearText_Flag'>kLinearText Flag</a> is clear, it is the same as setting <a href='#SkPaint_Hinting'>Hinting</a> to <a href='#SkPaint_kNo_Hinting'>kNo Hinting</a>.
 
 <a name='SkPaint_isLinearText'></a>
-## isLinearText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_isLinearText'>isLinearText</a>() const
@@ -1876,10 +1220,9 @@ Equivalent to <a href='#SkPaint_getFlags'>getFlags</a> masked with <a href='#SkP
 
 <a href='#SkPaint_setLinearText'>setLinearText</a> <a href='#SkPaint_Hinting'>Hinting</a>
 
----
-
 <a name='SkPaint_setLinearText'></a>
-## setLinearText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setLinearText'>setLinearText</a>(bool linearText)
@@ -1906,16 +1249,15 @@ Clears <a href='#SkPaint_kLinearText_Flag'>kLinearText Flag</a> if <a href='#SkP
 
 <a href='#SkPaint_isLinearText'>isLinearText</a> <a href='#SkPaint_Hinting'>Hinting</a>
 
----
-
-## <a name='Subpixel_Text'>Subpixel Text</a>
+<a name='Subpixel_Text'></a>
 
 <a href='#SkPaint_Flags'>Flags</a> <a href='#SkPaint_kSubpixelText_Flag'>kSubpixelText Flag</a> uses the pixel transparency to represent a fractional offset.
 As the opaqueness
 of the color increases, the edge of the glyph appears to move towards the outside of the pixel.
 
 <a name='SkPaint_isSubpixelText'></a>
-## isSubpixelText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_isSubpixelText'>isSubpixelText</a>() const
@@ -1942,10 +1284,9 @@ paint.isSubpixelText() == !!(paint.getFlags() & SkPaint::kSubpixelText_Flag)
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setSubpixelText'></a>
-## setSubpixelText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setSubpixelText'>setSubpixelText</a>(bool subpixelText)
@@ -1975,9 +1316,7 @@ paint1 == paint2
 
 </fiddle-embed></div>
 
----
-
-## <a name='LCD_Text'>LCD Text</a>
+<a name='LCD_Text'></a>
 
 When set, <a href='#SkPaint_Flags'>Flags</a> <a href='#SkPaint_kLCDRenderText_Flag'>kLCDRenderText Flag</a> takes advantage of the organization of RGB stripes that
 create a color, and relies
@@ -1986,7 +1325,8 @@ on the small size of the stripe and visual perception to make the color fringing
 the color components as RGB or BGR.
 
 <a name='SkPaint_isLCDRenderText'></a>
-## isLCDRenderText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_isLCDRenderText'>isLCDRenderText</a>() const
@@ -2013,10 +1353,9 @@ paint.isLCDRenderText() == !!(paint.getFlags() & SkPaint::kLCDRenderText_Flag)
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setLCDRenderText'></a>
-## setLCDRenderText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setLCDRenderText'>setLCDRenderText</a>(bool lcdText)
@@ -2046,9 +1385,9 @@ paint1 == paint2
 
 </fiddle-embed></div>
 
----
+<a name='Font_Embedded_Bitmaps'></a>
 
-## <a name='Font_Embedded_Bitmaps'>Font Embedded Bitmaps</a>
+---
 
 <a href='#Font_Embedded_Bitmaps'>Font Embedded Bitmaps</a> allows selecting custom sized bitmap <a href='undocumented#Glyph'>Glyphs</a>.
 <a href='#SkPaint_Flags'>Flags</a> <a href='#SkPaint_kEmbeddedBitmapText_Flag'>kEmbeddedBitmapText Flag</a> when set chooses an embedded bitmap glyph over an outline contained
@@ -2089,7 +1428,8 @@ Windows may select the bitmap glyph but is not required to do so.
 </pre>
 
 <a name='SkPaint_isEmbeddedBitmapText'></a>
-## isEmbeddedBitmapText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_isEmbeddedBitmapText'>isEmbeddedBitmapText</a>() const
@@ -2116,10 +1456,9 @@ paint.isEmbeddedBitmapText() == !!(paint.getFlags() & SkPaint::kEmbeddedBitmapTe
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setEmbeddedBitmapText'></a>
-## setEmbeddedBitmapText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setEmbeddedBitmapText'>setEmbeddedBitmapText</a>(bool useEmbeddedBitmapText)
@@ -2149,9 +1488,7 @@ paint1 == paint2
 
 </fiddle-embed></div>
 
----
-
-## <a name='Automatic_Hinting'>Automatic Hinting</a>
+<a name='Automatic_Hinting'></a>
 
 If <a href='#SkPaint_Hinting'>Hinting</a> is set to <a href='#SkPaint_kNormal_Hinting'>kNormal Hinting</a> or <a href='#SkPaint_kFull_Hinting'>kFull Hinting</a>, <a href='#Automatic_Hinting'>Automatic Hinting</a>
 instructs the <a href='undocumented#Font_Manager'>Font Manager</a> to always hint <a href='undocumented#Glyph'>Glyphs</a>.
@@ -2161,7 +1498,8 @@ instructs the <a href='undocumented#Font_Manager'>Font Manager</a> to always hin
 <a href='#Automatic_Hinting'>Automatic Hinting</a> only affects platforms that use FreeType as the <a href='undocumented#Font_Manager'>Font Manager</a>.
 
 <a name='SkPaint_isAutohinted'></a>
-## isAutohinted
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_isAutohinted'>isAutohinted</a>() const
@@ -2194,10 +1532,9 @@ paint.isAutohinted() == !!(paint.getFlags() & SkPaint::kAutoHinting_Flag)
 
 <a href='#SkPaint_setAutohinted'>setAutohinted</a> <a href='#SkPaint_Hinting'>Hinting</a>
 
----
-
 <a name='SkPaint_setAutohinted'></a>
-## setAutohinted
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setAutohinted'>setAutohinted</a>(bool useAutohinter)
@@ -2229,99 +1566,9 @@ Clears <a href='#SkPaint_kAutoHinting_Flag'>kAutoHinting Flag</a> if <a href='#S
 
 <a href='#SkPaint_isAutohinted'>isAutohinted</a> <a href='#SkPaint_Hinting'>Hinting</a>
 
----
-
-## <a name='Vertical_Text'>Vertical Text</a>
-
-<a href='undocumented#Text'>Text</a> may be drawn by positioning each glyph, or by positioning the first glyph and
-using <a href='undocumented#Advance'>Font Advance</a> to position subsequent <a href='undocumented#Glyph'>Glyphs</a>. By default, each successive glyph
-is positioned to the right of the preceding glyph. <a href='#Vertical_Text'>Vertical Text</a> sets successive
-<a href='undocumented#Glyph'>Glyphs</a> to position below the preceding glyph.
-
-Skia can translate text character codes as a series of <a href='undocumented#Glyph'>Glyphs</a>, but does not implement
-font substitution,
-textual substitution, line layout, or contextual spacing like <a href='undocumented#Kerning'>Kerning</a> pairs. Use
-a text shaping engine like <a href='https://harfbuzz.org/'>HarfBuzz</a></a> to translate text runs
-into glyph series.
-
-<a href='#Vertical_Text'>Vertical Text</a> is clear if text is drawn left to right or set if drawn from top to bottom.
-
-<a href='#SkPaint_Flags'>Flags</a> <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> if clear draws text left to right.
-<a href='#SkPaint_Flags'>Flags</a> <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> if set draws text top to bottom.
-
-<a href='#Vertical_Text'>Vertical Text</a> is clear by default.
-<a href='#Vertical_Text'>Vertical Text</a> can be set by default by setting <a href='undocumented#SkPaintDefaults_Flags'>SkPaintDefaults Flags</a> to
-<a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> at compile time.
-
-### Example
-
-<div><fiddle-embed name="8df5800819311b71373d9abb669b49b8"></fiddle-embed></div>
-
-<a name='SkPaint_isVerticalText'></a>
-## isVerticalText
-
-<pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
-bool <a href='#SkPaint_isVerticalText'>isVerticalText</a>() const
-</pre>
-
-Returns true if <a href='undocumented#Glyph'>Glyphs</a> are drawn top to bottom instead of left to right.
-
-Equivalent to <a href='#SkPaint_getFlags'>getFlags</a> masked with <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a>.
-
-### Return Value
-
-<a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> state
-
-### Example
-
-<div><fiddle-embed name="4a269b16e644d473870ffa873396f139">
-
-#### Example Output
-
-~~~~
-paint.isVerticalText() == !!(paint.getFlags() & SkPaint::kVerticalText_Flag)
-paint.isVerticalText() == !!(paint.getFlags() & SkPaint::kVerticalText_Flag)
-~~~~
-
-</fiddle-embed></div>
+<a name='Fake_Bold'></a>
 
 ---
-
-<a name='SkPaint_setVerticalText'></a>
-## setVerticalText
-
-<pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
-void <a href='#SkPaint_setVerticalText'>setVerticalText</a>(bool verticalText)
-</pre>
-
-Returns true if text advance positions the next glyph below the previous glyph instead of to the
-right of previous glyph.
-
-Sets <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> if vertical is true.
-Clears <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> if vertical is false.
-
-### Parameters
-
-<table>  <tr>    <td><a name='SkPaint_setVerticalText_verticalText'><code><strong>verticalText</strong></code></a></td>
-    <td>setting for <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a></td>
-  </tr>
-</table>
-
-### Example
-
-<div><fiddle-embed name="6fbd7e9e1a346cb8d7f537786009c736">
-
-#### Example Output
-
-~~~~
-paint1 == paint2
-~~~~
-
-</fiddle-embed></div>
-
----
-
-## <a name='Fake_Bold'>Fake Bold</a>
 
 <a href='#Fake_Bold'>Fake Bold</a> approximates the bold font style accompanying a normal font when a bold font face
 is not available. Skia does not provide font substitution; it is up to the client to find the
@@ -2341,7 +1588,8 @@ by increasing the stroke width and setting the <a href='#SkPaint_Style'>Style</a
 <div><fiddle-embed name="e811f4829a2daaaeaad3795504a7e02a"></fiddle-embed></div>
 
 <a name='SkPaint_isFakeBoldText'></a>
-## isFakeBoldText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_isFakeBoldText'>isFakeBoldText</a>() const
@@ -2369,10 +1617,9 @@ paint.isFakeBoldText() == !!(paint.getFlags() & SkPaint::kFakeBoldText_Flag)
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setFakeBoldText'></a>
-## setFakeBoldText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setFakeBoldText'>setFakeBoldText</a>(bool fakeBoldText)
@@ -2402,9 +1649,7 @@ paint1 == paint2
 
 </fiddle-embed></div>
 
----
-
-## <a name='Full_Hinting_Spacing'>Full Hinting Spacing</a>
+<a name='Full_Hinting_Spacing'></a>
 
 if <a href='#SkPaint_Hinting'>Hinting</a> is set to <a href='#SkPaint_kFull_Hinting'>kFull Hinting</a>, <a href='#Full_Hinting_Spacing'>Full Hinting Spacing</a> adjusts the character
 spacing by the difference of the hinted and <a href='undocumented#Unhinted'>Unhinted</a> <a href='undocumented#Left_Side_Bearing'>Left Side Bearing</a> and
@@ -2415,7 +1660,8 @@ FreeType as their <a href='undocumented#Engine'>Font Engine</a>.
 a specific pair of characters is adjusted using data in the font <a href='undocumented#Kerning'>Kerning</a> tables.
 
 <a name='SkPaint_isDevKernText'></a>
-## isDevKernText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_isDevKernText'>isDevKernText</a>() const
@@ -2423,10 +1669,9 @@ bool <a href='#SkPaint_isDevKernText'>isDevKernText</a>() const
 
 Deprecated.
 
----
-
 <a name='SkPaint_setDevKernText'></a>
-## setDevKernText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setDevKernText'>setDevKernText</a>(bool)
@@ -2434,9 +1679,9 @@ void <a href='#SkPaint_setDevKernText'>setDevKernText</a>(bool)
 
 Deprecated.
 
----
+<a name='Filter_Quality_Methods'></a>
 
-## <a name='Filter_Quality_Methods'>Filter Quality Methods</a>
+---
 
 <a href='undocumented#Filter_Quality'>Filter Quality</a> trades speed for image filtering when the image is scaled.
 A lower <a href='undocumented#Filter_Quality'>Filter Quality</a> draws faster, but has less fidelity.
@@ -2466,7 +1711,8 @@ and when <a href='#Paint'>Paint</a> has a <a href='undocumented#Shader'>Shader</
 <div><fiddle-embed name="69369cff2f5b145a6f616092513266a0"></fiddle-embed></div>
 
 <a name='SkPaint_getFilterQuality'></a>
-## getFilterQuality
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkFilterQuality'>SkFilterQuality</a> <a href='#SkPaint_getFilterQuality'>getFilterQuality</a>() const
@@ -2492,10 +1738,9 @@ kNone_SkFilterQuality == paint.getFilterQuality()
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setFilterQuality'></a>
-## setFilterQuality
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setFilterQuality'>setFilterQuality</a>(<a href='undocumented#SkFilterQuality'>SkFilterQuality</a> quality)
@@ -2529,9 +1774,9 @@ kHigh_SkFilterQuality == paint.getFilterQuality()
 
 <a href='undocumented#SkFilterQuality'>SkFilterQuality</a> <a href='undocumented#Image_Scaling'>Image Scaling</a>
 
----
+<a name='Color_Methods'></a>
 
-## <a name='Color_Methods'>Color Methods</a>
+---
 
 | name | description |
 | --- | ---  |
@@ -2559,7 +1804,8 @@ a different arrangement.
 <div><fiddle-embed name="214b559d75c65a7bef6ef4be1f860053"></fiddle-embed></div>
 
 <a name='SkPaint_getColor'></a>
-## getColor
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='SkColor_Reference#SkColor'>SkColor</a> <a href='#SkPaint_getColor'>getColor</a>() const
@@ -2587,12 +1833,42 @@ Yellow is 100% red, 100% green, and 0% blue.
 
 ### See Also
 
-<a href='SkColor_Reference#SkColor'>SkColor</a>
+<a href='#SkPaint_getColor4f'>getColor4f</a> <a href='SkColor_Reference#SkColor'>SkColor</a>
+
+<a name='SkPaint_getColor4f'></a>
 
 ---
 
+<pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
+<a href='SkColor4f_Reference#SkColor4f'>SkColor4f</a> <a href='#SkPaint_getColor4f'>getColor4f</a>() const
+</pre>
+
+Retrieves alpha and RGB, unpmreultiplied, as four floating point values. RGB are
+are extended sRGB values (sRGB gamut, and encoded with the sRGB transfer function).
+
+### Return Value
+
+<a href='undocumented#Unpremultiply'>Unpremultiplied</a> RGBA
+
+### Example
+
+<div><fiddle-embed name="8512ea2176f36e8f1aeef311ff228790">
+
+#### Example Output
+
+~~~~
+Yellow is 100% red, 100% green, and 0% blue.
+~~~~
+
+</fiddle-embed></div>
+
+### See Also
+
+<a href='#SkPaint_getColor'>getColor</a> <a href='SkColor_Reference#SkColor'>SkColor</a>
+
 <a name='SkPaint_setColor'></a>
-## setColor
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setColor'>setColor</a>(<a href='SkColor_Reference#SkColor'>SkColor</a> color)
@@ -2622,16 +1898,54 @@ green1 == green2
 
 ### See Also
 
-<a href='SkColor_Reference#SkColor'>SkColor</a> <a href='#SkPaint_setARGB'>setARGB</a> <a href='SkColor_Reference#SkColorSetARGB'>SkColorSetARGB</a>
+<a href='SkColor_Reference#SkColor'>SkColor</a> <a href='#SkPaint_setColor4f'>setColor4f</a> <a href='#SkPaint_setARGB'>setARGB</a> <a href='SkColor_Reference#SkColorSetARGB'>SkColorSetARGB</a>
+
+<a name='SkPaint_setColor4f'></a>
 
 ---
 
-## <a name='Alpha_Methods'>Alpha Methods</a>
+<pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
+void <a href='#SkPaint_setColor4f'>setColor4f</a>(const <a href='SkColor4f_Reference#SkColor4f'>SkColor4f</a>& color, <a href='undocumented#SkColorSpace'>SkColorSpace</a>* colorSpace)
+</pre>
+
+Sets alpha and RGB used when stroking and filling. The <a href='#SkPaint_setColor4f_color'>color</a> is four floating
+point values, unpremultiplied. The <a href='#SkPaint_setColor4f_color'>color</a> values are interpreted as being in
+the <a href='#SkPaint_setColor4f_colorSpace'>colorSpace</a>. If <a href='#SkPaint_setColor4f_colorSpace'>colorSpace</a> is nullptr, then <a href='#SkPaint_setColor4f_color'>color</a> is assumed to be in the
+sRGB <a href='#SkPaint_setColor4f_color'>color</a> space.
+
+### Parameters
+
+<table>  <tr>    <td><a name='SkPaint_setColor4f_color'><code><strong>color</strong></code></a></td>
+    <td><a href='undocumented#Unpremultiply'>Unpremultiplied</a> RGBA</td>
+  </tr>
+  <tr>    <td><a name='SkPaint_setColor4f_colorSpace'><code><strong>colorSpace</strong></code></a></td>
+    <td><a href='undocumented#Color_Space'>Color Space</a> describing the encoding of <a href='#SkPaint_setColor4f_color'>color</a></td>
+  </tr>
+</table>
+
+### Example
+
+<div><fiddle-embed name="fa60859e3d03bdc117a05b32e093a8f1">
+
+#### Example Output
+
+~~~~
+green1 == green2
+~~~~
+
+</fiddle-embed></div>
+
+### See Also
+
+<a href='SkColor_Reference#SkColor'>SkColor</a> <a href='#SkPaint_setColor'>setColor</a> <a href='#SkPaint_setARGB'>setARGB</a> <a href='SkColor_Reference#SkColorSetARGB'>SkColorSetARGB</a>
+
+<a name='Alpha_Methods'></a>
 
 <a href='SkColor_Reference#Alpha'>Color Alpha</a> sets the transparency independent of RGB: red, blue, and green.
 
 <a name='SkPaint_getAlpha'></a>
-## getAlpha
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 uint8_t <a href='#SkPaint_getAlpha'>getAlpha</a>() const
@@ -2655,10 +1969,9 @@ Retrieves <a href='SkColor_Reference#Alpha'>Alpha</a> from the <a href='SkColor_
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setAlpha'></a>
-## setAlpha
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setAlpha'>setAlpha</a>(<a href='undocumented#U8CPU'>U8CPU</a> a)
@@ -2689,10 +2002,9 @@ fully opaque.
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setARGB'></a>
-## setARGB
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setARGB'>setARGB</a>(<a href='undocumented#U8CPU'>U8CPU</a> a, <a href='undocumented#U8CPU'>U8CPU</a> r, <a href='undocumented#U8CPU'>U8CPU</a> g, <a href='undocumented#U8CPU'>U8CPU</a> b)
@@ -2733,56 +2045,64 @@ transRed1 == transRed2
 
 <a href='#SkPaint_setColor'>setColor</a> <a href='SkColor_Reference#SkColorSetARGB'>SkColorSetARGB</a>
 
----
+<a name='Style'></a>
 
-## <a name='Style'>Style</a>
+---
 
 <a href='#SkPaint_Style'>Style</a> specifies if the geometry is filled, stroked, or both filled and stroked.
 Some shapes ignore <a href='#SkPaint_Style'>Style</a> and are always drawn filled or stroked.
 
+<a name='Style_Fill'></a>
+
 Set <a href='#SkPaint_Style'>Style</a> to <a href='#SkPaint_kFill_Style'>kFill Style</a> to fill the shape.
 The fill covers the area inside the geometry for most shapes.
 
+<a name='Style_Stroke'></a>
+
 Set <a href='#SkPaint_Style'>Style</a> to <a href='#SkPaint_kStroke_Style'>kStroke Style</a> to stroke the shape.
-
-## <a name='Style_Fill'>Style Fill</a>
-
-### See Also
-
-<a href='SkPath_Reference#Fill_Type'>Path Fill Type</a>
-
-## <a name='Style_Stroke'>Style Stroke</a>
 
 The stroke covers the area described by following the shape edge with a pen or brush of
 <a href='#Stroke_Width'>Stroke Width</a>. The area covered where the shape starts and stops is described by <a href='#Stroke_Cap'>Stroke Cap</a>.
 The area covered where the shape turns a corner is described by <a href='#Stroke_Join'>Stroke Join</a>.
-The stroke is centered on the shape; it extends equally on either side of the shape edge.
-
-As <a href='#Stroke_Width'>Stroke Width</a> gets smaller, the drawn path frame is thinner. <a href='#Stroke_Width'>Stroke Width</a> less than one
+The stroke is centered on the shape; it extends equally on either side of the shape edge.As <a href='#Stroke_Width'>Stroke Width</a> gets smaller, the drawn path frame is thinner. <a href='#Stroke_Width'>Stroke Width</a> less than one
 may have gaps, and if <a href='#SkPaint_kAntiAlias_Flag'>kAntiAlias Flag</a> is set, <a href='SkColor_Reference#Alpha'>Color Alpha</a> will increase to visually decrease coverage.
 
-## <a name='Style_Hairline'>Style Hairline</a>
+### See Also
 
-<a href='#Stroke_Width'>Stroke Width</a> of zero has a special meaning and switches drawing to use <a href='#Style_Hairline'>Hairline</a>.
-<a href='#Style_Hairline'>Hairline</a> draws the thinnest continuous frame. If <a href='#SkPaint_kAntiAlias_Flag'>kAntiAlias Flag</a> is clear, adjacent pixels
+<a href='SkPath_Reference#Fill_Type'>Path Fill Type</a> <a href='undocumented#Path_Effect'>Path Effect</a> <a href='#Style_Fill'>Style Fill</a> <a href='#Style_Stroke'>Style Stroke</a>
+
+<a name='Hairline'></a>
+
+---
+
+<a href='#Stroke_Width'>Stroke Width</a> of zero has a special meaning and switches drawing to use <a href='#Hairline'>Hairline</a>.
+<a href='#Hairline'>Hairline</a> draws the thinnest continuous frame. If <a href='#SkPaint_kAntiAlias_Flag'>kAntiAlias Flag</a> is clear, adjacent pixels
 flow horizontally, vertically,or diagonally.
 
-<a href='SkPath_Reference#Path'>Path</a> drawing with <a href='#Style_Hairline'>Hairline</a> may hit the same pixel more than once. For instance, <a href='SkPath_Reference#Path'>Path</a> containing
-two lines in one <a href='SkPath_Reference#Contour'>Path Contour</a> will draw the corner point once, but may both lines may draw the adjacent
+<a href='SkPath_Reference#Path'>Path</a> drawing with <a href='#Hairline'>Hairline</a> may hit the same pixel more than once. For instance, <a href='SkPath_Reference#Path'>Path</a> containing
+two lines in one <a href='SkPath_Overview#Contour'>Path Contour</a> will draw the corner point once, but may both lines may draw the adjacent
 pixel. If <a href='#SkPaint_kAntiAlias_Flag'>kAntiAlias Flag</a> is set, transparency is applied twice, resulting in a darker pixel. Some
 GPU-backed implementations apply transparency at a later drawing stage, avoiding double hit pixels
 while stroking.
 
-## <a name='SkPaint_Style'>Enum SkPaint::Style</a>
+### See Also
+
+<a href='SkPath_Reference#Fill_Type'>Path Fill Type</a> <a href='undocumented#Path_Effect'>Path Effect</a> <a href='#Style_Fill'>Style Fill</a> <a href='#Style_Stroke'>Style Stroke</a>
+
+<a name='SkPaint_Style'></a>
+
+---
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
     enum <a href='#SkPaint_Style'>Style</a> {
-        <a href='#SkPaint_kFill_Style'>kFill Style</a>,
-        <a href='#SkPaint_kStroke_Style'>kStroke Style</a>,
-        <a href='#SkPaint_kStrokeAndFill_Style'>kStrokeAndFill Style</a>,
+        <a href='#SkPaint_kFill_Style'>kFill_Style</a>,
+        <a href='#SkPaint_kStroke_Style'>kStroke_Style</a>,
+        <a href='#SkPaint_kStrokeAndFill_Style'>kStrokeAndFill_Style</a>,
     };
+</pre>
 
-    static constexpr int <a href='#SkPaint_kStyleCount'>kStyleCount</a> = <a href='#SkPaint_kStrokeAndFill_Style'>kStrokeAndFill Style</a> + 1;
+<pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
+    static constexpr int <a href='#SkPaint_kStyleCount'>kStyleCount</a> = <a href='#SkPaint_kStrokeAndFill_Style'>kStrokeAndFill_Style</a> + 1;
 </pre>
 
 Set <a href='#SkPaint_Style'>Style</a> to fill, stroke, or both fill and stroke geometry.
@@ -2802,8 +2122,8 @@ a fill draw.
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a name='SkPaint_kFill_Style'><code>SkPaint::kFill_Style</code></a></td>
     <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>0</td>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>
-Applies to <a href='SkRect_Reference#Rect'>Rect</a>, <a href='undocumented#Region'>Region</a>, <a href='SkRRect_Reference#RRect'>Round Rect</a>, <a href='undocumented#Circle'>Circles</a>, <a href='undocumented#Oval'>Ovals</a>, <a href='SkPath_Reference#Path'>Path</a>, and <a href='undocumented#Text'>Text</a>.
-<a href='SkBitmap_Reference#Bitmap'>Bitmap</a>, <a href='SkImage_Reference#Image'>Image</a>, <a href='undocumented#Patch'>Patches</a>, <a href='undocumented#Region'>Region</a>, <a href='undocumented#Sprite'>Sprites</a>, and <a href='undocumented#Vertices'>Vertices</a> are painted as if
+Applies to <a href='SkRect_Reference#Rect'>Rect</a>, <a href='SkRegion_Reference#Region'>Region</a>, <a href='SkRRect_Reference#RRect'>Round Rect</a>, <a href='undocumented#Circle'>Circles</a>, <a href='undocumented#Oval'>Ovals</a>, <a href='SkPath_Reference#Path'>Path</a>, and <a href='undocumented#Text'>Text</a>.
+<a href='SkBitmap_Reference#Bitmap'>Bitmap</a>, <a href='SkImage_Reference#Image'>Image</a>, <a href='undocumented#Patch'>Patches</a>, <a href='SkRegion_Reference#Region'>Region</a>, <a href='undocumented#Sprite'>Sprites</a>, and <a href='undocumented#Vertices'>Vertices</a> are painted as if
 <a href='#SkPaint_kFill_Style'>kFill Style</a> is set, and ignore the set <a href='#SkPaint_Style'>Style</a>.
 The <a href='SkPath_Reference#Fill_Type'>Path Fill Type</a> specifies additional rules to fill the area outside the path edge,
 and to create an unfilled hole inside the shape.
@@ -2814,7 +2134,7 @@ and to create an unfilled hole inside the shape.
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a name='SkPaint_kStroke_Style'><code>SkPaint::kStroke_Style</code></a></td>
     <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>1</td>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>
-Applies to <a href='SkRect_Reference#Rect'>Rect</a>, <a href='undocumented#Region'>Region</a>, <a href='SkRRect_Reference#RRect'>Round Rect</a>, <a href='undocumented#Arc'>Arcs</a>, <a href='undocumented#Circle'>Circles</a>, <a href='undocumented#Oval'>Ovals</a>, <a href='SkPath_Reference#Path'>Path</a>, and <a href='undocumented#Text'>Text</a>.
+Applies to <a href='SkRect_Reference#Rect'>Rect</a>, <a href='SkRegion_Reference#Region'>Region</a>, <a href='SkRRect_Reference#RRect'>Round Rect</a>, <a href='undocumented#Arc'>Arcs</a>, <a href='undocumented#Circle'>Circles</a>, <a href='undocumented#Oval'>Ovals</a>, <a href='SkPath_Reference#Path'>Path</a>, and <a href='undocumented#Text'>Text</a>.
 <a href='undocumented#Arc'>Arcs</a>, <a href='undocumented#Line'>Lines</a>, and points, are always drawn as if <a href='#SkPaint_kStroke_Style'>kStroke Style</a> is set,
 and ignore the set <a href='#SkPaint_Style'>Style</a>.
 The stroke construction is unaffected by the <a href='SkPath_Reference#Fill_Type'>Path Fill Type</a>.
@@ -2824,7 +2144,7 @@ The stroke construction is unaffected by the <a href='SkPath_Reference#Fill_Type
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a name='SkPaint_kStrokeAndFill_Style'><code>SkPaint::kStrokeAndFill_Style</code></a></td>
     <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>2</td>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>
-Applies to <a href='SkRect_Reference#Rect'>Rect</a>, <a href='undocumented#Region'>Region</a>, <a href='SkRRect_Reference#RRect'>Round Rect</a>, <a href='undocumented#Circle'>Circles</a>, <a href='undocumented#Oval'>Ovals</a>, <a href='SkPath_Reference#Path'>Path</a>, and <a href='undocumented#Text'>Text</a>.
+Applies to <a href='SkRect_Reference#Rect'>Rect</a>, <a href='SkRegion_Reference#Region'>Region</a>, <a href='SkRRect_Reference#RRect'>Round Rect</a>, <a href='undocumented#Circle'>Circles</a>, <a href='undocumented#Oval'>Ovals</a>, <a href='SkPath_Reference#Path'>Path</a>, and <a href='undocumented#Text'>Text</a>.
 <a href='SkPath_Reference#Path'>Path</a> is treated as if it is set to <a href='SkPath_Reference#SkPath_kWinding_FillType'>SkPath::kWinding FillType</a>,
 and the set <a href='SkPath_Reference#Fill_Type'>Path Fill Type</a> is ignored.
 </td>
@@ -2839,7 +2159,8 @@ May be used to verify that <a href='#SkPaint_Style'>Style</a> is a legal value.
 </table>
 
 <a name='SkPaint_getStyle'></a>
-## getStyle
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='#SkPaint_Style'>Style</a> <a href='#SkPaint_getStyle'>getStyle</a>() const
@@ -2867,10 +2188,9 @@ SkPaint::kFill_Style == paint.getStyle()
 
 <a href='#SkPaint_Style'>Style</a> <a href='#SkPaint_setStyle'>setStyle</a>
 
----
-
 <a name='SkPaint_setStyle'></a>
-## setStyle
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setStyle'>setStyle</a>(<a href='#SkPaint_Style'>Style</a> style)
@@ -2894,13 +2214,9 @@ Has no effect if <a href='#SkPaint_setStyle_style'>style</a> is not a legal <a h
 
 <a href='#SkPaint_Style'>Style</a> <a href='#SkPaint_getStyle'>getStyle</a>
 
+<a name='Stroke_Width'></a>
+
 ---
-
-### See Also
-
-<a href='SkPath_Reference#Fill_Type'>Path Fill Type</a> <a href='undocumented#Path_Effect'>Path Effect</a> <a href='#Style_Fill'>Style Fill</a> <a href='#Style_Stroke'>Style Stroke</a>
-
-## <a name='Stroke_Width'>Stroke Width</a>
 
 <a href='#Stroke_Width'>Stroke Width</a> sets the width for stroking. The width is the thickness
 of the stroke perpendicular to the path direction when the paint style is
@@ -2910,7 +2226,7 @@ When width is greater than zero, the stroke encompasses as many pixels partially
 or fully as needed. When the width equals zero, the paint enables hairlines;
 the stroke is always one pixel wide.
 
-The stroke dimensions are scaled by the canvas matrix, but <a href='#Style_Hairline'>Hairline</a> stroke
+The stroke dimensions are scaled by the canvas matrix, but <a href='#Hairline'>Hairline</a> stroke
 remains one pixel wide regardless of scaling.
 
 The default width for the paint is zero.
@@ -2922,7 +2238,8 @@ line and the platform implementation.
 </div></fiddle-embed></div>
 
 <a name='SkPaint_getStrokeWidth'></a>
-## getStrokeWidth
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getStrokeWidth'>getStrokeWidth</a>() const
@@ -2933,7 +2250,7 @@ outline the shape.
 
 ### Return Value
 
-zero for <a href='#Style_Hairline'>Hairline</a>, greater than zero for pen thickness
+zero for <a href='#Hairline'>Hairline</a>, greater than zero for pen thickness
 
 ### Example
 
@@ -2947,10 +2264,9 @@ zero for <a href='#Style_Hairline'>Hairline</a>, greater than zero for pen thick
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setStrokeWidth'></a>
-## setStrokeWidth
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setStrokeWidth'>setStrokeWidth</a>(<a href='undocumented#SkScalar'>SkScalar</a> width)
@@ -2963,7 +2279,7 @@ Has no effect if <a href='#SkPaint_setStrokeWidth_width'>width</a> is less than 
 ### Parameters
 
 <table>  <tr>    <td><a name='SkPaint_setStrokeWidth_width'><code><strong>width</strong></code></a></td>
-    <td>zero thickness for <a href='#Style_Hairline'>Hairline</a>; greater than zero for pen thickness</td>
+    <td>zero thickness for <a href='#Hairline'>Hairline</a>; greater than zero for pen thickness</td>
   </tr>
 </table>
 
@@ -2979,9 +2295,9 @@ Has no effect if <a href='#SkPaint_setStrokeWidth_width'>width</a> is less than 
 
 </fiddle-embed></div>
 
----
+<a name='Miter_Limit'></a>
 
-## <a name='Miter_Limit'>Miter Limit</a>
+---
 
 <a href='#Miter_Limit'>Miter Limit</a> specifies the maximum miter length,
 relative to the stroke width.
@@ -2993,9 +2309,10 @@ or <a href='#SkPaint_kStrokeAndFill_Style'>kStrokeAndFill Style</a>.
 If the miter at a corner exceeds this limit, <a href='#SkPaint_kMiter_Join'>kMiter Join</a>
 is replaced with <a href='#SkPaint_kBevel_Join'>kBevel Join</a>.
 
-<a href='#Miter_Limit'>Miter Limit</a> can be computed from the corner angle:
+<a href='#Miter_Limit'>Miter Limit</a> can be computed from the corner angle using:
+<code>miter limit&nbsp;=&nbsp;1&nbsp;/&nbsp;sin&nbsp;\(&nbsp;angle&nbsp;/&nbsp;2&nbsp;\)</code>.
 
-miter limit = 1 / sin ( angle / 2 )<a href='#Miter_Limit'>Miter Limit</a> default value is 4.
+<a href='#Miter_Limit'>Miter Limit</a> default value is 4.
 The default may be changed at compile time by setting <a href='undocumented#SkPaintDefaults_MiterLimit'>SkPaintDefaults MiterLimit</a>
 in "SkUserConfig.h" or as a define supplied by the build environment.
 
@@ -3022,7 +2339,8 @@ by a bevel join.
 </div></fiddle-embed></div>
 
 <a name='SkPaint_getStrokeMiter'></a>
-## getStrokeMiter
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getStrokeMiter'>getStrokeMiter</a>() const
@@ -3050,10 +2368,9 @@ default miter limit == 4
 
 <a href='#Miter_Limit'>Miter Limit</a> <a href='#SkPaint_setStrokeMiter'>setStrokeMiter</a> <a href='#SkPaint_Join'>Join</a>
 
----
-
 <a name='SkPaint_setStrokeMiter'></a>
-## setStrokeMiter
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setStrokeMiter'>setStrokeMiter</a>(<a href='undocumented#SkScalar'>SkScalar</a> miter)
@@ -3086,26 +2403,27 @@ default miter limit == 8
 
 <a href='#Miter_Limit'>Miter Limit</a> <a href='#SkPaint_getStrokeMiter'>getStrokeMiter</a> <a href='#SkPaint_Join'>Join</a>
 
+<a name='Stroke_Cap'></a>
+
+<a name='SkPaint_Cap'></a>
+
 ---
-
-## <a name='Stroke_Cap'>Stroke Cap</a>
-
-## <a name='SkPaint_Cap'>Enum SkPaint::Cap</a>
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
     enum <a href='#SkPaint_Cap'>Cap</a> {
-        <a href='#SkPaint_kButt_Cap'>kButt Cap</a>,
-        <a href='#SkPaint_kRound_Cap'>kRound Cap</a>,
-        <a href='#SkPaint_kSquare_Cap'>kSquare Cap</a>,
-
-        <a href='#SkPaint_kLast_Cap'>kLast Cap</a> = <a href='#SkPaint_kSquare_Cap'>kSquare Cap</a>,
-        <a href='#SkPaint_kDefault_Cap'>kDefault Cap</a> = <a href='#SkPaint_kButt_Cap'>kButt Cap</a>,
+        <a href='#SkPaint_kButt_Cap'>kButt_Cap</a>,
+        <a href='#SkPaint_kRound_Cap'>kRound_Cap</a>,
+        <a href='#SkPaint_kSquare_Cap'>kSquare_Cap</a>,
+        <a href='#SkPaint_kLast_Cap'>kLast_Cap</a> = <a href='#SkPaint_kSquare_Cap'>kSquare_Cap</a>,
+        <a href='#SkPaint_kDefault_Cap'>kDefault_Cap</a> = <a href='#SkPaint_kButt_Cap'>kButt_Cap</a>,
     };
-
-    static constexpr int <a href='#SkPaint_kCapCount'>kCapCount</a> = <a href='#SkPaint_kLast_Cap'>kLast Cap</a> + 1;
 </pre>
 
-<a href='#Stroke_Cap'>Stroke Cap</a> draws at the beginning and end of an open <a href='SkPath_Reference#Contour'>Path Contour</a>.
+<pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
+    static constexpr int <a href='#SkPaint_kCapCount'>kCapCount</a> = <a href='#SkPaint_kLast_Cap'>kLast_Cap</a> + 1;
+</pre>
+
+<a href='#Stroke_Cap'>Stroke Cap</a> draws at the beginning and end of an open <a href='SkPath_Overview#Contour'>Path Contour</a>.
 
 ### Constants
 
@@ -3161,17 +2479,17 @@ May be used to verify that <a href='#Stroke_Cap'>Stroke Cap</a> is a legal value
 </table>
 
 Stroke describes the area covered by a pen of <a href='#Stroke_Width'>Stroke Width</a> as it
-follows the <a href='SkPath_Reference#Contour'>Path Contour</a>, moving parallel to the contour direction.
+follows the <a href='SkPath_Overview#Contour'>Path Contour</a>, moving parallel to the contour direction.
 
-If the <a href='SkPath_Reference#Contour'>Path Contour</a> is not terminated by <a href='SkPath_Reference#SkPath_kClose_Verb'>SkPath::kClose Verb</a>, the contour has a
+If the <a href='SkPath_Overview#Contour'>Path Contour</a> is not terminated by <a href='SkPath_Reference#SkPath_kClose_Verb'>SkPath::kClose Verb</a>, the contour has a
 visible beginning and end.
 
-<a href='SkPath_Reference#Contour'>Path Contour</a> may start and end at the same point; defining <a href='SkPath_Reference#Contour_Zero_Length'>Zero Length Contour</a>.
+<a href='SkPath_Overview#Contour'>Path Contour</a> may start and end at the same point; defining <a href='SkPath_Overview#Contour_Zero_Length'>Zero Length Contour</a>.
 
-<a href='#SkPaint_kButt_Cap'>kButt Cap</a> and <a href='SkPath_Reference#Contour_Zero_Length'>Zero Length Contour</a> is not drawn.
-<a href='#SkPaint_kRound_Cap'>kRound Cap</a> and <a href='SkPath_Reference#Contour_Zero_Length'>Zero Length Contour</a> draws a circle of diameter <a href='#Stroke_Width'>Stroke Width</a>
+<a href='#SkPaint_kButt_Cap'>kButt Cap</a> and <a href='SkPath_Overview#Contour_Zero_Length'>Zero Length Contour</a> is not drawn.
+<a href='#SkPaint_kRound_Cap'>kRound Cap</a> and <a href='SkPath_Overview#Contour_Zero_Length'>Zero Length Contour</a> draws a circle of diameter <a href='#Stroke_Width'>Stroke Width</a>
 at the contour point.
-<a href='#SkPaint_kSquare_Cap'>kSquare Cap</a> and <a href='SkPath_Reference#Contour_Zero_Length'>Zero Length Contour</a> draws an upright square with a side of
+<a href='#SkPaint_kSquare_Cap'>kSquare Cap</a> and <a href='SkPath_Overview#Contour_Zero_Length'>Zero Length Contour</a> draws an upright square with a side of
 <a href='#Stroke_Width'>Stroke Width</a> at the contour point.
 
 <a href='#Stroke_Cap'>Stroke Cap</a> is <a href='#SkPaint_kButt_Cap'>kButt Cap</a> by default.
@@ -3181,7 +2499,8 @@ at the contour point.
 <div><fiddle-embed name="2bffb6384cc20077e632e7d01da045ca"></fiddle-embed></div>
 
 <a name='SkPaint_getStrokeCap'></a>
-## getStrokeCap
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='#SkPaint_Cap'>Cap</a> <a href='#SkPaint_getStrokeCap'>getStrokeCap</a>() const
@@ -3209,10 +2528,9 @@ kButt_Cap == default stroke cap
 
 <a href='#Stroke_Cap'>Stroke Cap</a> <a href='#SkPaint_setStrokeCap'>setStrokeCap</a>
 
----
-
 <a name='SkPaint_setStrokeCap'></a>
-## setStrokeCap
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setStrokeCap'>setStrokeCap</a>(<a href='#SkPaint_Cap'>Cap</a> cap)
@@ -3244,14 +2562,12 @@ kRound_Cap == paint.getStrokeCap()
 
 <a href='#Stroke_Cap'>Stroke Cap</a> <a href='#SkPaint_getStrokeCap'>getStrokeCap</a>
 
----
+<a name='Stroke_Join'></a>
 
-## <a name='Stroke_Join'>Stroke Join</a>
-
-<a href='#Stroke_Join'>Stroke Join</a> draws at the sharp corners of an open or closed <a href='SkPath_Reference#Contour'>Path Contour</a>.
+<a href='#Stroke_Join'>Stroke Join</a> draws at the sharp corners of an open or closed <a href='SkPath_Overview#Contour'>Path Contour</a>.
 
 Stroke describes the area covered by a pen of <a href='#Stroke_Width'>Stroke Width</a> as it
-follows the <a href='SkPath_Reference#Contour'>Path Contour</a>, moving parallel to the contour direction.
+follows the <a href='SkPath_Overview#Contour'>Path Contour</a>, moving parallel to the contour direction.
 
 If the contour direction changes abruptly, because the tangent direction leading
 to the end of a curve within the contour does not match the tangent direction of
@@ -3261,19 +2577,22 @@ the following curve, the pair of curves meet at <a href='#Stroke_Join'>Stroke Jo
 
 <div><fiddle-embed name="917c44b504d3f9308571fd3835d90a0d"></fiddle-embed></div>
 
-## <a name='SkPaint_Join'>Enum SkPaint::Join</a>
+<a name='SkPaint_Join'></a>
+
+---
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
     enum <a href='#SkPaint_Join'>Join</a> {
-        <a href='#SkPaint_kMiter_Join'>kMiter Join</a>,
-        <a href='#SkPaint_kRound_Join'>kRound Join</a>,
-        <a href='#SkPaint_kBevel_Join'>kBevel Join</a>,
-
-        <a href='#SkPaint_kLast_Join'>kLast Join</a> = <a href='#SkPaint_kBevel_Join'>kBevel Join</a>,
-        <a href='#SkPaint_kDefault_Join'>kDefault Join</a> = <a href='#SkPaint_kMiter_Join'>kMiter Join</a>,
+        <a href='#SkPaint_kMiter_Join'>kMiter_Join</a>,
+        <a href='#SkPaint_kRound_Join'>kRound_Join</a>,
+        <a href='#SkPaint_kBevel_Join'>kBevel_Join</a>,
+        <a href='#SkPaint_kLast_Join'>kLast_Join</a> = <a href='#SkPaint_kBevel_Join'>kBevel_Join</a>,
+        <a href='#SkPaint_kDefault_Join'>kDefault_Join</a> = <a href='#SkPaint_kMiter_Join'>kMiter_Join</a>,
     };
+</pre>
 
-    static constexpr int <a href='#SkPaint_kJoinCount'>kJoinCount</a> = <a href='#SkPaint_kLast_Join'>kLast Join</a> + 1;
+<pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
+    static constexpr int <a href='#SkPaint_kJoinCount'>kJoinCount</a> = <a href='#SkPaint_kLast_Join'>kLast_Join</a> + 1;
 </pre>
 
 <a href='#SkPaint_Join'>Join</a> specifies how corners are drawn when a shape is stroked. <a href='#SkPaint_Join'>Join</a>
@@ -3347,7 +2666,8 @@ May be used to verify that <a href='#Stroke_Join'>Stroke Join</a> is a legal val
 <a href='#SkPaint_setStrokeJoin'>setStrokeJoin</a> <a href='#SkPaint_getStrokeJoin'>getStrokeJoin</a> <a href='#SkPaint_setStrokeMiter'>setStrokeMiter</a> <a href='#SkPaint_getStrokeMiter'>getStrokeMiter</a>
 
 <a name='SkPaint_getStrokeJoin'></a>
-## getStrokeJoin
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='#SkPaint_Join'>Join</a> <a href='#SkPaint_getStrokeJoin'>getStrokeJoin</a>() const
@@ -3375,10 +2695,9 @@ kMiter_Join == default stroke join
 
 <a href='#Stroke_Join'>Stroke Join</a> <a href='#SkPaint_setStrokeJoin'>setStrokeJoin</a>
 
----
-
 <a name='SkPaint_setStrokeJoin'></a>
-## setStrokeJoin
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setStrokeJoin'>setStrokeJoin</a>(<a href='#SkPaint_Join'>Join</a> join)
@@ -3410,13 +2729,13 @@ kMiter_Join == paint.getStrokeJoin()
 
 <a href='#Stroke_Join'>Stroke Join</a> <a href='#SkPaint_getStrokeJoin'>getStrokeJoin</a>
 
----
-
 ### See Also
 
 <a href='#Miter_Limit'>Miter Limit</a>
 
-## <a name='Fill_Path'>Fill Path</a>
+<a name='Fill_Path'></a>
+
+---
 
 <a href='#Fill_Path'>Fill Path</a> creates a <a href='SkPath_Reference#Path'>Path</a> by applying the <a href='undocumented#Path_Effect'>Path Effect</a>, followed by the <a href='#Style_Stroke'>Style Stroke</a>.
 
@@ -3434,10 +2753,15 @@ and <a href='#Miter_Limit'>Miter Limit</a> operate on the destination <a href='S
 Fill <a href='SkPath_Reference#Path'>Path</a> can specify the precision used by <a href='#Stroke_Width'>Stroke Width</a> to approximate the stroke geometry.
 
 If the <a href='#SkPaint_Style'>Style</a> is <a href='#SkPaint_kStroke_Style'>kStroke Style</a> and the <a href='#Stroke_Width'>Stroke Width</a> is zero, <a href='#SkPaint_getFillPath'>getFillPath</a>
-returns false since <a href='#Style_Hairline'>Hairline</a> has no filled equivalent.
+returns false since <a href='#Hairline'>Hairline</a> has no filled equivalent.
+
+### See Also
+
+<a href='#Style_Stroke'>Style Stroke</a> <a href='#Stroke_Width'>Stroke Width</a> <a href='undocumented#Path_Effect'>Path Effect</a>
 
 <a name='SkPaint_getFillPath'></a>
-## getFillPath
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_getFillPath'>getFillPath</a>(const <a href='SkPath_Reference#SkPath'>SkPath</a>& src, <a href='SkPath_Reference#SkPath'>SkPath</a>* dst, const <a href='SkRect_Reference#SkRect'>SkRect</a>* cullRect, <a href='undocumented#SkScalar'>SkScalar</a> resScale = 1) const
@@ -3464,7 +2788,7 @@ to favor speed and size</td>
 
 ### Return Value
 
-true if the path represents <a href='#Style_Fill'>Style Fill</a>, or false if it represents <a href='#Style_Hairline'>Hairline</a>
+true if the path represents <a href='#Style_Fill'>Style Fill</a>, or false if it represents <a href='#Hairline'>Hairline</a>
 
 ### Example
 
@@ -3473,9 +2797,9 @@ At the lowest precision, the <a href='SkPath_Reference#Quad'>Quad</a> stroke is 
 At the highest precision, the filled path has high fidelity compared to the original stroke.
 </div></fiddle-embed></div>
 
----
-
 <a name='SkPaint_getFillPath_2'></a>
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_getFillPath'>getFillPath</a>(const <a href='SkPath_Reference#SkPath'>SkPath</a>& src, <a href='SkPath_Reference#SkPath'>SkPath</a>* dst) const
@@ -3498,19 +2822,15 @@ Replaces <a href='#SkPaint_getFillPath_2_dst'>dst</a> with the <a href='#SkPaint
 
 ### Return Value
 
-true if the path represents <a href='#Style_Fill'>Style Fill</a>, or false if it represents <a href='#Style_Hairline'>Hairline</a>
+true if the path represents <a href='#Style_Fill'>Style Fill</a>, or false if it represents <a href='#Hairline'>Hairline</a>
 
 ### Example
 
 <div><fiddle-embed name="e6d8ca0cc17e0b475bd54dd995825468"></fiddle-embed></div>
 
+<a name='Shader_Methods'></a>
+
 ---
-
-### See Also
-
-<a href='#Style_Stroke'>Style Stroke</a> <a href='#Stroke_Width'>Stroke Width</a> <a href='undocumented#Path_Effect'>Path Effect</a>
-
-## <a name='Shader_Methods'>Shader Methods</a>
 
 <a href='undocumented#Shader'>Shader</a> defines the colors used when drawing a shape.
 <a href='undocumented#Shader'>Shader</a> may be an image, a gradient, or a computed fill.
@@ -3533,7 +2853,8 @@ If <a href='undocumented#Shader'>Shader</a> generates only <a href='SkColor_Refe
 <div><fiddle-embed name="fe80fd80b98a20823db7fb9a077243c7"></fiddle-embed></div>
 
 <a name='SkPaint_getShader'></a>
-## getShader
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkShader'>SkShader</a>* <a href='#SkPaint_getShader'>getShader</a>() const
@@ -3560,10 +2881,9 @@ nullptr != shader
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_refShader'></a>
-## refShader
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkShader'>SkShader</a>&gt; <a href='#SkPaint_refShader'>refShader</a>() const
@@ -3590,10 +2910,9 @@ shader unique: false
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setShader'></a>
-## setShader
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setShader'>setShader</a>(<a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkShader'>SkShader</a>&gt; shader)
@@ -3615,9 +2934,9 @@ Increments <a href='#SkPaint_setShader_shader'>shader</a> <a href='undocumented#
 
 <div><fiddle-embed name="77e64d5bae9b1ba037fd99252bb4aa58"></fiddle-embed></div>
 
----
+<a name='Color_Filter_Methods'></a>
 
-## <a name='Color_Filter_Methods'>Color Filter Methods</a>
+---
 
 <a href='undocumented#Color_Filter'>Color Filter</a> alters the color used when drawing a shape.
 <a href='undocumented#Color_Filter'>Color Filter</a> may apply <a href='SkBlendMode_Reference#Blend_Mode'>Blend Mode</a>, transform the color through a matrix, or composite multiple filters.
@@ -3630,7 +2949,8 @@ The drawn transparency can be modified without altering <a href='undocumented#Co
 <div><fiddle-embed name="5abde56ca2f89a18b8e231abd1b57c56"></fiddle-embed></div>
 
 <a name='SkPaint_getColorFilter'></a>
-## getColorFilter
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkColorFilter'>SkColorFilter</a>* <a href='#SkPaint_getColorFilter'>getColorFilter</a>() const
@@ -3656,10 +2976,9 @@ nullptr != color filter
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_refColorFilter'></a>
-## refColorFilter
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorFilter'>SkColorFilter</a>&gt; <a href='#SkPaint_refColorFilter'>refColorFilter</a>() const
@@ -3685,10 +3004,9 @@ color filter unique: false
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setColorFilter'></a>
-## setColorFilter
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setColorFilter'>setColorFilter</a>(<a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkColorFilter'>SkColorFilter</a>&gt; colorFilter)
@@ -3710,9 +3028,9 @@ Increments filter <a href='undocumented#Reference_Count'>Reference Count</a> by 
 
 <div><fiddle-embed name="c7b786dc9b3501cd0eaba47494b6fa31"></fiddle-embed></div>
 
----
+<a name='Blend_Mode_Methods'></a>
 
-## <a name='Blend_Mode_Methods'>Blend Mode Methods</a>
+---
 
 <a href='SkBlendMode_Reference#Blend_Mode'>Blend Mode</a> describes how <a href='SkColor_Reference#Color'>Color</a> combines with the destination color.
 The default setting, <a href='SkBlendMode_Reference#SkBlendMode_kSrcOver'>SkBlendMode::kSrcOver</a>, draws the source color
@@ -3727,7 +3045,8 @@ over the destination color.
 <a href='SkBlendMode_Reference#Blend_Mode'>Blend Mode</a>
 
 <a name='SkPaint_getBlendMode'></a>
-## getBlendMode
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='SkBlendMode_Reference#SkBlendMode'>SkBlendMode</a> <a href='#SkPaint_getBlendMode'>getBlendMode</a>() const
@@ -3753,10 +3072,9 @@ kSrcOver != getBlendMode
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_isSrcOver'></a>
-## isSrcOver
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_isSrcOver'>isSrcOver</a>() const
@@ -3781,10 +3099,9 @@ isSrcOver != true
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setBlendMode'></a>
-## setBlendMode
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setBlendMode'>setBlendMode</a>(<a href='SkBlendMode_Reference#SkBlendMode'>SkBlendMode</a> mode)
@@ -3813,9 +3130,9 @@ isSrcOver != true
 
 </fiddle-embed></div>
 
----
+<a name='Path_Effect_Methods'></a>
 
-## <a name='Path_Effect_Methods'>Path Effect Methods</a>
+---
 
 <a href='undocumented#Path_Effect'>Path Effect</a> modifies the path geometry before drawing it.
 <a href='undocumented#Path_Effect'>Path Effect</a> may implement dashing, custom fill effects and custom stroke effects.
@@ -3830,7 +3147,8 @@ If <a href='#Paint'>Paint</a> has no <a href='undocumented#Path_Effect'>Path Eff
 <a href='undocumented#Path_Effect'>Path Effect</a>
 
 <a name='SkPaint_getPathEffect'></a>
-## getPathEffect
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkPathEffect'>SkPathEffect</a>* <a href='#SkPaint_getPathEffect'>getPathEffect</a>() const
@@ -3856,10 +3174,9 @@ nullptr != path effect
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_refPathEffect'></a>
-## refPathEffect
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkPathEffect'>SkPathEffect</a>&gt; <a href='#SkPaint_refPathEffect'>refPathEffect</a>() const
@@ -3885,10 +3202,9 @@ path effect unique: false
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setPathEffect'></a>
-## setPathEffect
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setPathEffect'>setPathEffect</a>(<a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkPathEffect'>SkPathEffect</a>&gt; pathEffect)
@@ -3910,9 +3226,9 @@ Increments <a href='#SkPaint_setPathEffect_pathEffect'>pathEffect</a> <a href='u
 
 <div><fiddle-embed name="52dd55074ca0b7d520d04e750ca2a0d7"></fiddle-embed></div>
 
----
+<a name='Mask_Filter_Methods'></a>
 
-## <a name='Mask_Filter_Methods'>Mask Filter Methods</a>
+---
 
 <a href='undocumented#Mask_Filter'>Mask Filter</a> uses coverage of the shape drawn to create <a href='undocumented#Mask_Alpha'>Mask Alpha</a>.
 <a href='undocumented#Mask_Filter'>Mask Filter</a> takes a Mask, and returns a Mask.
@@ -3926,7 +3242,8 @@ modifying the draw.
 <div><fiddle-embed name="55d7b9d482ac8e17a6153f555a8adb8d"></fiddle-embed></div>
 
 <a name='SkPaint_getMaskFilter'></a>
-## getMaskFilter
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkMaskFilter'>SkMaskFilter</a>* <a href='#SkPaint_getMaskFilter'>getMaskFilter</a>() const
@@ -3952,10 +3269,9 @@ nullptr != mask filter
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_refMaskFilter'></a>
-## refMaskFilter
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkMaskFilter'>SkMaskFilter</a>&gt; <a href='#SkPaint_refMaskFilter'>refMaskFilter</a>() const
@@ -3982,10 +3298,9 @@ mask filter unique: false
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setMaskFilter'></a>
-## setMaskFilter
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setMaskFilter'>setMaskFilter</a>(<a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkMaskFilter'>SkMaskFilter</a>&gt; maskFilter)
@@ -4008,9 +3323,9 @@ Increments <a href='#SkPaint_setMaskFilter_maskFilter'>maskFilter</a> <a href='u
 
 <div><fiddle-embed name="a993831c40f3e134f809134e3b74e4a6"></fiddle-embed></div>
 
----
+<a name='Typeface_Methods'></a>
 
-## <a name='Typeface_Methods'>Typeface Methods</a>
+---
 
 <a href='undocumented#Typeface'>Typeface</a> identifies the font used when drawing and measuring text.
 <a href='undocumented#Typeface'>Typeface</a> may be specified by name, from a file, or from a data stream.
@@ -4022,7 +3337,8 @@ implementation.
 <div><fiddle-embed name="1a7a5062725139760962582f599f1b97"></fiddle-embed></div>
 
 <a name='SkPaint_getTypeface'></a>
-## getTypeface
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkTypeface'>SkTypeface</a>* <a href='#SkPaint_getTypeface'>getTypeface</a>() const
@@ -4048,10 +3364,9 @@ nullptr != typeface
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_refTypeface'></a>
-## refTypeface
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkTypeface'>SkTypeface</a>&gt; <a href='#SkPaint_refTypeface'>refTypeface</a>() const
@@ -4076,10 +3391,9 @@ typeface1 == typeface2
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setTypeface'></a>
-## setTypeface
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setTypeface'>setTypeface</a>(<a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkTypeface'>SkTypeface</a>&gt; typeface)
@@ -4100,9 +3414,9 @@ Pass nullptr to clear <a href='undocumented#Typeface'>Typeface</a> and use the d
 
 <div><fiddle-embed name="0e6fbb7773cd925b274552f4cd1abef2"></fiddle-embed></div>
 
----
+<a name='Image_Filter_Methods'></a>
 
-## <a name='Image_Filter_Methods'>Image Filter Methods</a>
+---
 
 <a href='undocumented#Image_Filter'>Image Filter</a> operates on the pixel representation of the shape, as modified by <a href='#Paint'>Paint</a>
 with <a href='SkBlendMode_Reference#Blend_Mode'>Blend Mode</a> set to <a href='SkBlendMode_Reference#SkBlendMode_kSrcOver'>SkBlendMode::kSrcOver</a>. <a href='undocumented#Image_Filter'>Image Filter</a> creates a new bitmap,
@@ -4118,7 +3432,8 @@ can operate on all channels of <a href='SkColor_Reference#Color'>Color</a>, whil
 <div><fiddle-embed name="ece04ee3d3761e3425f37c8f06f054c1"></fiddle-embed></div>
 
 <a name='SkPaint_getImageFilter'></a>
-## getImageFilter
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkImageFilter'>SkImageFilter</a>* <a href='#SkPaint_getImageFilter'>getImageFilter</a>() const
@@ -4144,10 +3459,9 @@ nullptr != image filter
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_refImageFilter'></a>
-## refImageFilter
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkImageFilter'>SkImageFilter</a>&gt; <a href='#SkPaint_refImageFilter'>refImageFilter</a>() const
@@ -4173,10 +3487,9 @@ image filter unique: false
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setImageFilter'></a>
-## setImageFilter
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setImageFilter'>setImageFilter</a>(<a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkImageFilter'>SkImageFilter</a>&gt; imageFilter)
@@ -4199,9 +3512,9 @@ Increments <a href='#SkPaint_setImageFilter_imageFilter'>imageFilter</a> <a href
 
 <div><fiddle-embed name="6679d6e4ec632715ee03e68391bd7f9a"></fiddle-embed></div>
 
----
+<a name='Draw_Looper_Methods'></a>
 
-## <a name='Draw_Looper_Methods'>Draw Looper Methods</a>
+---
 
 <a href='undocumented#Draw_Looper'>Draw Looper</a> sets a modifier that communicates state from one <a href='undocumented#Draw_Layer'>Draw Layer</a>
 to another to construct the draw.
@@ -4215,7 +3528,8 @@ Set <a href='undocumented#Draw_Looper'>Draw Looper</a> to nullptr to prevent <a 
 <div><fiddle-embed name="84ec12a36e50df5ac565cc7a75ffbe9f"></fiddle-embed></div>
 
 <a name='SkPaint_getDrawLooper'></a>
-## getDrawLooper
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkDrawLooper'>SkDrawLooper</a>* <a href='#SkPaint_getDrawLooper'>getDrawLooper</a>() const
@@ -4241,10 +3555,9 @@ nullptr != draw looper
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_refDrawLooper'></a>
-## refDrawLooper
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkDrawLooper'>SkDrawLooper</a>&gt; <a href='#SkPaint_refDrawLooper'>refDrawLooper</a>() const
@@ -4270,10 +3583,9 @@ draw looper unique: false
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_getLooper'></a>
-## getLooper
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkDrawLooper'>SkDrawLooper</a>* <a href='#SkPaint_getLooper'>getLooper</a>() const
@@ -4281,10 +3593,9 @@ draw looper unique: false
 
 Deprecated.
 
----
-
 <a name='SkPaint_setDrawLooper'></a>
-## setDrawLooper
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setDrawLooper'>setDrawLooper</a>(<a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkDrawLooper'>SkDrawLooper</a>&gt; drawLooper)
@@ -4307,10 +3618,9 @@ Increments <a href='#SkPaint_setDrawLooper_drawLooper'>drawLooper</a> <a href='u
 
 <div><fiddle-embed name="bf10f838b330f0a3a3266d42ea68a638"></fiddle-embed></div>
 
----
-
 <a name='SkPaint_setLooper'></a>
-## setLooper
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setLooper'>setLooper</a>(<a href='undocumented#sk_sp'>sk sp</a>&lt;<a href='undocumented#SkDrawLooper'>SkDrawLooper</a>&gt; drawLooper)
@@ -4318,38 +3628,19 @@ void <a href='#SkPaint_setLooper'>setLooper</a>(<a href='undocumented#sk_sp'>sk 
 
 Deprecated.
 
+<a name='Text_Align'></a>
+
+<a name='SkPaint_Align'></a>
+
 ---
-
-## <a name='Text_Align'>Text Align</a>
-
-## <a name='SkPaint_Align'>Enum SkPaint::Align</a>
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
     enum <a href='#SkPaint_Align'>Align</a> {
-        <a href='#SkPaint_kLeft_Align'>kLeft Align</a>,
-        <a href='#SkPaint_kCenter_Align'>kCenter Align</a>,
-        <a href='#SkPaint_kRight_Align'>kRight Align</a>,
+        <a href='#SkPaint_kLeft_Align'>kLeft_Align</a>,
+        <a href='#SkPaint_kCenter_Align'>kCenter_Align</a>,
+        <a href='#SkPaint_kRight_Align'>kRight_Align</a>,
     };
-
-    static constexpr int <a href='#SkPaint_kAlignCount'>kAlignCount</a> = 3;
 </pre>
-
-<a href='#SkPaint_Align'>Align</a> adjusts the text relative to the text position.
-<a href='#SkPaint_Align'>Align</a> affects <a href='undocumented#Glyph'>Glyphs</a> drawn with: <a href='SkCanvas_Reference#SkCanvas_drawText'>SkCanvas::drawText</a>, <a href='SkCanvas_Reference#SkCanvas_drawPosText'>SkCanvas::drawPosText</a>,
-<a href='SkCanvas_Reference#SkCanvas_drawPosTextH'>SkCanvas::drawPosTextH</a>, <a href='SkCanvas_Reference#SkCanvas_drawTextOnPath'>SkCanvas::drawTextOnPath</a>,
-<a href='SkCanvas_Reference#SkCanvas_drawTextOnPathHV'>SkCanvas::drawTextOnPathHV</a>, <a href='SkCanvas_Reference#SkCanvas_drawTextRSXform'>SkCanvas::drawTextRSXform</a>, <a href='SkCanvas_Reference#SkCanvas_drawTextBlob'>SkCanvas::drawTextBlob</a>,
-and <a href='SkCanvas_Reference#SkCanvas_drawString'>SkCanvas::drawString</a>;
-as well as calls that place text <a href='undocumented#Glyph'>Glyphs</a> like <a href='#SkPaint_getTextWidths'>getTextWidths</a> and <a href='#SkPaint_getTextPath'>getTextPath</a>.
-
-The text position is set by the font for both horizontal and vertical text.
-Typically, for horizontal text, the position is to the left side of the glyph on the
-base line; and for vertical text, the position is the horizontal center of the glyph
-at the caps height.
-
-<a href='#SkPaint_Align'>Align</a> adjusts the glyph position to center it or move it to abut the position
-using the metrics returned by the font.
-
-<a href='#SkPaint_Align'>Align</a> defaults to <a href='#SkPaint_kLeft_Align'>kLeft Align</a>.
 
 ### Constants
 
@@ -4359,100 +3650,71 @@ using the metrics returned by the font.
 <th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
   <tr style='background-color: #f0f0f0; '>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a name='SkPaint_kLeft_Align'><code>SkPaint::kLeft_Align</code></a></td>
-    <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>0</td>
+    <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>1</td>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>
-Leaves the glyph at the position computed by the font offset by the text position.
+Deprecated.
+
 </td>
   </tr>
   <tr>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a name='SkPaint_kCenter_Align'><code>SkPaint::kCenter_Align</code></a></td>
-    <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>1</td>
+    <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>2</td>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>
-Moves the glyph half its width if <a href='#SkPaint_Flags'>Flags</a> has <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> clear, and
-half its height if <a href='#SkPaint_Flags'>Flags</a> has <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> set.
+Deprecated.
+
 </td>
   </tr>
   <tr style='background-color: #f0f0f0; '>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a name='SkPaint_kRight_Align'><code>SkPaint::kRight_Align</code></a></td>
-    <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>2</td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>
-Moves the glyph by its width if <a href='#SkPaint_Flags'>Flags</a> has <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> clear,
-and by its height if <a href='#SkPaint_Flags'>Flags</a> has <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> set.
-</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a name='SkPaint_kAlignCount'><code>SkPaint::kAlignCount</code></a></td>
     <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>3</td>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>
-May be used to verify that <a href='#SkPaint_Align'>Align</a> is a legal value.
+Deprecated.
+
 </td>
   </tr>
 </table>
 
-### Example
+Deprecated.
 
-<div><fiddle-embed name="702617fd9ebc3f12e30081b5db93e8a8"><div>Each position separately moves the glyph in drawPosText.
-</div></fiddle-embed></div>
+### Constants
 
-### Example
+<table style='border-collapse: collapse; width: 62.5em'>
+  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Const</th>
+<th style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>Value</th>
+<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
+  <tr style='background-color: #f0f0f0; '>
+    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a name='SkPaint_kAlignCount'><code>SkPaint::kAlignCount</code></a></td>
+    <td style='text-align: center; border: 2px solid #dddddd; padding: 8px; '>0</td>
+    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>
+Deprecated.
 
-<div><fiddle-embed name="f1cbbbafe6b3c52b81309cccbf96a308"><div><a href='#Vertical_Text'>Vertical Text</a> treats <a href='#SkPaint_kLeft_Align'>kLeft Align</a> as top align, and <a href='#SkPaint_kRight_Align'>kRight Align</a> as bottom align.
-</div></fiddle-embed></div>
+</td>
+  </tr>
+</table>
 
 <a name='SkPaint_getTextAlign'></a>
-## getTextAlign
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='#SkPaint_Align'>Align</a> <a href='#SkPaint_getTextAlign'>getTextAlign</a>() const
 </pre>
 
-Returns <a href='#Text_Align'>Text Align</a>.
-Returns <a href='#SkPaint_kLeft_Align'>kLeft Align</a> if <a href='#Text_Align'>Text Align</a> has not been set.
-
-### Return Value
-
-text placement relative to position
-
-### Example
-
-<div><fiddle-embed name="2df932f526e810f74c89d30ec3f4c947">
-
-#### Example Output
-
-~~~~
-kLeft_Align == default
-~~~~
-
-</fiddle-embed></div>
-
----
+Deprecated.
 
 <a name='SkPaint_setTextAlign'></a>
-## setTextAlign
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void    <a href='#SkPaint_setTextAlign'>setTextAlign</a>(<a href='#SkPaint_Align'>Align</a> align)
 </pre>
 
-Sets <a href='#Text_Align'>Text Align</a> to <a href='#SkPaint_setTextAlign_align'>align</a>.
-Has no effect if <a href='#SkPaint_setTextAlign_align'>align</a> is an invalid value.
+Deprecated.
 
-### Parameters
-
-<table>  <tr>    <td><a name='SkPaint_setTextAlign_align'><code><strong>align</strong></code></a></td>
-    <td>text placement relative to position</td>
-  </tr>
-</table>
-
-### Example
-
-<div><fiddle-embed name="d37540afd918506ac2594665ca63979b"><div><a href='undocumented#Text'>Text</a> is left-aligned by default, and then set to center. Setting the
-alignment out of range has no effect.
-</div></fiddle-embed></div>
+<a name='Text_Size'></a>
 
 ---
-
-## <a name='Text_Size'>Text Size</a>
 
 <a href='#Text_Size'>Text Size</a> adjusts the overall text size in points.
 <a href='#Text_Size'>Text Size</a> can be set to any positive value or zero.
@@ -4464,7 +3726,8 @@ Set <a href='undocumented#SkPaintDefaults_TextSize'>SkPaintDefaults TextSize</a>
 <div><fiddle-embed name="91c9a3e498bb9412e4522a95d076ed5f"></fiddle-embed></div>
 
 <a name='SkPaint_getTextSize'></a>
-## getTextSize
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getTextSize'>getTextSize</a>() const
@@ -4480,10 +3743,9 @@ typographic height of text
 
 <div><fiddle-embed name="983e2a71ba72d4ba8c945420040b8f1c"></fiddle-embed></div>
 
----
-
 <a name='SkPaint_setTextSize'></a>
-## setTextSize
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setTextSize'>setTextSize</a>(<a href='undocumented#SkScalar'>SkScalar</a> textSize)
@@ -4503,9 +3765,9 @@ Has no effect if <a href='#SkPaint_setTextSize_textSize'>textSize</a> is not gre
 
 <div><fiddle-embed name="6510c9e2f57b83c47e67829e7a68d493"></fiddle-embed></div>
 
----
+<a name='Text_Scale_X'></a>
 
-## <a name='Text_Scale_X'>Text Scale X</a>
+---
 
 <a href='#Text_Scale_X'>Text Scale X</a> adjusts the text horizontal scale.
 <a href='undocumented#Text'>Text</a> scaling approximates condensed and expanded type faces when the actual face
@@ -4518,7 +3780,8 @@ is not available.
 <div><fiddle-embed name="d13d787c1e36f515319fc998411c1d91"></fiddle-embed></div>
 
 <a name='SkPaint_getTextScaleX'></a>
-## getTextScaleX
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getTextScaleX'>getTextScaleX</a>() const
@@ -4535,10 +3798,9 @@ text horizontal scale
 
 <div><fiddle-embed name="5dc8e58f6910cb8e4de9ed60f888188b"></fiddle-embed></div>
 
----
-
 <a name='SkPaint_setTextScaleX'></a>
-## setTextScaleX
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setTextScaleX'>setTextScaleX</a>(<a href='undocumented#SkScalar'>SkScalar</a> scaleX)
@@ -4558,9 +3820,9 @@ Default value is 1.
 
 <div><fiddle-embed name="a75bbdb8bb866b125c4c1dd5e967d470"></fiddle-embed></div>
 
----
+<a name='Text_Skew_X'></a>
 
-## <a name='Text_Skew_X'>Text Skew X</a>
+---
 
 <a href='#Text_Skew_X'>Text Skew X</a> adjusts the text horizontal slant.
 <a href='undocumented#Text'>Text</a> skewing approximates italic and oblique type faces when the actual face
@@ -4573,7 +3835,8 @@ is not available.
 <div><fiddle-embed name="aff208b0aab265f273045b27e683c17c"></fiddle-embed></div>
 
 <a name='SkPaint_getTextSkewX'></a>
-## getTextSkewX
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getTextSkewX'>getTextSkewX</a>() const
@@ -4590,10 +3853,9 @@ additional shear in x-axis relative to y-axis
 
 <div><fiddle-embed name="11c10f466dae0d1639dbb9f6a0040218"></fiddle-embed></div>
 
----
-
 <a name='SkPaint_setTextSkewX'></a>
-## setTextSkewX
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setTextSkewX'>setTextSkewX</a>(<a href='undocumented#SkScalar'>SkScalar</a> skewX)
@@ -4613,18 +3875,20 @@ Default value is zero.
 
 <div><fiddle-embed name="6bd705a6e0c5f8ee24f302fe531bfabc"></fiddle-embed></div>
 
+<a name='Text_Encoding'></a>
+
 ---
 
-## <a name='Text_Encoding'>Text Encoding</a>
+<a name='SkPaint_TextEncoding'></a>
 
-## <a name='SkPaint_TextEncoding'>Enum SkPaint::TextEncoding</a>
+---
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
     enum <a href='#SkPaint_TextEncoding'>TextEncoding</a> {
-        <a href='#SkPaint_kUTF8_TextEncoding'>kUTF8 TextEncoding</a>,
-        <a href='#SkPaint_kUTF16_TextEncoding'>kUTF16 TextEncoding</a>,
-        <a href='#SkPaint_kUTF32_TextEncoding'>kUTF32 TextEncoding</a>,
-        <a href='#SkPaint_kGlyphID_TextEncoding'>kGlyphID TextEncoding</a>,
+        <a href='#SkPaint_kUTF8_TextEncoding'>kUTF8_TextEncoding</a>,
+        <a href='#SkPaint_kUTF16_TextEncoding'>kUTF16_TextEncoding</a>,
+        <a href='#SkPaint_kUTF32_TextEncoding'>kUTF32_TextEncoding</a>,
+        <a href='#SkPaint_kGlyphID_TextEncoding'>kGlyphID_TextEncoding</a>,
     };
 </pre>
 
@@ -4687,7 +3951,8 @@ Fourth line has 16-bit glyph indices.
 </div></fiddle-embed></div>
 
 <a name='SkPaint_getTextEncoding'></a>
-## getTextEncoding
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='#SkPaint_TextEncoding'>TextEncoding</a> <a href='#SkPaint_getTextEncoding'>getTextEncoding</a>() const
@@ -4714,10 +3979,9 @@ kGlyphID_TextEncoding == text encoding
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_setTextEncoding'></a>
-## setTextEncoding
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_setTextEncoding'>setTextEncoding</a>(<a href='#SkPaint_TextEncoding'>TextEncoding</a> encoding)
@@ -4749,9 +4013,9 @@ Invalid values for <a href='#SkPaint_setTextEncoding_encoding'>encoding</a> are 
 
 </fiddle-embed></div>
 
----
+<a name='Font_Metrics'></a>
 
-## <a name='Font_Metrics'>Font Metrics</a>
+---
 
 <a href='#Font_Metrics'>Font Metrics</a> describe dimensions common to the <a href='undocumented#Glyph'>Glyphs</a> in <a href='undocumented#Typeface'>Typeface</a>.
 The dimensions are computed by <a href='undocumented#Font_Manager'>Font Manager</a> from font data and do not take
@@ -4766,165 +4030,40 @@ Y-axis values above the baseline are negative, and below the baseline are positi
 
 <div><fiddle-embed name="2bfa3783719fcd769af177a1b244e171"></fiddle-embed></div>
 
-# <a name='SkPaint_FontMetrics'>Struct SkPaint::FontMetrics</a>
+<a name='SkPaint_FontMetrics'></a>
 
-## <a name='Font_Metrics_Constant'>Constant</a>
-
-
-SkPaint related constants are defined by <code>enum</code>, <code>enum class</code>,  <code>#define</code>, <code>const</code>, and <code>constexpr</code>.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_FontMetricsFlags'>FontMetricsFlags</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>valid <a href='#Font_Metrics'>Font Metrics</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_kStrikeoutPositionIsValid_Flag'>kStrikeoutPositionIsValid Flag</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>set if <a href='#SkPaint_FontMetrics_fStrikeoutPosition'>fStrikeoutPosition</a> is valid</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_kStrikeoutThicknessIsValid_Flag'>kStrikeoutThicknessIsValid Flag</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>set if <a href='#SkPaint_FontMetrics_fStrikeoutThickness'>fStrikeoutThickness</a> is valid</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_kUnderlinePositionIsValid_Flag'>kUnderlinePositionIsValid Flag</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>set if <a href='#SkPaint_FontMetrics_fUnderlinePosition'>fUnderlinePosition</a> is valid</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_kUnderlineThicknessIsValid_Flag'>kUnderlineThicknessIsValid Flag</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>set if <a href='#SkPaint_FontMetrics_fUnderlineThickness'>fUnderlineThickness</a> is valid</td>
-  </tr>
-</table>
-
-## <a name='Font_Metrics_Member_Function'>Member_Function</a>
-
-
-SkPaint member functions read and modify the structure properties.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_hasStrikeoutPosition'>hasStrikeoutPosition</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns strikeout position if set</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_hasStrikeoutThickness'>hasStrikeoutThickness</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns strikeout thickness if set</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_hasUnderlinePosition'>hasUnderlinePosition</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns underline position if set</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_hasUnderlineThickness'>hasUnderlineThickness</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns underline thickness if set</td>
-  </tr>
-</table>
-
-## <a name='Font_Metrics_Member'>Member</a>
-
-
-SkPaint members may be read and written directly without using a member function.
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fAscent'>fAscent</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>distance to reserve above baseline</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fAvgCharWidth'>fAvgCharWidth</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>average character width</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fBottom'>fBottom</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>extent below baseline</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fCapHeight'>fCapHeight</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>height of an upper-case letter</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fDescent'>fDescent</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>distance to reserve below baseline</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fFlags'>fFlags</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>is set to <a href='#SkPaint_FontMetrics_FontMetricsFlags'>FontMetricsFlags</a> when metrics are valid</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fLeading'>fLeading</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>distance to add between lines</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fMaxCharWidth'>fMaxCharWidth</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>maximum character width</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fStrikeoutPosition'>fStrikeoutPosition</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>strikeout position relative to baseline</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fStrikeoutThickness'>fStrikeoutThickness</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>strikeout thickness</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fTop'>fTop</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>extent above baseline</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fUnderlinePosition'>fUnderlinePosition</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>underline position relative to baseline</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fUnderlineThickness'>fUnderlineThickness</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>underline thickness</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fXHeight'>fXHeight</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>height of lower-case 'x'</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fXMax'>fXMax</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>maximum x</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_FontMetrics_fXMin'>fXMin</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>minimum x</td>
-  </tr>
-</table>
+---
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
     struct <a href='#SkPaint_FontMetrics'>FontMetrics</a> {
         enum <a href='#SkPaint_FontMetrics_FontMetricsFlags'>FontMetricsFlags</a> {
-            <a href='#SkPaint_FontMetrics_kUnderlineThicknessIsValid_Flag'>kUnderlineThicknessIsValid Flag</a> = 1 << 0,
-            <a href='#SkPaint_FontMetrics_kUnderlinePositionIsValid_Flag'>kUnderlinePositionIsValid Flag</a> = 1 << 1,
-            <a href='#SkPaint_FontMetrics_kStrikeoutThicknessIsValid_Flag'>kStrikeoutThicknessIsValid Flag</a> = 1 << 2,
-            <a href='#SkPaint_FontMetrics_kStrikeoutPositionIsValid_Flag'>kStrikeoutPositionIsValid Flag</a> = 1 << 3,
+            <a href='#SkPaint_FontMetrics_kUnderlineThicknessIsValid_Flag'>kUnderlineThicknessIsValid_Flag</a> = 1 << 0,
+            <a href='#SkPaint_FontMetrics_kUnderlinePositionIsValid_Flag'>kUnderlinePositionIsValid_Flag</a> = 1 << 1,
+            <a href='#SkPaint_FontMetrics_kStrikeoutThicknessIsValid_Flag'>kStrikeoutThicknessIsValid_Flag</a> = 1 << 2,
+            <a href='#SkPaint_FontMetrics_kStrikeoutPositionIsValid_Flag'>kStrikeoutPositionIsValid_Flag</a> = 1 << 3,
         };
 
-        uint32_t    <a href='#SkPaint_FontMetrics_fFlags'>fFlags</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fTop'>fTop</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fAscent'>fAscent</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fDescent'>fDescent</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fBottom'>fBottom</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fLeading'>fLeading</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fAvgCharWidth'>fAvgCharWidth</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fMaxCharWidth'>fMaxCharWidth</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fXMin'>fXMin</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fXMax'>fXMax</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fXHeight'>fXHeight</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fCapHeight'>fCapHeight</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fUnderlineThickness'>fUnderlineThickness</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fUnderlinePosition'>fUnderlinePosition</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fStrikeoutThickness'>fStrikeoutThickness</a>;
-        <a href='undocumented#SkScalar'>SkScalar</a>    <a href='#SkPaint_FontMetrics_fStrikeoutPosition'>fStrikeoutPosition</a>;
+        uint32_t <a href='#SkPaint_FontMetrics_fFlags'>fFlags</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fTop'>fTop</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fAscent'>fAscent</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fDescent'>fDescent</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fBottom'>fBottom</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fLeading'>fLeading</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fAvgCharWidth'>fAvgCharWidth</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fMaxCharWidth'>fMaxCharWidth</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fXMin'>fXMin</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fXMax'>fXMax</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fXHeight'>fXHeight</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fCapHeight'>fCapHeight</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fUnderlineThickness'>fUnderlineThickness</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fUnderlinePosition'>fUnderlinePosition</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fStrikeoutThickness'>fStrikeoutThickness</a>;
+        <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_FontMetrics_fStrikeoutPosition'>fStrikeoutPosition</a>;
 
-        bool <a href='#SkPaint_FontMetrics_hasUnderlineThickness'>hasUnderlineThickness(SkScalar* thickness)</a> const;
-        bool <a href='#SkPaint_FontMetrics_hasUnderlinePosition'>hasUnderlinePosition(SkScalar* position)</a> const;
-        bool <a href='#SkPaint_FontMetrics_hasStrikeoutThickness'>hasStrikeoutThickness(SkScalar* thickness)</a> const;
-        bool <a href='#SkPaint_FontMetrics_hasStrikeoutPosition'>hasStrikeoutPosition(SkScalar* position)</a> const;
+        bool <a href='#SkPaint_FontMetrics_hasUnderlineThickness'>hasUnderlineThickness</a>(<a href='undocumented#SkScalar'>SkScalar</a>* thickness) const;
+        bool <a href='#SkPaint_FontMetrics_hasUnderlinePosition'>hasUnderlinePosition</a>(<a href='undocumented#SkScalar'>SkScalar</a>* position) const;
+        bool <a href='#SkPaint_FontMetrics_hasStrikeoutThickness'>hasStrikeoutThickness</a>(<a href='undocumented#SkScalar'>SkScalar</a>* thickness) const;
+        bool <a href='#SkPaint_FontMetrics_hasStrikeoutPosition'>hasStrikeoutPosition</a>(<a href='undocumented#SkScalar'>SkScalar</a>* position) const;
     };
 </pre>
 
@@ -4942,14 +4081,16 @@ are valid, since their value may be zero.
 <a href='#SkPaint_FontMetrics_fStrikeoutThickness'>fStrikeoutThickness</a> and <a href='#SkPaint_FontMetrics_fStrikeoutPosition'>fStrikeoutPosition</a> have a bit set in <a href='#SkPaint_FontMetrics_fFlags'>fFlags</a> if their values
 are valid, since their value may be zero.
 
-## <a name='SkPaint_FontMetrics_FontMetricsFlags'>Enum SkPaint::FontMetrics::FontMetricsFlags</a>
+<a name='SkPaint_FontMetrics_FontMetricsFlags'></a>
+
+---
 
 <pre style="padding: 1em 1em 1em 1em;width: 62.5em; background-color: #f0f0f0">
         enum <a href='#SkPaint_FontMetrics_FontMetricsFlags'>FontMetricsFlags</a> {
-            <a href='#SkPaint_FontMetrics_kUnderlineThicknessIsValid_Flag'>kUnderlineThicknessIsValid Flag</a> = 1 << 0,
-            <a href='#SkPaint_FontMetrics_kUnderlinePositionIsValid_Flag'>kUnderlinePositionIsValid Flag</a> = 1 << 1,
-            <a href='#SkPaint_FontMetrics_kStrikeoutThicknessIsValid_Flag'>kStrikeoutThicknessIsValid Flag</a> = 1 << 2,
-            <a href='#SkPaint_FontMetrics_kStrikeoutPositionIsValid_Flag'>kStrikeoutPositionIsValid Flag</a> = 1 << 3,
+            <a href='#SkPaint_FontMetrics_kUnderlineThicknessIsValid_Flag'>kUnderlineThicknessIsValid_Flag</a> = 1 << 0,
+            <a href='#SkPaint_FontMetrics_kUnderlinePositionIsValid_Flag'>kUnderlinePositionIsValid_Flag</a> = 1 << 1,
+            <a href='#SkPaint_FontMetrics_kStrikeoutThicknessIsValid_Flag'>kStrikeoutThicknessIsValid_Flag</a> = 1 << 2,
+            <a href='#SkPaint_FontMetrics_kStrikeoutPositionIsValid_Flag'>kStrikeoutPositionIsValid_Flag</a> = 1 << 3,
         };
 </pre>
 
@@ -4987,13 +4128,10 @@ set if fStrikeoutThickness is valid</td>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>
 set if fStrikeoutPosition is valid</td>
   </tr>
-</table>
+</table><table style='border-collapse: collapse; width: 62.5em'>
 
-### Members
-
-<table style='border-collapse: collapse; width: 62.5em'>
   <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Type</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Name</th>
+<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Member</th>
 <th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
   <tr style='background-color: #f0f0f0; '>
     <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>uint32_t</td>
@@ -5126,7 +4264,8 @@ If <a href='#SkPaint_FontMetrics_kStrikeoutPositionIsValid_Flag'>kStrikeoutPosit
 </table>
 
 <a name='SkPaint_FontMetrics_hasUnderlineThickness'></a>
-## hasUnderlineThickness
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_FontMetrics_hasUnderlineThickness'>hasUnderlineThickness</a>(<a href='undocumented#SkScalar'>SkScalar</a>* thickness) const
@@ -5147,10 +4286,9 @@ return false, and ignore <a href='#SkPaint_FontMetrics_hasUnderlineThickness_thi
 
 true if font specifies underline width
 
----
-
 <a name='SkPaint_FontMetrics_hasUnderlinePosition'></a>
-## hasUnderlinePosition
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_FontMetrics_hasUnderlinePosition'>hasUnderlinePosition</a>(<a href='undocumented#SkScalar'>SkScalar</a>* position) const
@@ -5171,10 +4309,9 @@ return false, and ignore <a href='#SkPaint_FontMetrics_hasUnderlinePosition_posi
 
 true if font specifies underline <a href='#SkPaint_FontMetrics_hasUnderlinePosition_position'>position</a>
 
----
-
 <a name='SkPaint_FontMetrics_hasStrikeoutThickness'></a>
-## hasStrikeoutThickness
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_FontMetrics_hasStrikeoutThickness'>hasStrikeoutThickness</a>(<a href='undocumented#SkScalar'>SkScalar</a>* thickness) const
@@ -5195,10 +4332,9 @@ return false, and ignore <a href='#SkPaint_FontMetrics_hasStrikeoutThickness_thi
 
 true if font specifies strikeout width
 
----
-
 <a name='SkPaint_FontMetrics_hasStrikeoutPosition'></a>
-## hasStrikeoutPosition
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_FontMetrics_hasStrikeoutPosition'>hasStrikeoutPosition</a>(<a href='undocumented#SkScalar'>SkScalar</a>* position) const
@@ -5219,10 +4355,9 @@ return false, and ignore <a href='#SkPaint_FontMetrics_hasStrikeoutPosition_posi
 
 true if font specifies strikeout <a href='#SkPaint_FontMetrics_hasStrikeoutPosition_position'>position</a>
 
----
-
 <a name='SkPaint_getFontMetrics'></a>
-## getFontMetrics
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getFontMetrics'>getFontMetrics</a>(<a href='#SkPaint_FontMetrics'>FontMetrics</a>* metrics, <a href='undocumented#SkScalar'>SkScalar</a> scale = 0) const
@@ -5260,10 +4395,9 @@ recommended spacing between lines
 
 <a href='#Text_Size'>Text Size</a> <a href='undocumented#Typeface'>Typeface</a> <a href='#Typeface_Methods'>Typeface Methods</a>
 
----
-
 <a name='SkPaint_getFontSpacing'></a>
-## getFontSpacing
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_getFontSpacing'>getFontSpacing</a>() const
@@ -5294,10 +4428,9 @@ textSize: 32 fontSpacing: 37.25
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_getFontBounds'></a>
-## getFontBounds
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='SkRect_Reference#SkRect'>SkRect</a> <a href='#SkPaint_getFontBounds'>getFontBounds</a>() const
@@ -5329,10 +4462,9 @@ font bounds    = { -12.2461, -14.7891, 21.5215, 5.55469 }
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_textToGlyphs'></a>
-## textToGlyphs
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 int <a href='#SkPaint_textToGlyphs'>textToGlyphs</a>(const void* text, size_t byteLength, <a href='undocumented#SkGlyphID'>SkGlyphID</a> glyphs[]) const
@@ -5372,10 +4504,9 @@ number of <a href='#SkPaint_textToGlyphs_glyphs'>glyphs</a> represented by <a hr
 
 <div><fiddle-embed name="343e9471a7f7b5f09abdc3b44983433b"></fiddle-embed></div>
 
----
-
 <a name='SkPaint_countText'></a>
-## countText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 int <a href='#SkPaint_countText'>countText</a>(const void* text, size_t byteLength) const
@@ -5411,10 +4542,9 @@ count = 5
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_containsText'></a>
-## containsText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_containsText'>containsText</a>(const void* text, size_t byteLength) const
@@ -5475,10 +4605,9 @@ that it corresponds to an entry in <a href='undocumented#Typeface'>Typeface</a>.
 
 <a href='#SkPaint_setTextEncoding'>setTextEncoding</a> <a href='undocumented#Typeface'>Typeface</a>
 
----
-
 <a name='SkPaint_glyphsToUnichars'></a>
-## glyphsToUnichars
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_glyphsToUnichars'>glyphsToUnichars</a>(const <a href='undocumented#SkGlyphID'>SkGlyphID</a> glyphs[], int count, <a href='undocumented#SkUnichar'>SkUnichar</a> text[]) const
@@ -5509,19 +4638,17 @@ Only supported on platforms that use FreeType as the <a href='undocumented#Engin
 <div><fiddle-embed name="c12686b0b3e0a87d0a248bbfc57e9492"><div>Convert UTF-8 <a href='#SkPaint_glyphsToUnichars_text'>text</a> to <a href='#SkPaint_glyphsToUnichars_glyphs'>glyphs</a>; then convert <a href='#SkPaint_glyphsToUnichars_glyphs'>glyphs</a> to Unichar code points.
 </div></fiddle-embed></div>
 
----
-
-## <a name='Measure_Text'>Measure Text</a>
+<a name='Measure_Text'></a>
 
 <a name='SkPaint_measureText'></a>
-## measureText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_measureText'>measureText</a>(const void* text, size_t length, <a href='SkRect_Reference#SkRect'>SkRect</a>* bounds) const
 </pre>
 
-Returns the advance width of <a href='#SkPaint_measureText_text'>text</a> if <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> is clear,
-and the height of <a href='#SkPaint_measureText_text'>text</a> if <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> is set.
+Returns the advance width of <a href='#SkPaint_measureText_text'>text</a>.
 The advance is the normal distance to move before drawing additional <a href='#SkPaint_measureText_text'>text</a>.
 Uses <a href='#Text_Encoding'>Text Encoding</a> to decode <a href='#SkPaint_measureText_text'>text</a>, <a href='undocumented#Typeface'>Typeface</a> to get the font metrics,
 and <a href='#Text_Size'>Text Size</a>, <a href='#Text_Scale_X'>Text Scale X</a>, <a href='#Text_Skew_X'>Text Skew X</a>, <a href='#Stroke_Width'>Stroke Width</a>, and
@@ -5550,16 +4677,15 @@ advance width or height
 
 <div><fiddle-embed name="06084f609184470135a9cd9ebc5af149"></fiddle-embed></div>
 
----
-
 <a name='SkPaint_measureText_2'></a>
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 <a href='undocumented#SkScalar'>SkScalar</a> <a href='#SkPaint_measureText'>measureText</a>(const void* text, size_t length) const
 </pre>
 
-Returns the advance width of <a href='#SkPaint_measureText_2_text'>text</a> if <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> is clear,
-and the height of <a href='#SkPaint_measureText_2_text'>text</a> if <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> is set.
+Returns the advance width of <a href='#SkPaint_measureText_2_text'>text</a>.
 The advance is the normal distance to move before drawing additional <a href='#SkPaint_measureText_2_text'>text</a>.
 Uses <a href='#Text_Encoding'>Text Encoding</a> to decode <a href='#SkPaint_measureText_2_text'>text</a>, <a href='undocumented#Typeface'>Typeface</a> to get the font metrics,
 and <a href='#Text_Size'>Text Size</a> to scale the metrics.
@@ -5592,10 +4718,9 @@ double width = 10
 
 </fiddle-embed></div>
 
----
-
 <a name='SkPaint_breakText'></a>
-## breakText
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 size_t <a href='#SkPaint_breakText'>breakText</a>(const void* text, size_t length, <a href='undocumented#SkScalar'>SkScalar</a> maxWidth,
@@ -5603,10 +4728,7 @@ size_t <a href='#SkPaint_breakText'>breakText</a>(const void* text, size_t lengt
 </pre>
 
 Returns the bytes of <a href='#SkPaint_breakText_text'>text</a> that fit within <a href='#SkPaint_breakText_maxWidth'>maxWidth</a>.
-If <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> is clear, the <a href='#SkPaint_breakText_text'>text</a> fragment fits if its advance width is less than or
-equal to <a href='#SkPaint_breakText_maxWidth'>maxWidth</a>.
-If <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> is set, the <a href='#SkPaint_breakText_text'>text</a> fragment fits if its advance height is less than or
-equal to <a href='#SkPaint_breakText_maxWidth'>maxWidth</a>.
+The <a href='#SkPaint_breakText_text'>text</a> fragment fits if its advance width is less than or equal to <a href='#SkPaint_breakText_maxWidth'>maxWidth</a>.
 Measures only while the advance is less than or equal to <a href='#SkPaint_breakText_maxWidth'>maxWidth</a>.
 Returns the advance or the <a href='#SkPaint_breakText_text'>text</a> fragment in <a href='#SkPaint_breakText_measuredWidth'>measuredWidth</a> if it not nullptr.
 Uses <a href='#Text_Encoding'>Text Encoding</a> to decode <a href='#SkPaint_breakText_text'>text</a>, <a href='undocumented#Typeface'>Typeface</a> to get the font metrics,
@@ -5639,10 +4761,9 @@ bytes of <a href='#SkPaint_breakText_text'>text</a> that fit, always less than o
 <a href='undocumented#Line'>Line</a> under "" shows measured width after breaking <a href='#SkPaint_breakText_text'>text</a>.
 </div></fiddle-embed></div>
 
----
-
 <a name='SkPaint_getTextWidths'></a>
-## getTextWidths
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 int <a href='#SkPaint_getTextWidths'>getTextWidths</a>(const void* text, size_t byteLength, <a href='undocumented#SkScalar'>SkScalar</a> widths[], <a href='SkRect_Reference#SkRect'>SkRect</a> bounds[] = nullptr) const
@@ -5653,8 +4774,7 @@ the glyph count in <a href='#SkPaint_getTextWidths_text'>text</a>.
 Both <a href='#SkPaint_getTextWidths_widths'>widths</a> and <a href='#SkPaint_getTextWidths_bounds'>bounds</a> may be nullptr.
 If <a href='#SkPaint_getTextWidths_widths'>widths</a> is not nullptr, <a href='#SkPaint_getTextWidths_widths'>widths</a> must be an array of glyph count entries.
 if <a href='#SkPaint_getTextWidths_bounds'>bounds</a> is not nullptr, <a href='#SkPaint_getTextWidths_bounds'>bounds</a> must be an array of glyph count entries.
-If <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> is clear, <a href='#SkPaint_getTextWidths_widths'>widths</a> returns the horizontal advance.
-If <a href='#SkPaint_kVerticalText_Flag'>kVerticalText Flag</a> is set, <a href='#SkPaint_getTextWidths_widths'>widths</a> returns the vertical advance.
+Widths returns the horizontal advance.
 Uses <a href='#Text_Encoding'>Text Encoding</a> to decode <a href='#SkPaint_getTextWidths_text'>text</a>, <a href='undocumented#Typeface'>Typeface</a> to get the font metrics,
 and <a href='#Text_Size'>Text Size</a> to scale the <a href='#SkPaint_getTextWidths_widths'>widths</a> and <a href='#SkPaint_getTextWidths_bounds'>bounds</a>.
 Does not scale the advance by <a href='#Fake_Bold'>Fake Bold</a> or <a href='undocumented#Path_Effect'>Path Effect</a>.
@@ -5686,14 +4806,13 @@ glyph count in <a href='#SkPaint_getTextWidths_text'>text</a>
 The underlines show the <a href='#SkPaint_getTextWidths_text'>text</a> advance, spaced to keep them distinct.
 </div></fiddle-embed></div>
 
----
-
-## <a name='Text_Path'>Text Path</a>
+<a name='Text_Path'></a>
 
 <a href='#Text_Path'>Text Path</a> describes the geometry of <a href='undocumented#Glyph'>Glyphs</a> used to draw text.
 
 <a name='SkPaint_getTextPath'></a>
-## getTextPath
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_getTextPath'>getTextPath</a>(const void* text, size_t length, <a href='undocumented#SkScalar'>SkScalar</a> x, <a href='undocumented#SkScalar'>SkScalar</a> y, <a href='SkPath_Reference#SkPath'>SkPath</a>* path) const
@@ -5730,10 +4849,9 @@ Uses <a href='#SkPaint_getTextPath_x'>x</a>, <a href='#SkPaint_getTextPath_y'>y<
 the offset location. The result is rendered with one draw call.
 </div></fiddle-embed></div>
 
----
-
 <a name='SkPaint_getPosTextPath'></a>
-## getPosTextPath
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 void <a href='#SkPaint_getPosTextPath'>getPosTextPath</a>(const void* text, size_t length, const <a href='SkPoint_Reference#SkPoint'>SkPoint</a> pos[], <a href='SkPath_Reference#SkPath'>SkPath</a>* path) const
@@ -5767,16 +4885,15 @@ Uses <a href='#SkPaint_getPosTextPath_pos'>pos</a> array and <a href='#Text_Alig
 <div><fiddle-embed name="7f27c93472aa99a7542fb3493076f072"><div>Simplifies three <a href='undocumented#Glyph'>Glyphs</a> to eliminate overlaps, and strokes the result.
 </div></fiddle-embed></div>
 
----
-
-## <a name='Text_Intercepts'>Text Intercepts</a>
+<a name='Text_Intercepts'></a>
 
 <a href='#Text_Intercepts'>Text Intercepts</a> describe the intersection of drawn text <a href='undocumented#Glyph'>Glyphs</a> with a pair
 of lines parallel to the text advance. <a href='#Text_Intercepts'>Text Intercepts</a> permits creating a
 underline that skips <a href='undocumented#Descenders'>Descenders</a>.
 
 <a name='SkPaint_getTextIntercepts'></a>
-## getTextIntercepts
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 int <a href='#SkPaint_getTextIntercepts'>getTextIntercepts</a>(const void* text, size_t length, <a href='undocumented#SkScalar'>SkScalar</a> x, <a href='undocumented#SkScalar'>SkScalar</a> y,
@@ -5826,10 +4943,9 @@ number of intersections; may be zero
 <div><fiddle-embed name="2a0b80ed20d193c688085b79deb5bdc9"><div>Underline uses intercepts to draw on either side of the glyph Descender.
 </div></fiddle-embed></div>
 
----
-
 <a name='SkPaint_getPosTextIntercepts'></a>
-## getPosTextIntercepts
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 int <a href='#SkPaint_getPosTextIntercepts'>getPosTextIntercepts</a>(const void* text, size_t length, const <a href='SkPoint_Reference#SkPoint'>SkPoint</a> pos[],
@@ -5873,13 +4989,12 @@ number of intersections; may be zero
 
 ### Example
 
-<div><fiddle-embed name="98b2dfc552d0540a7c041fe7a2839bd7"><div><a href='undocumented#Text'>Text</a> intercepts draw on either side of, but not inside, <a href='undocumented#Glyph'>Glyphs</a> in a run.
+<div><fiddle-embed name="5b5754fdb90b44c245d72567854eca04"><div><a href='undocumented#Text'>Text</a> intercepts draw on either side of, but not inside, <a href='undocumented#Glyph'>Glyphs</a> in a run.
 </div></fiddle-embed></div>
 
----
-
 <a name='SkPaint_getPosTextHIntercepts'></a>
-## getPosTextHIntercepts
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 int <a href='#SkPaint_getPosTextHIntercepts'>getPosTextHIntercepts</a>(const void* text, size_t length, const <a href='undocumented#SkScalar'>SkScalar</a> xpos[], <a href='undocumented#SkScalar'>SkScalar</a> constY,
@@ -5929,13 +5044,12 @@ number of intersections; may be zero
 <div><fiddle-embed name="dc9851c43acc3716aca8c9a4d40d452d"><div><a href='undocumented#Text'>Text</a> intercepts do not take stroke thickness into consideration.
 </div></fiddle-embed></div>
 
+<a name='SkPaint_getTextBlobIntercepts'></a>
+
 ---
 
-<a name='SkPaint_getTextBlobIntercepts'></a>
-## getTextBlobIntercepts
-
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
-int <a href='#SkPaint_getTextBlobIntercepts'>getTextBlobIntercepts</a>(const <a href='undocumented#SkTextBlob'>SkTextBlob</a>* blob, const <a href='undocumented#SkScalar'>SkScalar</a> bounds[2], <a href='undocumented#SkScalar'>SkScalar</a>* intervals) const
+int <a href='#SkPaint_getTextBlobIntercepts'>getTextBlobIntercepts</a>(const <a href='SkTextBlob_Reference#SkTextBlob'>SkTextBlob</a>* blob, const <a href='undocumented#SkScalar'>SkScalar</a> bounds[2], <a href='undocumented#SkScalar'>SkScalar</a>* intervals) const
 </pre>
 
 Returns the number of <a href='#SkPaint_getTextBlobIntercepts_intervals'>intervals</a> that intersect <a href='#SkPaint_getTextBlobIntercepts_bounds'>bounds</a>.
@@ -5973,10 +5087,9 @@ number of intersections; may be zero
 
 <div><fiddle-embed name="f2229dd5c8e76f9e12fafe59b61353c8"></fiddle-embed></div>
 
----
-
 <a name='SkPaint_nothingToDraw'></a>
-## nothingToDraw
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_nothingToDraw'>nothingToDraw</a>() const
@@ -6007,19 +5120,22 @@ alpha 0 nothing to draw: true
 
 </fiddle-embed></div>
 
----
+<a name='Fast_Bounds'></a>
 
-## <a name='Fast_Bounds'>Fast Bounds</a>
+Private: To be made private.
 
 <a href='#Fast_Bounds'>Fast Bounds</a> functions conservatively outset a drawing bounds by additional area
 <a href='#Paint'>Paint</a> may draw to.
 
 <a name='SkPaint_canComputeFastBounds'></a>
-## canComputeFastBounds
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 bool <a href='#SkPaint_canComputeFastBounds'>canComputeFastBounds</a>() const
 </pre>
+
+Private: (to be made private)
 
 Returns true if <a href='#Paint'>Paint</a> does not include elements requiring extensive computation
 to compute <a href='undocumented#Device'>Device</a> bounds of drawn geometry. For instance, <a href='#Paint'>Paint</a> with <a href='undocumented#Path_Effect'>Path Effect</a>
@@ -6029,14 +5145,15 @@ always returns false.
 
 true if <a href='#Paint'>Paint</a> allows for fast computation of bounds
 
----
-
 <a name='SkPaint_computeFastBounds'></a>
-## computeFastBounds
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 const <a href='SkRect_Reference#SkRect'>SkRect</a>& <a href='#SkPaint_computeFastBounds'>computeFastBounds</a>(const <a href='SkRect_Reference#SkRect'>SkRect</a>& orig, <a href='SkRect_Reference#SkRect'>SkRect</a>* storage) const
 </pre>
+
+Private: (to be made private)
 
 Only call this if <a href='#SkPaint_canComputeFastBounds'>canComputeFastBounds</a> returned true. This takes a
 raw rectangle (the raw bounds of a shape), and adjusts it for stylistic
@@ -6048,6 +5165,15 @@ The returned <a href='SkRect_Reference#Rect'>Rect</a> will either be <a href='#S
 should not rely on <a href='#SkPaint_computeFastBounds_storage'>storage</a> being set to the result, but should always
 use the returned value. It is legal for <a href='#SkPaint_computeFastBounds_orig'>orig</a> and <a href='#SkPaint_computeFastBounds_storage'>storage</a> to be the same
 <a href='SkRect_Reference#Rect'>Rect</a>.
+
+Private: For example:
+    if (!path.isInverseFillType() && paint.canComputeFastBounds()) {
+        SkRect storage;
+        if (canvas->quickReject(paint.computeFastBounds(path.getBounds(), &storage))) {
+            return; // do not draw the path
+        }
+    }
+    // draw the path
 
 ### Parameters
 
@@ -6063,14 +5189,15 @@ use the returned value. It is legal for <a href='#SkPaint_computeFastBounds_orig
 
 fast computed bounds
 
----
-
 <a name='SkPaint_computeFastStrokeBounds'></a>
-## computeFastStrokeBounds
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 const <a href='SkRect_Reference#SkRect'>SkRect</a>& <a href='#SkPaint_computeFastStrokeBounds'>computeFastStrokeBounds</a>(const <a href='SkRect_Reference#SkRect'>SkRect</a>& orig, <a href='SkRect_Reference#SkRect'>SkRect</a>* storage) const
 </pre>
+
+Private: (to be made private)
 
 ### Parameters
 
@@ -6086,14 +5213,15 @@ const <a href='SkRect_Reference#SkRect'>SkRect</a>& <a href='#SkPaint_computeFas
 
 fast computed bounds
 
----
-
 <a name='SkPaint_doComputeFastBounds'></a>
-## doComputeFastBounds
+
+---
 
 <pre style="padding: 1em 1em 1em 1em; width: 62.5em;background-color: #f0f0f0">
 const <a href='SkRect_Reference#SkRect'>SkRect</a>& <a href='#SkPaint_doComputeFastBounds'>doComputeFastBounds</a>(const <a href='SkRect_Reference#SkRect'>SkRect</a>& orig, <a href='SkRect_Reference#SkRect'>SkRect</a>* storage, <a href='#SkPaint_Style'>Style</a> style) const
 </pre>
+
+Private: (to be made private)
 
 Computes the bounds, overriding the <a href='#Paint'>Paint</a> <a href='#SkPaint_Style'>Style</a>. This can be used to
 account for additional width required by stroking <a href='#SkPaint_doComputeFastBounds_orig'>orig</a>, without
@@ -6116,33 +5244,5 @@ altering <a href='#SkPaint_Style'>Style</a> set to fill.
 
 fast computed bounds
 
----
-
-## <a name='Utility'>Utility</a>
-
-
-<table style='border-collapse: collapse; width: 62.5em'>
-  <tr><th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Topic</th>
-<th style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>Description</th></tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_containsText'>containsText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns if all text corresponds to <a href='undocumented#Glyph'>Glyphs</a></td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_countText'>countText</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns number of <a href='undocumented#Glyph'>Glyphs</a> in text</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_glyphsToUnichars'>glyphsToUnichars</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>converts <a href='undocumented#Glyph'>Glyphs</a> into text</td>
-  </tr>
-  <tr>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_nothingToDraw'>nothingToDraw</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>returns true if <a href='#Paint'>Paint</a> prevents all drawing</td>
-  </tr>
-  <tr style='background-color: #f0f0f0; '>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '><a href='#SkPaint_textToGlyphs'>textToGlyphs</a></td>
-    <td style='text-align: left; border: 2px solid #dddddd; padding: 8px; '>converts text into glyph indices</td>
-  </tr>
-</table>
+<a name='Utility'></a>
 

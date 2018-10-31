@@ -4,7 +4,7 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#include "SampleCode.h"
+#include "Sample.h"
 #include "Sk1DPathEffect.h"
 #include "Sk2DPathEffect.h"
 #include "SkAlphaThresholdFilter.h"
@@ -39,7 +39,6 @@
 #include "SkTableColorFilter.h"
 #include "SkTileImageFilter.h"
 #include "SkTypeface.h"
-#include "SkView.h"
 #include "SkXfermodeImageFilter.h"
 #if SK_SUPPORT_GPU
 #include "text/GrSDFMaskFilter.h"
@@ -158,10 +157,6 @@ static SkMatrix make_matrix() {
 
 static SkBlendMode make_xfermode() {
     return static_cast<SkBlendMode>(R((int)SkBlendMode::kLastMode+1));
-}
-
-static SkPaint::Align make_paint_align() {
-    return static_cast<SkPaint::Align>(R(SkPaint::kRight_Align+1));
 }
 
 static SkPaint::Hinting make_paint_hinting() {
@@ -501,7 +496,6 @@ static SkPaint make_paint() {
     paint.setLCDRenderText(make_bool());
     paint.setEmbeddedBitmapText(make_bool());
     paint.setAutohinted(make_bool());
-    paint.setVerticalText(make_bool());
     paint.setFakeBoldText(make_bool());
     paint.setDevKernText(make_bool());
     paint.setFilterQuality(make_filter_quality());
@@ -524,7 +518,6 @@ static SkPaint make_paint() {
 
     paint.setImageFilter(make_image_filter());
     sk_sp<SkData> data(make_3Dlut(nullptr, make_bool(), make_bool(), make_bool()));
-    paint.setTextAlign(make_paint_align());
     paint.setTextSize(make_scalar());
     paint.setTextScaleX(make_scalar());
     paint.setTextSkewX(make_scalar());
@@ -786,17 +779,16 @@ static void do_fuzz(SkCanvas* canvas) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-class ImageFilterFuzzView : public SampleView {
+class ImageFilterFuzzView : public Sample {
 public:
     ImageFilterFuzzView() {
         this->setBGColor(0xFFDDDDDD);
     }
 
 protected:
-    // overrides from SkEventSink
-    virtual bool onQuery(SkEvent* evt) {
-        if (SampleCode::TitleQ(*evt)) {
-            SampleCode::TitleR(evt, "ImageFilterFuzzer");
+    virtual bool onQuery(Sample::Event* evt) {
+        if (Sample::TitleQ(*evt)) {
+            Sample::TitleR(evt, "ImageFilterFuzzer");
             return true;
         }
         return this->INHERITED::onQuery(evt);
@@ -811,10 +803,9 @@ protected:
     }
 
 private:
-    typedef SkView INHERITED;
+    typedef Sample INHERITED;
 };
 
 //////////////////////////////////////////////////////////////////////////////
 
-static SkView* MyFactory() { return new ImageFilterFuzzView; }
-static SkViewRegister reg(MyFactory);
+DEF_SAMPLE( return new ImageFilterFuzzView(); )

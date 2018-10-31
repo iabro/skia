@@ -78,6 +78,7 @@ void GrTextureOpList::onPrepare(GrOpFlushState* flushState) {
     // Loop over the ops that haven't yet generated their geometry
     for (int i = 0; i < fRecordedOps.count(); ++i) {
         if (fRecordedOps[i]) {
+            SkASSERT(fRecordedOps[i]->isChainHead());
             GrOpFlushState::OpArgs opArgs = {
                 fRecordedOps[i].get(),
                 nullptr,
@@ -98,16 +99,16 @@ bool GrTextureOpList::onExecute(GrOpFlushState* flushState) {
 
     SkASSERT(fTarget.get()->peekTexture());
 
-    std::unique_ptr<GrGpuTextureCommandBuffer> commandBuffer(
-                         flushState->gpu()->createCommandBuffer(fTarget.get()->peekTexture(),
-                                                                fTarget.get()->origin()));
-    flushState->setCommandBuffer(commandBuffer.get());
+    GrGpuTextureCommandBuffer* commandBuffer(
+                         flushState->gpu()->getCommandBuffer(fTarget.get()->peekTexture(),
+                                                             fTarget.get()->origin()));
+    flushState->setCommandBuffer(commandBuffer);
 
     for (int i = 0; i < fRecordedOps.count(); ++i) {
         if (!fRecordedOps[i]) {
             continue;
         }
-
+        SkASSERT(fRecordedOps[i]->isChainHead());
         GrOpFlushState::OpArgs opArgs = {
             fRecordedOps[i].get(),
             nullptr,
@@ -119,7 +120,7 @@ bool GrTextureOpList::onExecute(GrOpFlushState* flushState) {
         flushState->setOpArgs(nullptr);
     }
 
-    commandBuffer->submit();
+    flushState->gpu()->submit(commandBuffer);
     flushState->setCommandBuffer(nullptr);
 
     return true;
@@ -196,7 +197,7 @@ void GrTextureOpList::gatherProxyIntervals(GrResourceAllocator* alloc) const {
     for (int i = 0; i < fRecordedOps.count(); ++i) {
         const GrOp* op = fRecordedOps[i].get(); // only diff from the GrRenderTargetOpList version
         if (op) {
-            op->visitProxies(gather);
+            op->visitProxies(gather, GrOp::VisitorType::kAllocatorGather);
         }
 
         // Even though the op may have been moved we still need to increment the op count to

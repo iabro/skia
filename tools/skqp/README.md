@@ -68,7 +68,7 @@ How to build and run the SkQP tests
 
 6.  Monitor the output with:
 
-        adb logcat org.skia.skqp skia "*:S"
+        adb logcat TestRunner org.skia.skqp skia "*:S"
 
     Note the test's output path on the device.  It will look something like this:
 
@@ -84,13 +84,13 @@ How to build and run the SkQP tests
 Running a single test
 ---------------------
 
-To run a single test, for example `gles/aarectmodes`:
+To run a single test, for example `gles_aarectmodes`:
 
-    adb shell am instrument -e class 'org.skia.skqp.SkQPRunner#gles/aarectmodes' -w org.skia.skqp
+    adb shell am instrument -e class 'org.skia.skqp.SkQPRunner#gles_aarectmodes' -w org.skia.skqp
 
-Unit tests can be run with the `unitTest/` prefix:
+Unit tests can be run with the `unitTest_` prefix:
 
-    adb shell am instrument -e class 'org.skia.skqp.SkQPRunner#unitTest/GrSurface -w org.skia.skqp
+    adb shell am instrument -e class 'org.skia.skqp.SkQPRunner#unitTest_GrSurface -w org.skia.skqp
 
 Run as a non-APK executable
 ---------------------------

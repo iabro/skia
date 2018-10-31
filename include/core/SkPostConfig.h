@@ -203,11 +203,6 @@
 #  endif
 #endif
 
-#if !defined(SK_ATTR_DEPRECATED)
-   // FIXME: we ignore msg for now...
-#  define SK_ATTR_DEPRECATED(msg) SK_ATTRIBUTE(deprecated)
-#endif
-
 /**
  * If your judgment is better than the compiler's (i.e. you've profiled it),
  * you can use SK_ALWAYS_INLINE to force inlining. E.g.
@@ -299,6 +294,10 @@
 
 #ifndef SK_HISTOGRAM_ENUMERATION
 #  define SK_HISTOGRAM_ENUMERATION(name, value, boundary_value)
+#endif
+
+#ifndef SK_DISABLE_LEGACY_SHADERCONTEXT
+#define SK_ENABLE_LEGACY_SHADERCONTEXT
 #endif
 
 #endif // SkPostConfig_DEFINED

@@ -134,10 +134,16 @@ bool GrCCAtlas::internalPlaceRect(int w, int h, SkIPoint16* loc) {
     return true;
 }
 
-void GrCCAtlas::setUserBatchID(int id) {
+void GrCCAtlas::setFillBatchID(int id) {
     // This can't be called anymore once makeRenderTargetContext() has been called.
     SkASSERT(!fTextureProxy->isInstantiated());
-    fUserBatchID = id;
+    fFillBatchID = id;
+}
+
+void GrCCAtlas::setStrokeBatchID(int id) {
+    // This can't be called anymore once makeRenderTargetContext() has been called.
+    SkASSERT(!fTextureProxy->isInstantiated());
+    fStrokeBatchID = id;
 }
 
 static uint32_t next_atlas_unique_id() {
@@ -160,10 +166,11 @@ const GrUniqueKey& GrCCAtlas::getOrAssignUniqueKey(GrOnFlushResourceProvider* on
     return fUniqueKey;
 }
 
-sk_sp<GrCCAtlas::CachedAtlasInfo> GrCCAtlas::refOrMakeCachedAtlasInfo() {
+sk_sp<GrCCAtlas::CachedAtlasInfo> GrCCAtlas::refOrMakeCachedAtlasInfo(uint32_t contextUniqueID) {
     if (!fCachedAtlasInfo) {
-        fCachedAtlasInfo = sk_make_sp<CachedAtlasInfo>();
+        fCachedAtlasInfo = sk_make_sp<CachedAtlasInfo>(contextUniqueID);
     }
+    SkASSERT(fCachedAtlasInfo->fContextUniqueID == contextUniqueID);
     return fCachedAtlasInfo;
 }
 

@@ -185,7 +185,9 @@ public:
         font.setTextScaleX(4.2f);
         font.setTypeface(SkTypeface::MakeDefault());
         font.setTextSkewX(0.42f);
+#ifdef SK_SUPPORT_LEGACY_SETTEXTALIGN
         font.setTextAlign(SkPaint::kCenter_Align);
+#endif
         font.setHinting(SkPaint::kFull_Hinting);
         font.setAntiAlias(true);
         font.setFakeBoldText(true);
@@ -195,7 +197,6 @@ public:
         font.setLCDRenderText(true);
         font.setEmbeddedBitmapText(true);
         font.setAutohinted(true);
-        font.setVerticalText(true);
 
         // Ensure we didn't pick default values by mistake.
         SkPaint defaultPaint;
@@ -203,7 +204,9 @@ public:
         REPORTER_ASSERT(reporter, defaultPaint.getTextScaleX() != font.getTextScaleX());
         REPORTER_ASSERT(reporter, defaultPaint.getTypeface() != font.getTypeface());
         REPORTER_ASSERT(reporter, defaultPaint.getTextSkewX() != font.getTextSkewX());
+#ifdef SK_SUPPORT_LEGACY_SETTEXTALIGN
         REPORTER_ASSERT(reporter, defaultPaint.getTextAlign() != font.getTextAlign());
+#endif
         REPORTER_ASSERT(reporter, defaultPaint.getHinting() != font.getHinting());
         REPORTER_ASSERT(reporter, defaultPaint.isAntiAlias() != font.isAntiAlias());
         REPORTER_ASSERT(reporter, defaultPaint.isFakeBoldText() != font.isFakeBoldText());
@@ -213,7 +216,6 @@ public:
         REPORTER_ASSERT(reporter,
                         defaultPaint.isEmbeddedBitmapText() != font.isEmbeddedBitmapText());
         REPORTER_ASSERT(reporter, defaultPaint.isAutohinted() != font.isAutohinted());
-        REPORTER_ASSERT(reporter, defaultPaint.isVerticalText() != font.isVerticalText());
 
         SkTextBlobBuilder builder;
         AddRun(font, 1, SkTextBlobRunIterator::kDefault_Positioning, SkPoint::Make(0, 0), builder);
@@ -231,7 +233,9 @@ public:
             REPORTER_ASSERT(reporter, paint.getTextScaleX() == font.getTextScaleX());
             REPORTER_ASSERT(reporter, paint.getTypeface() == font.getTypeface());
             REPORTER_ASSERT(reporter, paint.getTextSkewX() == font.getTextSkewX());
+#ifdef SK_SUPPORT_LEGACY_SETTEXTALIGN
             REPORTER_ASSERT(reporter, paint.getTextAlign() == font.getTextAlign());
+#endif
             REPORTER_ASSERT(reporter, paint.getHinting() == font.getHinting());
             REPORTER_ASSERT(reporter, paint.isAntiAlias() == font.isAntiAlias());
             REPORTER_ASSERT(reporter, paint.isFakeBoldText() == font.isFakeBoldText());
@@ -240,7 +244,6 @@ public:
             REPORTER_ASSERT(reporter, paint.isLCDRenderText() == font.isLCDRenderText());
             REPORTER_ASSERT(reporter, paint.isEmbeddedBitmapText() == font.isEmbeddedBitmapText());
             REPORTER_ASSERT(reporter, paint.isAutohinted() == font.isAutohinted());
-            REPORTER_ASSERT(reporter, paint.isVerticalText() == font.isVerticalText());
 
             it.next();
         }
@@ -356,7 +359,7 @@ DEF_TEST(TextBlob_extended, reporter) {
     (void)paint.textToGlyphs(text1, strlen(text1), glyphs.get());
     paint.setTextEncoding(SkPaint::kGlyphID_TextEncoding);
 
-    auto run = textBlobBuilder.allocRunText(
+    auto run = SkTextBlobBuilderPriv::AllocRunText(&textBlobBuilder,
             paint, glyphCount, 0, 0, SkToInt(strlen(text2)), SkString(), nullptr);
     memcpy(run.glyphs, glyphs.get(), sizeof(uint16_t) * glyphCount);
     memcpy(run.utf8text, text2, strlen(text2));
@@ -469,10 +472,8 @@ DEF_TEST(TextBlob_serialize, reporter) {
 }
 
 DEF_TEST(TextBlob_MakeAsDrawText, reporter) {
-    SkPaint paint;
-    paint.setTextEncoding(SkPaint::kUTF8_TextEncoding);
     const char text[] = "Hello";
-    auto blob = SkTextBlob::MakeFromText(text, strlen(text), paint);
+    auto blob = SkTextBlob::MakeFromString(text, SkFont(), SkPaint::kUTF8_TextEncoding);
 
     int runs = 0;
     for(SkTextBlobRunIterator it(blob.get()); !it.done(); it.next()) {

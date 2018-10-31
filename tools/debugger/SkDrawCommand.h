@@ -43,6 +43,7 @@ public:
         kDrawImageLattice_OpType,
         kDrawImageNine_OpType,
         kDrawImageRect_OpType,
+        kDrawImageSet_OpType,
         kDrawOval_OpType,
         kDrawArc_OpType,
         kDrawPaint_OpType,
@@ -57,7 +58,6 @@ public:
         kDrawShadow_OpType,
         kDrawText_OpType,
         kDrawTextBlob_OpType,
-        kDrawTextOnPath_OpType,
         kDrawTextRSXform_OpType,
         kDrawVertices_OpType,
         kDrawAtlas_OpType,
@@ -73,8 +73,7 @@ public:
 
     static const int kOpTypeCount = kLast_OpType + 1;
 
-    static void WritePNG(const uint8_t* rgba, unsigned width, unsigned height,
-                         SkWStream& out, bool isOpaque);
+    static void WritePNG(SkBitmap bitmap, SkWStream& out);
 
     SkDrawCommand(OpType opType);
 
@@ -365,6 +364,22 @@ private:
     typedef SkDrawCommand INHERITED;
 };
 
+class SkDrawImageSetCommand : public SkDrawCommand {
+public:
+    SkDrawImageSetCommand(const SkCanvas::ImageSetEntry[], int count, float alpha, SkFilterQuality,
+                          SkBlendMode);
+    void execute(SkCanvas* canvas) const override;
+
+private:
+    SkAutoTArray<SkCanvas::ImageSetEntry> fSet;
+    int fCount;
+    float fAlpha;
+    SkFilterQuality fFilterQuality;
+    SkBlendMode fMode;
+
+    typedef SkDrawCommand INHERITED;
+};
+
 class SkDrawOvalCommand : public SkDrawCommand {
 public:
     SkDrawOvalCommand(const SkRect& oval, const SkPaint& paint);
@@ -510,22 +525,6 @@ private:
     sk_sp<SkData>      fText;
     SkTDArray<SkPoint> fPos;
     SkPaint            fPaint;
-
-    typedef SkDrawCommand INHERITED;
-};
-
-class SkDrawTextOnPathCommand : public SkDrawCommand {
-public:
-    SkDrawTextOnPathCommand(const void* text, size_t byteLength, const SkPath& path,
-                            const SkMatrix* matrix, const SkPaint& paint);
-    void execute(SkCanvas* canvas) const override;
-    Json::Value toJSON(UrlDataManager& urlDataManager) const override;
-
-private:
-    sk_sp<SkData>     fText;
-    SkPath            fPath;
-    SkTLazy<SkMatrix> fMatrix;
-    SkPaint           fPaint;
 
     typedef SkDrawCommand INHERITED;
 };

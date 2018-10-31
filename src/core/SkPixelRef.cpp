@@ -35,9 +35,7 @@ SkPixelRef::SkPixelRef(int width, int height, void* pixels, size_t rowBytes)
     , fHeight(height)
     , fPixels(pixels)
     , fRowBytes(rowBytes)
-#ifdef SK_BUILD_FOR_ANDROID_FRAMEWORK
-    , fStableID(SkNextID::ImageID())
-#endif
+    , fAddedToCache(false)
 {
 #ifdef SK_TRACE_PIXELREF_LIFETIME
     SkDebugf(" pixelref %d\n", sk_atomic_inc(&gInstCounter));
@@ -45,7 +43,6 @@ SkPixelRef::SkPixelRef(int width, int height, void* pixels, size_t rowBytes)
 
     this->needsNewGenID();
     fMutability = kMutable;
-    fAddedToCache.store(false);
 }
 
 SkPixelRef::~SkPixelRef() {
@@ -75,7 +72,7 @@ uint32_t SkPixelRef::getGenerationID() const {
     uint32_t id = fTaggedGenID.load();
     if (0 == id) {
         uint32_t next = SkNextID::ImageID() | 1u;
-        if (fTaggedGenID.compare_exchange(&id, next)) {
+        if (fTaggedGenID.compare_exchange_strong(id, next)) {
             id = next;  // There was no race or we won the race.  fTaggedGenID is next now.
         } else {
             // We lost a race to set fTaggedGenID. compare_exchange() filled id with the winner.
@@ -92,21 +89,21 @@ void SkPixelRef::addGenIDChangeListener(GenIDChangeListener* listener) {
         delete listener;
         return;
     }
+    SkAutoMutexAcquire lock(fGenIDChangeListenersMutex);
     *fGenIDChangeListeners.append() = listener;
 }
 
 // we need to be called *before* the genID gets changed or zerod
 void SkPixelRef::callGenIDChangeListeners() {
+    SkAutoMutexAcquire lock(fGenIDChangeListenersMutex);
     // We don't invalidate ourselves if we think another SkPixelRef is sharing our genID.
     if (this->genIDIsUnique()) {
         for (int i = 0; i < fGenIDChangeListeners.count(); i++) {
             fGenIDChangeListeners[i]->onChange();
         }
 
-        // TODO: SkAtomic could add "old_value = atomic.xchg(new_value)" to make this clearer.
-        if (fAddedToCache.load()) {
+        if (fAddedToCache.exchange(false)) {
             SkNotifyBitmapGenIDIsStale(this->getGenerationID());
-            fAddedToCache.store(false);
         }
     }
     // Listeners get at most one shot, so whether these triggered or not, blow them away.

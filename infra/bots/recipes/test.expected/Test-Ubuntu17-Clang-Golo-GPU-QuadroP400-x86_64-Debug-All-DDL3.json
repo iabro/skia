@@ -289,6 +289,10 @@
       "svgparse_",
       "_",
       "image",
+      "gen_platf",
+      "error",
+      "_",
+      "image",
       "_",
       "interlaced1.png",
       "_",
@@ -380,6 +384,7 @@
       "_",
       ".SRW",
       "--nonativeFonts",
+      "--reduceOpListSplitting",
       "--verbose"
     ],
     "cwd": "[START_DIR]/skia",

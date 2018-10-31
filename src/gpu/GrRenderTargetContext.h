@@ -17,9 +17,10 @@
 #include "GrTypesPriv.h"
 #include "GrXferProcessor.h"
 #include "SkCanvas.h"
+#include "SkDrawable.h"
 #include "SkRefCnt.h"
 #include "SkSurfaceProps.h"
-#include "text/GrTextUtils.h"
+#include "text/GrTextTarget.h"
 
 class GrBackendSemaphore;
 class GrCCPRAtlas;
@@ -59,18 +60,7 @@ class SK_API GrRenderTargetContext : public GrSurfaceContext {
 public:
     ~GrRenderTargetContext() override;
 
-    // We use SkPaint rather than GrPaint here for two reasons:
-    //    * The SkPaint carries extra text settings. If these were extracted to a lighter object
-    //      we could use GrPaint except that
-    //    * SkPaint->GrPaint conversion depends upon whether the glyphs are color or grayscale and
-    //      this can vary within a text run.
-    virtual void drawPosText(const GrClip&, const SkPaint&, const SkMatrix& viewMatrix,
-                             const char text[], size_t byteLength, const SkScalar pos[],
-                             int scalarsPerPosition, const SkPoint& offset,
-                             const SkIRect& clipBounds);
-    virtual void drawGlyphRunList(const GrClip&,
-                                  const SkMatrix& viewMatrix, const SkGlyphRunList&,
-                                  const SkIRect& clipBounds);
+    virtual void drawGlyphRunList(const GrClip&, const SkMatrix& viewMatrix, const SkGlyphRunList&);
 
     /**
      * Provides a perfomance hint that the render target's contents are allowed
@@ -146,9 +136,24 @@ public:
      * device space.
      */
     void drawTexture(const GrClip& clip, sk_sp<GrTextureProxy>, GrSamplerState::Filter, GrColor,
-                     const SkRect& srcRect, const SkRect& dstRect, GrAA aa,
+                     const SkRect& srcRect, const SkRect& dstRect, GrQuadAAFlags,
                      SkCanvas::SrcRectConstraint, const SkMatrix& viewMatrix,
                      sk_sp<GrColorSpaceXform> texXform, sk_sp<GrColorSpaceXform> colorXform);
+
+    /** Used with drawTextureSet */
+    struct TextureSetEntry {
+        sk_sp<GrTextureProxy> fProxy;
+        SkRect fSrcRect;
+        SkRect fDstRect;
+        GrQuadAAFlags fAAFlags;
+    };
+    /**
+     * Draws a set of textures with a shared filter, color, view matrix, color xform, and
+     * texture color xform. The textures must all have the same GrTextureType and GrConfig.
+     */
+    void drawTextureSet(const GrClip&, const TextureSetEntry[], int cnt, GrSamplerState::Filter,
+                        GrColor, const SkMatrix& viewMatrix, sk_sp<GrColorSpaceXform> texXform,
+                        sk_sp<GrColorSpaceXform> colorXform);
 
     /**
      * Draw a roundrect using a paint.
@@ -210,7 +215,22 @@ public:
                   GrAA,
                   const SkMatrix& viewMatrix,
                   const SkPath&,
-                  const GrStyle& style);
+                  const GrStyle&);
+
+    /**
+     * Draws a shape.
+     *
+     * @param paint         describes how to color pixels.
+     * @param GrAA          Controls whether the path is antialiased.
+     * @param viewMatrix    transformation matrix
+     * @param shape         the shape to draw
+     */
+    void drawShape(const GrClip&,
+                   GrPaint&&,
+                   GrAA,
+                   const SkMatrix& viewMatrix,
+                   const GrShape&);
+
 
     /**
      * Draws vertices with a paint.
@@ -226,7 +246,7 @@ public:
                       GrPaint&& paint,
                       const SkMatrix& viewMatrix,
                       sk_sp<SkVertices> vertices,
-                      const SkMatrix bones[],
+                      const SkVertices::Bone bones[],
                       int boneCount,
                       GrPrimitiveType* overridePrimType = nullptr);
 
@@ -320,6 +340,12 @@ public:
                           const SkRect& dst);
 
     /**
+     * Adds the necessary signal and wait semaphores and adds the passed in SkDrawable to the
+     * command stream.
+     */
+    void drawDrawable(std::unique_ptr<SkDrawable::GpuDrawHandler>, const SkRect& bounds);
+
+    /**
      * After this returns any pending surface IO will be issued to the backend 3D API and
      * if the surface has MSAA it will be resolved.
      */
@@ -374,7 +400,7 @@ public:
     GrRenderTargetContextPriv priv();
     const GrRenderTargetContextPriv priv() const;
 
-    GrTextUtils::Target* textTarget() { return fTextTarget.get(); }
+    GrTextTarget* textTarget() { return fTextTarget.get(); }
 
     bool isWrapped_ForTesting() const;
 
@@ -453,7 +479,7 @@ private:
     GrRenderTargetOpList* getRTOpList();
     GrOpList* getOpList() override;
 
-    std::unique_ptr<GrTextUtils::Target> fTextTarget;
+    std::unique_ptr<GrTextTarget> fTextTarget;
     sk_sp<GrRenderTargetProxy> fRenderTargetProxy;
 
     // In MDB-mode the GrOpList can be closed by some other renderTargetContext that has picked

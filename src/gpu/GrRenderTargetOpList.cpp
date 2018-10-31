@@ -75,7 +75,15 @@ void GrRenderTargetOpList::dump(bool printDependencies) const {
 
 void GrRenderTargetOpList::visitProxies_debugOnly(const GrOp::VisitProxyFunc& func) const {
     for (const RecordedOp& recordedOp : fRecordedOps) {
-        recordedOp.visitProxies(func);
+        recordedOp.visitProxies(func, GrOp::VisitorType::kOther);
+    }
+}
+
+static void assert_chain_bounds(const GrOp* op) {
+    SkASSERT(op->isChainHead());
+    auto headBounds = op->bounds();
+    while ((op = op->nextInChain())) {
+        SkASSERT(headBounds.contains(op->bounds()));
     }
 }
 #endif
@@ -89,7 +97,7 @@ void GrRenderTargetOpList::onPrepare(GrOpFlushState* flushState) {
 
     // Loop over the ops that haven't yet been prepared.
     for (int i = 0; i < fRecordedOps.count(); ++i) {
-        if (fRecordedOps[i].fOp) {
+        if (fRecordedOps[i].fOp && fRecordedOps[i].fOp->isChainHead()) {
 #ifdef SK_BUILD_FOR_ANDROID_FRAMEWORK
             TRACE_EVENT0("skia", fRecordedOps[i].fOp->name());
 #endif
@@ -99,7 +107,7 @@ void GrRenderTargetOpList::onPrepare(GrOpFlushState* flushState) {
                 fRecordedOps[i].fAppliedClip,
                 fRecordedOps[i].fDstProxy
             };
-
+            SkDEBUGCODE(assert_chain_bounds(opArgs.fOp));
             flushState->setOpArgs(&opArgs);
             fRecordedOps[i].fOp->prepare(flushState);
             flushState->setOpArgs(nullptr);
@@ -107,12 +115,13 @@ void GrRenderTargetOpList::onPrepare(GrOpFlushState* flushState) {
     }
 }
 
-static std::unique_ptr<GrGpuRTCommandBuffer> create_command_buffer(GrGpu* gpu,
-                                                                   GrRenderTarget* rt,
-                                                                   GrSurfaceOrigin origin,
-                                                                   GrLoadOp colorLoadOp,
-                                                                   GrColor loadClearColor,
-                                                                   GrLoadOp stencilLoadOp) {
+static GrGpuRTCommandBuffer* create_command_buffer(GrGpu* gpu,
+                                                   GrRenderTarget* rt,
+                                                   GrSurfaceOrigin origin,
+                                                   const SkRect& bounds,
+                                                   GrLoadOp colorLoadOp,
+                                                   GrColor loadClearColor,
+                                                   GrLoadOp stencilLoadOp) {
     const GrGpuRTCommandBuffer::LoadAndStoreInfo kColorLoadStoreInfo {
         colorLoadOp,
         GrStoreOp::kStore,
@@ -129,20 +138,7 @@ static std::unique_ptr<GrGpuRTCommandBuffer> create_command_buffer(GrGpu* gpu,
         GrStoreOp::kStore,
     };
 
-    std::unique_ptr<GrGpuRTCommandBuffer> buffer(
-                            gpu->createCommandBuffer(rt, origin,
-                                                     kColorLoadStoreInfo,
-                                                     stencilLoadAndStoreInfo));
-    return buffer;
-}
-
-static inline void finish_command_buffer(GrGpuRTCommandBuffer* buffer) {
-    if (!buffer) {
-        return;
-    }
-
-    buffer->end();
-    buffer->submit();
+    return gpu->getCommandBuffer(rt, origin, bounds, kColorLoadStoreInfo, stencilLoadAndStoreInfo);
 }
 
 // TODO: this is where GrOp::renderTarget is used (which is fine since it
@@ -165,19 +161,20 @@ bool GrRenderTargetOpList::onExecute(GrOpFlushState* flushState) {
 
     // TODO: at the very least, we want the stencil store op to always be discard (at this
     // level). In Vulkan, sub-command buffers would still need to load & store the stencil buffer.
-    std::unique_ptr<GrGpuRTCommandBuffer> commandBuffer = create_command_buffer(
+    GrGpuRTCommandBuffer* commandBuffer = create_command_buffer(
                                                     flushState->gpu(),
                                                     fTarget.get()->peekRenderTarget(),
                                                     fTarget.get()->origin(),
+                                                    fTarget.get()->getBoundsRect(),
                                                     fColorLoadOp,
                                                     fLoadClearColor,
                                                     fStencilLoadOp);
-    flushState->setCommandBuffer(commandBuffer.get());
+    flushState->setCommandBuffer(commandBuffer);
     commandBuffer->begin();
 
     // Draw all the generated geometry.
     for (int i = 0; i < fRecordedOps.count(); ++i) {
-        if (!fRecordedOps[i].fOp) {
+        if (!fRecordedOps[i].fOp || !fRecordedOps[i].fOp->isChainHead()) {
             continue;
         }
 #ifdef SK_BUILD_FOR_ANDROID_FRAMEWORK
@@ -196,7 +193,8 @@ bool GrRenderTargetOpList::onExecute(GrOpFlushState* flushState) {
         flushState->setOpArgs(nullptr);
     }
 
-    finish_command_buffer(commandBuffer.get());
+    commandBuffer->end();
+    flushState->gpu()->submit(commandBuffer);
     flushState->setCommandBuffer(nullptr);
 
     return true;
@@ -271,7 +269,7 @@ void GrRenderTargetOpList::purgeOpsWithUninstantiatedProxies() {
     for (RecordedOp& recordedOp : fRecordedOps) {
         hasUninstantiatedProxy = false;
         if (recordedOp.fOp) {
-            recordedOp.visitProxies(checkInstantiation);
+            recordedOp.visitProxies(checkInstantiation, GrOp::VisitorType::kOther);
         }
         if (hasUninstantiatedProxy) {
             // When instantiation of the proxy fails we drop the Op
@@ -308,7 +306,8 @@ void GrRenderTargetOpList::gatherProxyIntervals(GrResourceAllocator* alloc) cons
         alloc->addInterval(p SkDEBUGCODE(, fTarget.get() == p));
     };
     for (const RecordedOp& recordedOp : fRecordedOps) {
-        recordedOp.visitProxies(gather); // only diff from the GrTextureOpList version
+        // only diff from the GrTextureOpList version
+        recordedOp.visitProxies(gather, GrOp::VisitorType::kAllocatorGather);
 
         // Even though the op may have been moved we still need to increment the op count to
         // keep all the math consistent.
@@ -318,26 +317,26 @@ void GrRenderTargetOpList::gatherProxyIntervals(GrResourceAllocator* alloc) cons
 
 static inline bool can_reorder(const SkRect& a, const SkRect& b) { return !GrRectsOverlap(a, b); }
 
-bool GrRenderTargetOpList::combineIfPossible(const RecordedOp& a, GrOp* b,
-                                             const GrAppliedClip* bClip,
-                                             const DstProxy* bDstProxy,
-                                             const GrCaps& caps) {
+GrOp::CombineResult GrRenderTargetOpList::combineIfPossible(const RecordedOp& a, GrOp* b,
+                                                            const GrAppliedClip* bClip,
+                                                            const DstProxy* bDstProxy,
+                                                            const GrCaps& caps) {
     if (a.fAppliedClip) {
         if (!bClip) {
-            return false;
+            return GrOp::CombineResult::kCannotCombine;
         }
         if (*a.fAppliedClip != *bClip) {
-            return false;
+            return GrOp::CombineResult::kCannotCombine;
         }
     } else if (bClip) {
-        return false;
+        return GrOp::CombineResult::kCannotCombine;
     }
     if (bDstProxy) {
         if (a.fDstProxy != *bDstProxy) {
-            return false;
+            return GrOp::CombineResult::kCannotCombine;
         }
     } else if (a.fDstProxy.proxy()) {
-        return false;
+        return GrOp::CombineResult::kCannotCombine;
     }
     return a.fOp->combineIfPossible(b, caps);
 }
@@ -346,6 +345,7 @@ uint32_t GrRenderTargetOpList::recordOp(std::unique_ptr<GrOp> op,
                                         const GrCaps& caps,
                                         GrAppliedClip* clip,
                                         const DstProxy* dstProxy) {
+    SkDEBUGCODE(op->validate();)
     SkASSERT(fTarget.get());
 
     // A closed GrOpList should never receive new/more ops
@@ -366,23 +366,28 @@ uint32_t GrRenderTargetOpList::recordOp(std::unique_ptr<GrOp> op,
     GrOP_INFO(SkTabString(op->dumpInfo(), 1).c_str());
     GrOP_INFO("\tOutcome:\n");
     int maxCandidates = SkTMin(kMaxOpLookback, fRecordedOps.count());
-    // If we don't have a valid destination render target then we cannot reorder.
     if (maxCandidates) {
         int i = 0;
         while (true) {
             const RecordedOp& candidate = fRecordedOps.fromBack(i);
-
-            if (this->combineIfPossible(candidate, op.get(), clip, dstProxy, caps)) {
-                GrOP_INFO("\t\tBackward: Combining with (%s, opID: %u)\n", candidate.fOp->name(),
-                          candidate.fOp->uniqueID());
-                GrOP_INFO("\t\t\tBackward: Combined op info:\n");
-                GrOP_INFO(SkTabString(candidate.fOp->dumpInfo(), 4).c_str());
-                GR_AUDIT_TRAIL_OPS_RESULT_COMBINED(fAuditTrail, candidate.fOp.get(), op.get());
-                fOpMemoryPool->release(std::move(op));
-                return SK_InvalidUniqueID;
+            auto combineResult = this->combineIfPossible(candidate, op.get(), clip, dstProxy, caps);
+            switch (combineResult) {
+                case GrOp::CombineResult::kMayChain:
+                    // See skbug.com/8491 for an explanation of why op chaining is disabled.
+                    break;
+                case GrOp::CombineResult::kMerged:
+                    GrOP_INFO("\t\tBackward: Combining with (%s, opID: %u)\n",
+                              candidate.fOp->name(), candidate.fOp->uniqueID());
+                    GrOP_INFO("\t\t\tBackward: Combined op info:\n");
+                    GrOP_INFO(SkTabString(candidate.fOp->dumpInfo(), 4).c_str());
+                    GR_AUDIT_TRAIL_OPS_RESULT_COMBINED(fAuditTrail, candidate.fOp.get(), op.get());
+                    fOpMemoryPool->release(std::move(op));
+                    return SK_InvalidUniqueID;
+                case GrOp::CombineResult::kCannotCombine:
+                    break;
             }
             // Stop going backwards if we would cause a painter's order violation.
-            if (!can_reorder(fRecordedOps.fromBack(i).fOp->bounds(), op->bounds())) {
+            if (!can_reorder(candidate.fOp->bounds(), op->bounds())) {
                 GrOP_INFO("\t\tBackward: Intersects with (%s, opID: %u)\n", candidate.fOp->name(),
                           candidate.fOp->uniqueID());
                 break;
@@ -407,38 +412,45 @@ uint32_t GrRenderTargetOpList::recordOp(std::unique_ptr<GrOp> op,
 
 void GrRenderTargetOpList::forwardCombine(const GrCaps& caps) {
     SkASSERT(!this->isClosed());
-
     GrOP_INFO("opList: %d ForwardCombine %d ops:\n", this->uniqueID(), fRecordedOps.count());
 
     for (int i = 0; i < fRecordedOps.count() - 1; ++i) {
         GrOp* op = fRecordedOps[i].fOp.get();
-
         int maxCandidateIdx = SkTMin(i + kMaxOpLookahead, fRecordedOps.count() - 1);
         int j = i + 1;
         while (true) {
             const RecordedOp& candidate = fRecordedOps[j];
-
-            if (this->combineIfPossible(fRecordedOps[i], candidate.fOp.get(),
-                                        candidate.fAppliedClip, &candidate.fDstProxy, caps)) {
-                GrOP_INFO("\t\t%d: (%s opID: %u) -> Combining with (%s, opID: %u)\n",
-                          i, op->name(), op->uniqueID(),
-                          candidate.fOp->name(), candidate.fOp->uniqueID());
-                GR_AUDIT_TRAIL_OPS_RESULT_COMBINED(fAuditTrail, op, candidate.fOp.get());
-                fOpMemoryPool->release(std::move(fRecordedOps[j].fOp));
-                fRecordedOps[j].fOp = std::move(fRecordedOps[i].fOp);
+            auto combineResult =
+                    this->combineIfPossible(fRecordedOps[i], candidate.fOp.get(),
+                                            candidate.fAppliedClip, &candidate.fDstProxy, caps);
+            switch (combineResult) {
+                case GrOp::CombineResult::kMayChain:
+                    // See skbug.com/8491 for an explanation of why op chaining is disabled.
+                    break;
+                case GrOp::CombineResult::kMerged:
+                    GrOP_INFO("\t\t%d: (%s opID: %u) -> Combining with (%s, opID: %u)\n", i,
+                              op->name(), op->uniqueID(), candidate.fOp->name(),
+                              candidate.fOp->uniqueID());
+                    GR_AUDIT_TRAIL_OPS_RESULT_COMBINED(fAuditTrail, op, candidate.fOp.get());
+                    fOpMemoryPool->release(std::move(fRecordedOps[j].fOp));
+                    fRecordedOps[j].fOp = std::move(fRecordedOps[i].fOp);
+                    break;
+                case GrOp::CombineResult::kCannotCombine:
+                    break;
+            }
+            if (!fRecordedOps[i].fOp) {
                 break;
             }
             // Stop traversing if we would cause a painter's order violation.
-            if (!can_reorder(fRecordedOps[j].fOp->bounds(), op->bounds())) {
+            if (!can_reorder(candidate.fOp->bounds(), op->bounds())) {
                 GrOP_INFO("\t\t%d: (%s opID: %u) -> Intersects with (%s, opID: %u)\n",
                           i, op->name(), op->uniqueID(),
                           candidate.fOp->name(), candidate.fOp->uniqueID());
                 break;
             }
-            ++j;
-            if (j > maxCandidateIdx) {
-                GrOP_INFO("\t\t%d: (%s opID: %u) -> Reached max lookahead or end of array\n",
-                          i, op->name(), op->uniqueID());
+            if (++j > maxCandidateIdx) {
+                GrOP_INFO("\t\t%d: (%s opID: %u) -> Reached max lookahead or end of array\n", i,
+                          op->name(), op->uniqueID());
                 break;
             }
         }

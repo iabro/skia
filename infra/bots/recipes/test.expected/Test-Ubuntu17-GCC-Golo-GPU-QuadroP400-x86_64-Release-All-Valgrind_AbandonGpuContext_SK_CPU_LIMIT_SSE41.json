@@ -223,6 +223,10 @@
       "_",
       "_",
       "image",
+      "gen_platf",
+      "error",
+      "_",
+      "image",
       "_",
       "interlaced1.png",
       "_",
@@ -316,6 +320,7 @@
       "--match",
       "~Threaded",
       "--nonativeFonts",
+      "--reduceOpListSplitting",
       "--verbose",
       "--abandonGpuContext"
     ],

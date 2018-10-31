@@ -57,8 +57,6 @@ public:
         return sk_sp<SkImageFilter>(new MatrixTestImageFilter(reporter, expectedMatrix));
     }
 
-    SK_DECLARE_PUBLIC_FLATTENABLE_DESERIALIZATION_PROCS(MatrixTestImageFilter)
-
 protected:
     sk_sp<SkSpecialImage> onFilterImage(SkSpecialImage* source, const Context& ctx,
                                         SkIPoint* offset) const override {
@@ -75,6 +73,8 @@ protected:
     }
 
 private:
+    SK_FLATTENABLE_HOOKS(MatrixTestImageFilter)
+
     MatrixTestImageFilter(skiatest::Reporter* reporter, const SkMatrix& expectedMatrix)
         : INHERITED(nullptr, 0, nullptr)
         , fReporter(reporter)
@@ -100,7 +100,7 @@ public:
         return nullptr;
     }
 
-    SK_DECLARE_PUBLIC_FLATTENABLE_DESERIALIZATION_PROCS(FailImageFilter)
+    SK_FLATTENABLE_HOOKS(FailImageFilter)
 
 private:
     typedef SkImageFilter INHERITED;
@@ -289,6 +289,7 @@ public:
 
 private:
     Factory getFactory() const override { return nullptr; }
+    const char* getTypeName() const override { return nullptr; }
 
     sk_sp<SkSpecialImage> onFilterImage(SkSpecialImage* src, const Context&,
                                         SkIPoint* offset) const override {
@@ -721,6 +722,7 @@ DEF_TEST(ImageFilterDrawTiled, reporter) {
     const int tileSize = 8;
 
     SkPaint textPaint;
+    sk_tool_utils::set_portable_typeface(&textPaint);
     textPaint.setTextSize(SkIntToScalar(height));
     textPaint.setColor(SK_ColorWHITE);
 
@@ -730,6 +732,7 @@ DEF_TEST(ImageFilterDrawTiled, reporter) {
     for (int scale = 1; scale <= 2; ++scale) {
         for (int i = 0; i < filters.count(); ++i) {
             SkPaint combinedPaint;
+            sk_tool_utils::set_portable_typeface(&combinedPaint);
             combinedPaint.setTextSize(SkIntToScalar(height));
             combinedPaint.setColor(SK_ColorWHITE);
             combinedPaint.setImageFilter(sk_ref_sp(filters.getFilter(i)));
@@ -763,7 +766,7 @@ DEF_TEST(ImageFilterDrawTiled, reporter) {
             }
             tiledCanvas.flush();
 
-            if (!sk_tool_utils::equal_pixels(untiledResult, tiledResult, 1)) {
+            if (!sk_tool_utils::equal_pixels(untiledResult, tiledResult)) {
                 REPORTER_ASSERT(reporter, false, filters.getName(i));
                 break;
             }
@@ -1829,6 +1832,7 @@ DEF_TEST(ImageFilterColorSpaceDAG, reporter) {
         TestFilter() : INHERITED(nullptr, 0, nullptr) {}
 
         Factory getFactory() const override { return nullptr; }
+        const char* getTypeName() const override { return nullptr; }
 
         size_t cloneCount() const { return fCloneCount; }
 

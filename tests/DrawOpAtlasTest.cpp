@@ -34,7 +34,7 @@
 #include "ops/GrDrawOp.h"
 #include "text/GrAtlasManager.h"
 #include "text/GrTextContext.h"
-#include "text/GrTextUtils.h"
+#include "text/GrTextTarget.h"
 
 #include <memory>
 
@@ -194,19 +194,17 @@ DEF_GPUTEST_FOR_RENDERING_CONTEXTS(GrAtlasTextOpPreparation, reporter, ctxInfo) 
     paint.setLCDRenderText(false);
     paint.setAntiAlias(false);
     paint.setSubpixelText(false);
-    GrTextUtils::Paint utilsPaint(&paint, &rtc->colorSpaceInfo());
 
     const char* text = "a";
 
-    std::unique_ptr<GrDrawOp> op = textContext->createOp_TestingOnly(context, textContext,
-                                                                     rtc.get(), paint,
-                                                                     SkMatrix::I(), text,
-                                                                     16, 16);
+    std::unique_ptr<GrDrawOp> op = textContext->createOp_TestingOnly(
+            context, textContext, rtc.get(), paint, SkMatrix::I(), text, 16, 16);
     op->finalize(*context->contextPriv().caps(), nullptr);
 
     TestingUploadTarget uploadTarget;
 
-    GrOpFlushState flushState(gpu, resourceProvider, uploadTarget.writeableTokenTracker());
+    GrOpFlushState flushState(gpu, resourceProvider, uploadTarget.writeableTokenTracker(), nullptr,
+                              nullptr);
     GrOpFlushState::OpArgs opArgs = {
         op.get(),
         rtc->asRenderTargetProxy(),
@@ -225,4 +223,13 @@ DEF_GPUTEST_FOR_RENDERING_CONTEXTS(GrAtlasTextOpPreparation, reporter, ctxInfo) 
     op->prepare(&flushState);
     flushState.setOpArgs(nullptr);
     opMemoryPool->release(std::move(op));
+}
+
+DEF_GPUTEST(GrDrawOpAtlasConfig_Basic, reporter, options) {
+    REPORTER_ASSERT(reporter, GrDrawOpAtlasConfig::PlotsPerLongDimensionForARGB(   1) == 1);
+    REPORTER_ASSERT(reporter, GrDrawOpAtlasConfig::PlotsPerLongDimensionForARGB( 256) == 1);
+    REPORTER_ASSERT(reporter, GrDrawOpAtlasConfig::PlotsPerLongDimensionForARGB( 512) == 2);
+    REPORTER_ASSERT(reporter, GrDrawOpAtlasConfig::PlotsPerLongDimensionForARGB(1024) == 4);
+    REPORTER_ASSERT(reporter, GrDrawOpAtlasConfig::PlotsPerLongDimensionForARGB(2048) == 8);
+    REPORTER_ASSERT(reporter, GrDrawOpAtlasConfig::PlotsPerLongDimensionForARGB(4096) == 8);
 }

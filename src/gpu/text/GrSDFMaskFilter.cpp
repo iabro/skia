@@ -26,11 +26,11 @@ public:
 
     void computeFastBounds(const SkRect&, SkRect*) const override;
 
-    SK_DECLARE_PUBLIC_FLATTENABLE_DESERIALIZATION_PROCS(GrSDFMaskFilterImpl)
-
 protected:
 
 private:
+    SK_FLATTENABLE_HOOKS(GrSDFMaskFilterImpl)
+
     typedef SkMaskFilter INHERITED;
     friend void gr_register_sdf_maskfilter_createproc();
 };
@@ -44,7 +44,7 @@ SkMask::Format GrSDFMaskFilterImpl::getFormat() const {
 }
 
 bool GrSDFMaskFilterImpl::filterMask(SkMask* dst, const SkMask& src,
-                                 const SkMatrix& matrix, SkIPoint* margin) const {
+                                     const SkMatrix& matrix, SkIPoint* margin) const {
     if (src.fFormat != SkMask::kA8_Format && src.fFormat != SkMask::kBW_Format) {
         return false;
     }
@@ -87,7 +87,7 @@ sk_sp<SkFlattenable> GrSDFMaskFilterImpl::CreateProc(SkReadBuffer& buffer) {
 }
 
 void gr_register_sdf_maskfilter_createproc() {
-    SK_DEFINE_FLATTENABLE_REGISTRAR_ENTRY(GrSDFMaskFilterImpl)
+    SK_REGISTER_FLATTENABLE(GrSDFMaskFilterImpl)
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -5,7 +5,7 @@
  * found in the LICENSE file.
  */
 
-#include "SampleCode.h"
+#include "Sample.h"
 #include "SkAnimTimer.h"
 #include "SkCanvas.h"
 #include "SkColorFilter.h"
@@ -20,8 +20,8 @@
 #include "SkRegion.h"
 #include "SkShader.h"
 #include "SkString.h"
-#include "SkUtils.h"
-#include "SkView.h"
+#include "SkTextUtils.h"
+#include "SkUTF.h"
 #include "Sk1DPathEffect.h"
 
 #include "SkParsePath.h"
@@ -37,7 +37,7 @@ static void testparse() {
     SkParsePath::ToSVGString(p2, &str2);
 }
 
-class ArcsView : public SampleView {
+class ArcsView : public Sample {
     class MyDrawable : public SkDrawable {
         SkRect   fR;
         SkScalar fSweep;
@@ -99,10 +99,9 @@ public:
     }
 
 protected:
-    // overrides from SkEventSink
-    bool onQuery(SkEvent* evt) override {
-        if (SampleCode::TitleQ(*evt)) {
-            SampleCode::TitleR(evt, "Arcs");
+    bool onQuery(Sample::Event* evt) override {
+        if (Sample::TitleQ(*evt)) {
+            Sample::TitleR(evt, "Arcs");
             return true;
         }
         return this->INHERITED::onQuery(evt);
@@ -118,17 +117,15 @@ protected:
 
     static void DrawLabel(SkCanvas* canvas, const SkRect& rect, SkScalar start, SkScalar sweep) {
         SkPaint paint;
-
         paint.setAntiAlias(true);
-        paint.setTextAlign(SkPaint::kCenter_Align);
 
         SkString    str;
-
         str.appendScalar(start);
         str.append(", ");
         str.appendScalar(sweep);
-        canvas->drawString(str, rect.centerX(),
-                         rect.fBottom + paint.getTextSize() * 5/4, paint);
+        SkTextUtils::DrawString(canvas, str, rect.centerX(),
+                         rect.fBottom + paint.getTextSize() * 5/4, paint,
+                                SkTextUtils::kCenter_Align);
     }
 
     static void DrawArcs(SkCanvas* canvas) {
@@ -199,10 +196,9 @@ protected:
 private:
     SkScalar fSweep;
 
-    typedef SampleView INHERITED;
+    typedef Sample INHERITED;
 };
 
 //////////////////////////////////////////////////////////////////////////////
 
-static SkView* MyFactory() { return new ArcsView; }
-static SkViewRegister reg(MyFactory);
+DEF_SAMPLE( return new ArcsView(); )

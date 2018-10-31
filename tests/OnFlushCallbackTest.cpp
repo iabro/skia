@@ -48,9 +48,9 @@ public:
         return Helper::FactoryHelper<NonAARectOp>(context, std::move(paint), r, &local, ClassID());
     }
 
-    GrColor color() const { return fColor; }
+    const GrColor4h& color() const { return fColor; }
 
-    NonAARectOp(const Helper::MakeArgs& helperArgs, GrColor color, const SkRect& r,
+    NonAARectOp(const Helper::MakeArgs& helperArgs, const GrColor4h& color, const SkRect& r,
                 const SkRect* localRect, int32_t classID)
             : INHERITED(classID)
             , fColor(color)
@@ -66,7 +66,7 @@ public:
 
     const char* name() const override { return "NonAARectOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
     }
 
@@ -83,14 +83,12 @@ public:
     }
 
 protected:
-    GrColor fColor;
-    bool    fHasLocalRect;
-    GrQuad  fLocalQuad;
-    SkRect  fRect;
+    GrColor4h fColor;
+    bool      fHasLocalRect;
+    GrQuad    fLocalQuad;
+    SkRect    fRect;
 
 private:
-    bool onCombineIfPossible(GrOp*, const GrCaps&) override { return false; }
-
     void onPrepareDraws(Target* target) override {
         using namespace GrDefaultGeoProcFactory;
 
@@ -146,7 +144,7 @@ private:
         // Setup vertex colors
         GrColor* color = (GrColor*)((intptr_t)vertices + kColorOffset);
         for (int i = 0; i < 4; ++i) {
-            *color = fColor;
+            *color = fColor.toGrColor();
             color = (GrColor*)((intptr_t)color + vertexStride);
         }
 
@@ -159,9 +157,9 @@ private:
             }
         }
 
-        GrMesh mesh(GrPrimitiveType::kTriangles);
-        mesh.setIndexed(indexBuffer, 6, firstIndex, 0, 3, GrPrimitiveRestart::kNo);
-        mesh.setVertexData(vertexBuffer, firstVertex);
+        GrMesh* mesh = target->allocMesh(GrPrimitiveType::kTriangles);
+        mesh->setIndexed(indexBuffer, 6, firstIndex, 0, 3, GrPrimitiveRestart::kNo);
+        mesh->setVertexData(vertexBuffer, firstVertex);
 
         auto pipe = fHelper.makePipeline(target);
         target->draw(std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState, mesh);
@@ -206,14 +204,15 @@ public:
     // We set the initial color of the NonAARectOp based on the ID.
     // Note that we force creation of a NonAARectOp that has local coords in anticipation of
     // pulling from the atlas.
-    AtlasedRectOp(const Helper::MakeArgs& helperArgs, GrColor color, const SkRect& r, int id)
-            : INHERITED(helperArgs, kColors[id], r, &kEmptyRect, ClassID())
+    AtlasedRectOp(const Helper::MakeArgs& helperArgs, const GrColor4h& color, const SkRect& r,
+                  int id)
+            : INHERITED(helperArgs, GrColor4h::FromGrColor(kColors[id]), r, &kEmptyRect, ClassID())
             , fID(id)
             , fNext(nullptr) {
         SkASSERT(fID < kMaxIDs);
     }
 
-    void setColor(GrColor color) { fColor = color; }
+    void setColor(const GrColor4h& color) { fColor = color; }
     void setLocalRect(const SkRect& localRect) {
         SkASSERT(fHasLocalRect);    // This should've been created to anticipate this
         fLocalQuad = GrQuad(localRect);
@@ -227,7 +226,7 @@ public:
 private:
 
     static const int kMaxIDs = 9;
-    static const SkColor kColors[kMaxIDs];
+    static const GrColor kColors[kMaxIDs];
 
     int            fID;
     // The Atlased ops have an internal singly-linked list of ops that land in the same opList
@@ -283,7 +282,7 @@ public:
         }
 
         if (!header) {
-            fOps.push({opListID, nullptr});
+            fOps.push_back({opListID, nullptr});
             header = &(fOps[fOps.count()-1]);
         }
 
@@ -315,7 +314,7 @@ public:
                     desc.fConfig = kRGBA_8888_GrPixelConfig;
 
                     return resourceProvider->createTexture(desc, SkBudgeted::kYes,
-                                                           GrResourceProvider::kNoPendingIO_Flag);
+                                                           GrResourceProvider::Flags::kNoPendingIO);
                 },
                 GrProxyProvider::Renderable::kYes,
                 kBottomLeft_GrSurfaceOrigin,
@@ -336,7 +335,7 @@ public:
         SkTDArray<LinkedListHeader*> lists;
         for (int i = 0; i < numOpListIDs; ++i) {
             if (LinkedListHeader* list = this->getList(opListIDs[i])) {
-                lists.push(list);
+                lists.push_back(list);
             }
         }
 
@@ -368,10 +367,11 @@ public:
 
                 // For now, we avoid the resource buffer issues and just use clears
 #if 1
-                rtc->clear(&r, op->color(), GrRenderTargetContext::CanClearFullscreen::kNo);
+                rtc->clear(&r, op->color().toGrColor(),
+                           GrRenderTargetContext::CanClearFullscreen::kNo);
 #else
                 GrPaint paint;
-                paint.setColor4f(GrColor4f::FromGrColor(op->color()));
+                paint.setColor4f(SkPMColor4f::FromBytes_RGBA(op->color()));
                 std::unique_ptr<GrDrawOp> drawOp(NonAARectOp::Make(std::move(paint),
                                                                    SkRect::Make(r)));
                 rtc->priv().testingOnly_addDrawOp(std::move(drawOp));
@@ -380,7 +380,7 @@ public:
 
                 // Set the atlased Op's color to white (so we know we're not using it for
                 // the final draw).
-                op->setColor(0xFFFFFFFF);
+                op->setColor(GrColor4h_WHITE);
 
                 // Set the atlased Op's localRect to point to where it landed in the atlas
                 op->setLocalRect(SkRect::Make(r));

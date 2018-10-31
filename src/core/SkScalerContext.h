@@ -235,7 +235,6 @@ public:
         kEmbolden_Flag            = 0x0008,
         kSubpixelPositioning_Flag = 0x0010,
         kForceAutohinting_Flag    = 0x0020,  // Use auto instead of bytcode hinting if hinting.
-        kVertical_Flag            = 0x0040,
 
         // together, these two flags resulting in a two bit value which matches
         // up with the SkPaint::Hinting enum.
@@ -271,9 +270,8 @@ public:
         return SkToBool(fRec.fFlags & kSubpixelPositioning_Flag);
     }
 
-    bool isVertical() const {
-        return SkToBool(fRec.fFlags & kVertical_Flag);
-    }
+    // DEPRECATED
+    bool isVertical() const { return false; }
 
     /** Return the corresponding glyph for the specified unichar. Since contexts
         may be chained (under the hood), the glyphID that is returned may in
@@ -359,10 +357,10 @@ public:
 protected:
     SkScalerContextRec fRec;
 
-    /** Generates the contents of glyph.fAdvanceX and glyph.fAdvanceY.
-     *  May call getMetrics if that would be just as fast.
+    /** Generates the contents of glyph.fAdvanceX and glyph.fAdvanceY if it can do so quickly.
+     *  Returns true if it could, false otherwise.
      */
-    virtual void generateAdvance(SkGlyph* glyph) = 0;
+    virtual bool generateAdvance(SkGlyph* glyph) = 0;
 
     /** Generates the contents of glyph.fWidth, fHeight, fTop, fLeft,
      *  as well as fAdvanceX and fAdvanceY if not already set.
@@ -436,8 +434,7 @@ private:
 };
 
 #define kRec_SkDescriptorTag            SkSetFourByteTag('s', 'r', 'e', 'c')
-#define kPathEffect_SkDescriptorTag     SkSetFourByteTag('p', 't', 'h', 'e')
-#define kMaskFilter_SkDescriptorTag     SkSetFourByteTag('m', 's', 'k', 'f')
+#define kEffects_SkDescriptorTag        SkSetFourByteTag('e', 'f', 'c', 't')
 
 ///////////////////////////////////////////////////////////////////////////////
 

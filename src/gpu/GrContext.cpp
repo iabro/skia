@@ -6,6 +6,7 @@
  */
 
 #include "GrContext.h"
+#include <unordered_map>
 #include "GrBackendSemaphore.h"
 #include "GrClip.h"
 #include "GrContextOptions.h"
@@ -25,21 +26,19 @@
 #include "GrSurfaceProxyPriv.h"
 #include "GrTexture.h"
 #include "GrTextureContext.h"
-#include "GrTextureStripAtlas.h"
 #include "GrTracing.h"
 #include "SkAutoPixmapStorage.h"
 #include "SkDeferredDisplayList.h"
 #include "SkGr.h"
 #include "SkImageInfoPriv.h"
-#include "SkJSONWriter.h"
 #include "SkMakeUnique.h"
 #include "SkSurface_Gpu.h"
 #include "SkTaskGroup.h"
+#include "SkTraceMemoryDump.h"
 #include "SkUnPreMultiplyPriv.h"
 #include "effects/GrConfigConversionEffect.h"
 #include "effects/GrSkSLFP.h"
 #include "text/GrTextBlobCache.h"
-#include <unordered_map>
 
 #define ASSERT_OWNED_PROXY(P) \
     SkASSERT(!(P) || !((P)->peekTexture()) || (P)->peekTexture()->getContext() == this)
@@ -68,7 +67,7 @@ static int32_t next_id() {
     return id;
 }
 
-GrContext::GrContext(GrBackend backend, int32_t id)
+GrContext::GrContext(GrBackendApi backend, int32_t id)
         : fBackend(backend)
         , fUniqueID(SK_InvalidGenID == id ? next_id() : id) {
     fResourceCache = nullptr;
@@ -96,8 +95,6 @@ bool GrContext::initCommon(const GrContextOptions& options) {
     if (fResourceCache) {
         fResourceCache->setProxyProvider(fProxyProvider);
     }
-
-    fTextureStripAtlasManager.reset(new GrTextureStripAtlasManager);
 
     fDisableGpuYUVConversion = options.fDisableGpuYUVConversion;
     fSharpenMipmappedTextures = options.fSharpenMipmappedTextures;
@@ -138,7 +135,8 @@ bool GrContext::initCommon(const GrContextOptions& options) {
                                             : false;
     fDrawingManager.reset(new GrDrawingManager(this, prcOptions, textContextOptions,
                                                &fSingleOwner, explicitlyAllocatingResources,
-                                               options.fSortRenderTargets));
+                                               options.fSortRenderTargets,
+                                               options.fReduceOpListSplitting));
 
     fGlyphCache = new GrGlyphCache(fCaps.get(), options.fGlyphCacheTextureMaximumBytes);
 
@@ -162,7 +160,6 @@ GrContext::~GrContext() {
     if (fDrawingManager) {
         fDrawingManager->cleanup();
     }
-    fTextureStripAtlasManager = nullptr;
     delete fResourceProvider;
     delete fResourceCache;
     delete fProxyProvider;
@@ -172,7 +169,7 @@ GrContext::~GrContext() {
 //////////////////////////////////////////////////////////////////////////////
 
 GrContextThreadSafeProxy::GrContextThreadSafeProxy(sk_sp<const GrCaps> caps, uint32_t uniqueID,
-                                                   GrBackend backend,
+                                                   GrBackendApi backend,
                                                    const GrContextOptions& options,
                                                    sk_sp<GrSkSLFPFactoryCache> cache)
         : fCaps(std::move(caps))
@@ -197,7 +194,7 @@ SkSurfaceCharacterization GrContextThreadSafeProxy::createCharacterization(
         return SkSurfaceCharacterization(); // return an invalid characterization
     }
 
-    if (kOpenGL_GrBackend != backendFormat.backend() && willUseGLFBO0) {
+    if (GrBackendApi::kOpenGL != backendFormat.backend() && willUseGLFBO0) {
         // The willUseGLFBO0 flags can only be used for a GL backend.
         return SkSurfaceCharacterization(); // return an invalid characterization
     }
@@ -243,7 +240,6 @@ SkSurfaceCharacterization GrContextThreadSafeProxy::createCharacterization(
 void GrContext::abandonContext() {
     ASSERT_SINGLE_OWNER
 
-    fTextureStripAtlasManager->abandon();
     fProxyProvider->abandon();
     fResourceProvider->abandon();
 
@@ -269,7 +265,6 @@ bool GrContext::abandoned() const {
 void GrContext::releaseResourcesAndAbandonContext() {
     ASSERT_SINGLE_OWNER
 
-    fTextureStripAtlasManager->abandon();
     fProxyProvider->abandon();
     fResourceProvider->abandon();
 
@@ -483,6 +478,7 @@ bool GrContextPriv::writeSurfacePixels(GrSurfaceContext* dst, int left, int top,
     // For canvas2D putImageData performance we have a special code path for unpremul RGBA_8888 srcs
     // that are premultiplied on the GPU. This is kept as narrow as possible for now.
     bool canvas2DFastPath =
+            !fContext->contextPriv().caps()->avoidWritePixelsFastPath() &&
             premul &&
             !dst->colorSpaceInfo().colorSpace() &&
             (srcColorType == GrColorType::kRGBA_8888 || srcColorType == GrColorType::kBGRA_8888) &&
@@ -530,7 +526,7 @@ bool GrContextPriv::writeSurfacePixels(GrSurfaceContext* dst, int left, int top,
             GrPaint paint;
             paint.setPorterDuffXPFactory(SkBlendMode::kSrc);
             auto fp = fContext->createUPMToPMEffect(
-                    GrSimpleTextureEffect::Make(std::move(tempProxy), SkMatrix::I()), true);
+                    GrSimpleTextureEffect::Make(std::move(tempProxy), SkMatrix::I()));
             if (srcColorType == GrColorType::kBGRA_8888) {
                 fp = GrFragmentProcessor::SwizzleOutput(std::move(fp), GrSwizzle::BGRA());
             }
@@ -570,7 +566,9 @@ bool GrContextPriv::writeSurfacePixels(GrSurfaceContext* dst, int left, int top,
         if (kUnknown_SkColorType == srcSkColorType || kUnknown_SkColorType == dstSkColorType) {
             return false;
         }
-        auto srcAlphaType = premul ? kUnpremul_SkAlphaType : kPremul_SkAlphaType;
+        auto srcAlphaType = SkColorTypeIsAlwaysOpaque(srcSkColorType)
+                ? kOpaque_SkAlphaType
+                : (premul ? kUnpremul_SkAlphaType : kPremul_SkAlphaType);
         SkPixmap src(SkImageInfo::Make(width, height, srcSkColorType, srcAlphaType,
                                        sk_ref_sp(srcColorSpace)),
                      buffer, rowBytes);
@@ -701,8 +699,7 @@ bool GrContextPriv::readSurfacePixels(GrSurfaceContext* src, int left, int top, 
             paint.setPorterDuffXPFactory(SkBlendMode::kSrc);
             auto fp = fContext->createPMToUPMEffect(
                     GrSimpleTextureEffect::Make(sk_ref_sp(srcProxy->asTextureProxy()),
-                                                SkMatrix::I()),
-                    true);
+                                                SkMatrix::I()));
             if (dstColorType == GrColorType::kBGRA_8888) {
                 fp = GrFragmentProcessor::SwizzleOutput(std::move(fp), GrSwizzle::BGRA());
                 dstColorType = GrColorType::kRGBA_8888;
@@ -744,15 +741,16 @@ bool GrContextPriv::readSurfacePixels(GrSurfaceContext* src, int left, int top, 
     if (convert) {
         SkColorType srcSkColorType = GrColorTypeToSkColorType(allowedColorType);
         SkColorType dstSkColorType = GrColorTypeToSkColorType(dstColorType);
+        bool srcAlwaysOpaque = SkColorTypeIsAlwaysOpaque(srcSkColorType);
+        bool dstAlwaysOpaque = SkColorTypeIsAlwaysOpaque(dstSkColorType);
         if (kUnknown_SkColorType == srcSkColorType || kUnknown_SkColorType == dstSkColorType) {
             return false;
         }
-        auto tempAT = SkColorTypeIsAlwaysOpaque(srcSkColorType) ? kOpaque_SkAlphaType
-                                                                : kPremul_SkAlphaType;
+        auto tempAT = srcAlwaysOpaque ? kOpaque_SkAlphaType : kPremul_SkAlphaType;
         auto tempII = SkImageInfo::Make(width, height, srcSkColorType, tempAT,
                                         src->colorSpaceInfo().refColorSpace());
-        SkASSERT(!unpremul || !SkColorTypeIsAlwaysOpaque(dstSkColorType));
-        auto finalAT = SkColorTypeIsAlwaysOpaque(srcSkColorType)
+        SkASSERT(!unpremul || !dstAlwaysOpaque);
+        auto finalAT = (srcAlwaysOpaque || dstAlwaysOpaque)
                                ? kOpaque_SkAlphaType
                                : unpremul ? kUnpremul_SkAlphaType : kPremul_SkAlphaType;
         auto finalII =
@@ -977,6 +975,7 @@ static inline GrPixelConfig GrPixelConfigFallback(GrPixelConfig config) {
         case kRGBA_4444_GrPixelConfig:
         case kBGRA_8888_GrPixelConfig:
         case kRGBA_1010102_GrPixelConfig:
+        case kRGBA_half_GrPixelConfig:
             return kRGBA_8888_GrPixelConfig;
         case kSBGRA_8888_GrPixelConfig:
             return kSRGBA_8888_GrPixelConfig;
@@ -1058,39 +1057,25 @@ sk_sp<GrRenderTargetContext> GrContextPriv::makeDeferredRenderTargetContext(
 }
 
 std::unique_ptr<GrFragmentProcessor> GrContext::createPMToUPMEffect(
-        std::unique_ptr<GrFragmentProcessor> fp, bool useConfigConversionEffect) {
+        std::unique_ptr<GrFragmentProcessor> fp) {
     ASSERT_SINGLE_OWNER
-    // We have specialized effects that guarantee round-trip conversion for some formats
-    if (useConfigConversionEffect) {
-        // We should have already called this->validPMUPMConversionExists() in this case
-        SkASSERT(fDidTestPMConversions);
-        // ...and it should have succeeded
-        SkASSERT(this->validPMUPMConversionExists());
+    // We should have already called this->validPMUPMConversionExists() in this case
+    SkASSERT(fDidTestPMConversions);
+    // ...and it should have succeeded
+    SkASSERT(this->validPMUPMConversionExists());
 
-        return GrConfigConversionEffect::Make(std::move(fp), PMConversion::kToUnpremul);
-    } else {
-        // For everything else (sRGB, half-float, etc...), it doesn't make sense to try and
-        // explicitly round the results. Just do the obvious, naive thing in the shader.
-        return GrFragmentProcessor::UnpremulOutput(std::move(fp));
-    }
+    return GrConfigConversionEffect::Make(std::move(fp), PMConversion::kToUnpremul);
 }
 
 std::unique_ptr<GrFragmentProcessor> GrContext::createUPMToPMEffect(
-        std::unique_ptr<GrFragmentProcessor> fp, bool useConfigConversionEffect) {
+        std::unique_ptr<GrFragmentProcessor> fp) {
     ASSERT_SINGLE_OWNER
-    // We have specialized effects that guarantee round-trip conversion for these formats
-    if (useConfigConversionEffect) {
-        // We should have already called this->validPMUPMConversionExists() in this case
-        SkASSERT(fDidTestPMConversions);
-        // ...and it should have succeeded
-        SkASSERT(this->validPMUPMConversionExists());
+    // We should have already called this->validPMUPMConversionExists() in this case
+    SkASSERT(fDidTestPMConversions);
+    // ...and it should have succeeded
+    SkASSERT(this->validPMUPMConversionExists());
 
-        return GrConfigConversionEffect::Make(std::move(fp), PMConversion::kToPremul);
-    } else {
-        // For everything else (sRGB, half-float, etc...), it doesn't make sense to try and
-        // explicitly round the results. Just do the obvious, naive thing in the shader.
-        return GrFragmentProcessor::PremulOutput(std::move(fp));
-    }
+    return GrConfigConversionEffect::Make(std::move(fp), PMConversion::kToPremul);
 }
 
 bool GrContext::validPMUPMConversionExists() {
@@ -1130,10 +1115,13 @@ void GrContext::setResourceCacheLimits(int maxResources, size_t maxResourceBytes
 void GrContext::dumpMemoryStatistics(SkTraceMemoryDump* traceMemoryDump) const {
     ASSERT_SINGLE_OWNER
     fResourceCache->dumpMemoryStatistics(traceMemoryDump);
+    traceMemoryDump->dumpNumericValue("skia/gr_text_blob_cache", "size", "bytes",
+                                      fTextBlobCache->usedBytes());
 }
 
 //////////////////////////////////////////////////////////////////////////////
-
+#ifdef SK_ENABLE_DUMP_GPU
+#include "SkJSONWriter.h"
 SkString GrContextPriv::dump() const {
     SkDynamicMemoryWStream stream;
     SkJSONWriter writer(&stream, SkJSONWriter::Mode::kPretty);
@@ -1145,11 +1133,11 @@ SkString GrContextPriv::dump() const {
         "Vulkan",
         "Mock",
     };
-    GR_STATIC_ASSERT(0 == kMetal_GrBackend);
-    GR_STATIC_ASSERT(1 == kOpenGL_GrBackend);
-    GR_STATIC_ASSERT(2 == kVulkan_GrBackend);
-    GR_STATIC_ASSERT(3 == kMock_GrBackend);
-    writer.appendString("backend", kBackendStr[fContext->fBackend]);
+    GR_STATIC_ASSERT(0 == (unsigned)GrBackendApi::kMetal);
+    GR_STATIC_ASSERT(1 == (unsigned)GrBackendApi::kOpenGL);
+    GR_STATIC_ASSERT(2 == (unsigned)GrBackendApi::kVulkan);
+    GR_STATIC_ASSERT(3 == (unsigned)GrBackendApi::kMock);
+    writer.appendString("backend", kBackendStr[(unsigned)fContext->fBackend]);
 
     writer.appendName("caps");
     fContext->fCaps->dumpJSON(&writer);
@@ -1169,3 +1157,4 @@ SkString GrContextPriv::dump() const {
     stream.copyToAndReset(result.writable_str());
     return result;
 }
+#endif

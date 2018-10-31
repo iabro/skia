@@ -157,7 +157,7 @@ public:
     }
 
     AAFlatteningConvexPathOp(const Helper::MakeArgs& helperArgs,
-                             GrColor color,
+                             const GrColor4h& color,
                              const SkMatrix& viewMatrix,
                              const SkPath& path,
                              SkScalar strokeWidth,
@@ -185,7 +185,7 @@ public:
 
     const char* name() const override { return "AAFlatteningConvexPathOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
     }
 
@@ -195,7 +195,8 @@ public:
             string.appendf(
                     "Color: 0x%08x, StrokeWidth: %.2f, Style: %d, Join: %d, "
                     "MiterLimit: %.2f\n",
-                    path.fColor, path.fStrokeWidth, path.fStyle, path.fJoin, path.fMiterLimit);
+                    path.fColor.toGrColor(), path.fStrokeWidth, path.fStyle, path.fJoin,
+                    path.fMiterLimit);
         }
         string += fHelper.dumpInfo();
         string += INHERITED::dumpInfo();
@@ -217,7 +218,6 @@ private:
             return;
         }
         const GrBuffer* vertexBuffer;
-        GrMesh mesh(GrPrimitiveType::kTriangles);
         int firstVertex;
         void* verts = target->makeVertexSpace(vertexStride, vertexCount, &vertexBuffer,
                                               &firstVertex);
@@ -235,9 +235,10 @@ private:
             return;
         }
         memcpy(idxs, indices, indexCount * sizeof(uint16_t));
-        mesh.setIndexed(indexBuffer, indexCount, firstIndex, 0, vertexCount - 1,
-                        GrPrimitiveRestart::kNo);
-        mesh.setVertexData(vertexBuffer, firstVertex);
+        GrMesh* mesh = target->allocMesh(GrPrimitiveType::kTriangles);
+        mesh->setIndexed(indexBuffer, indexCount, firstIndex, 0, vertexCount - 1,
+                         GrPrimitiveRestart::kNo);
+        mesh->setVertexData(vertexBuffer, firstVertex);
         target->draw(std::move(gp), pipeline, fixedDynamicState, mesh);
     }
 
@@ -304,8 +305,9 @@ private:
                 indices = (uint16_t*) sk_realloc_throw(indices, maxIndices * sizeof(uint16_t));
             }
 
-            extract_verts(tess, vertices + vertexStride * vertexCount, vertexStride, args.fColor,
-                          vertexCount, indices + indexCount,
+            // TODO4F: Preserve float colors
+            extract_verts(tess, vertices + vertexStride * vertexCount, vertexStride,
+                          args.fColor.toGrColor(), vertexCount, indices + indexCount,
                           fHelper.compatibleWithAlphaAsCoverage());
             vertexCount += currentVertices;
             indexCount += currentIndices;
@@ -318,21 +320,20 @@ private:
         sk_free(indices);
     }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
         AAFlatteningConvexPathOp* that = t->cast<AAFlatteningConvexPathOp>();
         if (!fHelper.isCompatible(that->fHelper, caps, this->bounds(), that->bounds())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         fPaths.push_back_n(that->fPaths.count(), that->fPaths.begin());
-        this->joinBounds(*that);
-        return true;
+        return CombineResult::kMerged;
     }
 
     const SkMatrix& viewMatrix() const { return fPaths[0].fViewMatrix; }
 
     struct PathData {
-        GrColor fColor;
+        GrColor4h fColor;
         SkMatrix fViewMatrix;
         SkPath fPath;
         SkScalar fStrokeWidth;

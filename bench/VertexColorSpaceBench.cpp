@@ -15,6 +15,7 @@
 #include "GrRenderTargetContextPriv.h"
 #include "SkColorSpacePriv.h"
 #include "SkGr.h"
+#include "SkHalf.h"
 #include "SkString.h"
 #include "glsl/GrGLSLColorSpaceXformHelper.h"
 #include "glsl/GrGLSLFragmentShaderBuilder.h"
@@ -28,6 +29,7 @@ namespace {
 enum Mode {
     kBaseline_Mode,  // Do the wrong thing, but quickly.
     kFloat_Mode,     // Transform colors on CPU, use float4 attributes.
+    kHalf_Mode,      // Transform colors on CPU, use half4 attributes.
     kShader_Mode,    // Use ubyte4 attributes, transform colors on GPU (vertex shader).
 };
 
@@ -37,11 +39,18 @@ public:
             : INHERITED(kVertexColorSpaceBenchGP_ClassID)
             , fMode(mode)
             , fColorSpaceXform(std::move(colorSpaceXform)) {
-        fInPosition = {"inPosition", kFloat2_GrVertexAttribType};
-        if (kFloat_Mode == fMode) {
-            fInColor = {"inColor", kFloat4_GrVertexAttribType};
-        } else {
-            fInColor = {"inColor", kUByte4_norm_GrVertexAttribType};
+        fInPosition = {"inPosition", kFloat2_GrVertexAttribType, kFloat2_GrSLType};
+        switch (fMode) {
+            case kBaseline_Mode:
+            case kShader_Mode:
+                fInColor = {"inColor", kUByte4_norm_GrVertexAttribType, kHalf4_GrSLType};
+                break;
+            case kFloat_Mode:
+                fInColor = {"inColor", kFloat4_GrVertexAttribType, kHalf4_GrSLType};
+                break;
+            case kHalf_Mode:
+                fInColor = {"inColor", kHalf4_GrVertexAttribType, kHalf4_GrSLType};
+                break;
         }
         this->setVertexAttributeCnt(2);
     }
@@ -126,10 +135,11 @@ public:
         this->setBounds(SkRect::MakeWH(100.f, 100.f), HasAABloat::kNo, IsZeroArea::kNo);
     }
 
-    Op(GrColor4f color4f)
+    Op(const SkColor4f& color4f, Mode mode)
             : INHERITED(ClassID())
-            , fMode(kFloat_Mode)
+            , fMode(mode)
             , fColor4f(color4f) {
+        SkASSERT(kFloat_Mode == fMode || kHalf_Mode == mode);
         this->setBounds(SkRect::MakeWH(100.f, 100.f), HasAABloat::kNo, IsZeroArea::kNo);
     }
 
@@ -152,13 +162,20 @@ public:
 private:
     friend class ::GrOpMemoryPool;
 
-    bool onCombineIfPossible(GrOp*, const GrCaps&) override { return false; }
-
     void onPrepareDraws(Target* target) override {
         sk_sp<GrGeometryProcessor> gp(new GP(fMode, fColorSpaceXform));
 
-        size_t vertexStride = sizeof(SkPoint) +
-                              ((kFloat_Mode == fMode) ? sizeof(GrColor4f) : sizeof(uint32_t));
+        size_t vertexStride = sizeof(SkPoint);
+        switch (fMode) {
+            case kFloat_Mode:
+                vertexStride += sizeof(SkColor4f);
+                break;
+            case kHalf_Mode:
+                vertexStride += sizeof(uint64_t);
+                break;
+            default:
+                vertexStride += sizeof(uint32_t);
+        }
         SkASSERT(vertexStride == gp->debugOnly_vertexStride());
 
         const int kVertexCount = 1024;
@@ -174,7 +191,7 @@ private:
         if (kFloat_Mode == fMode) {
             struct V {
                 SkPoint fPos;
-                GrColor4f fColor;
+                SkColor4f fColor;
             };
             SkASSERT(sizeof(V) == vertexStride);
             V* v = (V*)verts;
@@ -183,6 +200,25 @@ private:
                 v[i + 0].fColor = fColor4f;
                 v[i + 1].fPos.set(dx * i, 100.0f);
                 v[i + 1].fColor = fColor4f;
+            }
+        } else if (kHalf_Mode == fMode) {
+            struct V {
+                SkPoint fPos;
+                uint64_t fColor;
+            };
+            SkASSERT(sizeof(V) == vertexStride);
+            uint64_t color;
+            Sk4h halfColor = SkFloatToHalf_finite_ftz(Sk4f::Load(&fColor4f));
+            color = (uint64_t)halfColor[0] << 48 |
+                    (uint64_t)halfColor[1] << 32 |
+                    (uint64_t)halfColor[2] << 16 |
+                    (uint64_t)halfColor[3] << 0;
+            V* v = (V*)verts;
+            for (int i = 0; i < kVertexCount; i += 2) {
+                v[i + 0].fPos.set(dx * i, 0.0f);
+                v[i + 0].fColor = color;
+                v[i + 1].fPos.set(dx * i, 100.0f);
+                v[i + 1].fColor = color;
             }
         } else {
             struct V {
@@ -199,9 +235,9 @@ private:
             }
         }
 
-        GrMesh mesh(GrPrimitiveType::kTriangleStrip);
-        mesh.setNonIndexedNonInstanced(kVertexCount);
-        mesh.setVertexData(vertexBuffer, firstVertex);
+        GrMesh* mesh = target->allocMesh(GrPrimitiveType::kTriangleStrip);
+        mesh->setNonIndexedNonInstanced(kVertexCount);
+        mesh->setVertexData(vertexBuffer, firstVertex);
         auto pipe = target->makePipeline(0, GrProcessorSet::MakeEmptySet(),
                                          target->detachAppliedClip());
         target->draw(gp, pipe.fPipeline, pipe.fFixedDynamicState, mesh);
@@ -209,7 +245,7 @@ private:
 
     Mode fMode;
     GrColor fColor;
-    GrColor4f fColor4f;
+    SkColor4f fColor4f;
     sk_sp<GrColorSpaceXform> fColorSpaceXform;
 
     typedef GrMeshDrawOp INHERITED;
@@ -228,13 +264,19 @@ public:
 
     void onDraw(int loops, SkCanvas* canvas) override {
         GrContext* context = canvas->getGrContext();
+        SkASSERT(context);
+
+        if (kHalf_Mode == fMode &&
+            !context->contextPriv().caps()->halfFloatVertexAttributeSupport()) {
+            return;
+        }
+
         GrOpMemoryPool* pool = context->contextPriv().opMemoryPool();
 
-        SkASSERT(context);
         auto p3 = SkColorSpace::MakeRGB(SkColorSpace::kSRGB_RenderTargetGamma,
                                         SkColorSpace::kDCIP3_D65_Gamut);
-        auto xform = GrColorSpaceXform::MakeUnpremulToUnpremul(sk_srgb_singleton(),
-                                                               p3.get());
+        auto xform = GrColorSpaceXform::Make(sk_srgb_singleton(), kUnpremul_SkAlphaType,
+                                             p3.get(),            kUnpremul_SkAlphaType);
 
         SkRandom r;
         const int kDrawsPerLoop = 32;
@@ -256,10 +298,11 @@ public:
                     case kShader_Mode:
                         op = pool->allocate<Op>(SkColorToUnpremulGrColor(c), xform);
                         break;
+                    case kHalf_Mode:
                     case kFloat_Mode: {
-                        GrColor4f c4f = GrColor4f::FromGrColor(SkColorToUnpremulGrColor(c));
+                        SkColor4f c4f = SkColor4f::FromColor(c);
                         c4f = xform->apply(c4f);
-                        op = pool->allocate<Op>(c4f);
+                        op = pool->allocate<Op>(c4f, fMode);
                     }
                 }
                 rtc->priv().testingOnly_addDrawOp(std::move(op));
@@ -278,4 +321,5 @@ private:
 
 DEF_BENCH(return new VertexColorSpaceBench(kBaseline_Mode, "baseline"));
 DEF_BENCH(return new VertexColorSpaceBench(kFloat_Mode,    "float"));
+DEF_BENCH(return new VertexColorSpaceBench(kHalf_Mode,     "half"));
 DEF_BENCH(return new VertexColorSpaceBench(kShader_Mode,   "shader"));

@@ -77,21 +77,22 @@ public:
             , fStroke(stroke) {
         int cnt = 3;
         if (clipPlane) {
-            fInClipPlane = {"inClipPlane", kHalf3_GrVertexAttribType};
+            fInClipPlane = {"inClipPlane", kFloat3_GrVertexAttribType, kHalf3_GrSLType};
             ++cnt;
         }
         if (isectPlane) {
-            fInIsectPlane = {"inIsectPlane", kHalf3_GrVertexAttribType};
+            fInIsectPlane = {"inIsectPlane", kFloat3_GrVertexAttribType, kHalf3_GrSLType};
             ++cnt;
         }
         if (unionPlane) {
-            fInUnionPlane = {"inUnionPlane", kHalf3_GrVertexAttribType};
+            fInUnionPlane = {"inUnionPlane", kFloat3_GrVertexAttribType, kHalf3_GrSLType};
             ++cnt;
         }
         if (roundCaps) {
             SkASSERT(stroke);
             SkASSERT(clipPlane);
-            fInRoundCapCenters = {"inRoundCapCenters", kFloat4_GrVertexAttribType};
+            fInRoundCapCenters =
+                    {"inRoundCapCenters", kFloat4_GrVertexAttribType, kFloat4_GrSLType};
             ++cnt;
         }
         this->setVertexAttributeCnt(cnt);
@@ -166,27 +167,27 @@ private:
 
             fragBuilder->codeAppend("float d = length(circleEdge.xy);");
             fragBuilder->codeAppend("half distanceToOuterEdge = circleEdge.z * (1.0 - d);");
-            fragBuilder->codeAppend("half edgeAlpha = clamp(distanceToOuterEdge, 0.0, 1.0);");
+            fragBuilder->codeAppend("half edgeAlpha = saturate(distanceToOuterEdge);");
             if (cgp.fStroke) {
                 fragBuilder->codeAppend(
                         "half distanceToInnerEdge = circleEdge.z * (d - circleEdge.w);");
-                fragBuilder->codeAppend("half innerAlpha = clamp(distanceToInnerEdge, 0.0, 1.0);");
+                fragBuilder->codeAppend("half innerAlpha = saturate(distanceToInnerEdge);");
                 fragBuilder->codeAppend("edgeAlpha *= innerAlpha;");
             }
 
             if (cgp.fInClipPlane.isInitialized()) {
                 fragBuilder->codeAppend(
-                        "half clip = clamp(circleEdge.z * dot(circleEdge.xy, clipPlane.xy) + "
-                        "clipPlane.z, 0.0, 1.0);");
+                        "half clip = saturate(circleEdge.z * dot(circleEdge.xy, clipPlane.xy) + "
+                        "clipPlane.z);");
                 if (cgp.fInIsectPlane.isInitialized()) {
                     fragBuilder->codeAppend(
-                            "clip *= clamp(circleEdge.z * dot(circleEdge.xy, isectPlane.xy) + "
-                            "isectPlane.z, 0.0, 1.0);");
+                            "clip *= saturate(circleEdge.z * dot(circleEdge.xy, isectPlane.xy) + "
+                            "isectPlane.z);");
                 }
                 if (cgp.fInUnionPlane.isInitialized()) {
                     fragBuilder->codeAppend(
-                            "clip = clamp(clip + clamp(circleEdge.z * dot(circleEdge.xy, "
-                            "unionPlane.xy) + unionPlane.z, 0.0, 1.0), 0.0, 1.0);");
+                            "clip = saturate(clip + saturate(circleEdge.z * dot(circleEdge.xy, "
+                            "unionPlane.xy) + unionPlane.z));");
                 }
                 fragBuilder->codeAppend("edgeAlpha *= clip;");
                 if (cgp.fInRoundCapCenters.isInitialized()) {
@@ -237,9 +238,12 @@ private:
 
     SkMatrix fLocalMatrix;
 
-    static constexpr Attribute kInPosition = {"inPosition", kFloat2_GrVertexAttribType};
-    static constexpr Attribute kInColor = {"inColor", kUByte4_norm_GrVertexAttribType};
-    static constexpr Attribute kInCircleEdge = {"inCircleEdge", kFloat4_GrVertexAttribType};
+    static constexpr Attribute kInPosition =
+            {"inPosition", kFloat2_GrVertexAttribType, kFloat2_GrSLType};
+    static constexpr Attribute kInColor =
+            {"inColor", kUByte4_norm_GrVertexAttribType, kHalf4_GrSLType};
+    static constexpr Attribute kInCircleEdge =
+            {"inCircleEdge", kFloat4_GrVertexAttribType, kFloat4_GrSLType};
 
     // Optional attributes.
     Attribute fInClipPlane;
@@ -403,7 +407,7 @@ private:
                     float linearDist;
                     angleToEdge = clamp(angleToEdge, -3.1415, 3.1415);
                     linearDist = diameter * sin(angleToEdge / 2);
-                    return clamp(linearDist + 0.5, 0, 1);
+                    return saturate(linearDist + 0.5);
             )",
                                       &fnName);
             fragBuilder->codeAppend(R"(
@@ -411,9 +415,9 @@ private:
 
                     // Compute coverage from outer/inner edges of the stroke.
                     half distanceToOuterEdge = circleEdge.z - d;
-                    half edgeAlpha = clamp(distanceToOuterEdge, 0.0, 1.0);
+                    half edgeAlpha = saturate(distanceToOuterEdge);
                     half distanceToInnerEdge = d - circleEdge.z * circleEdge.w;
-                    half innerAlpha = clamp(distanceToInnerEdge, 0.0, 1.0);
+                    half innerAlpha = saturate(distanceToInnerEdge);
                     edgeAlpha *= innerAlpha;
 
                     half angleFromStart = atan(circleEdge.y, circleEdge.x) - dashParams.z;
@@ -489,10 +493,14 @@ private:
     }
 
     SkMatrix fLocalMatrix;
-    static constexpr Attribute kInPosition = {"inPosition", kFloat2_GrVertexAttribType};
-    static constexpr Attribute kInColor = {"inColor", kUByte4_norm_GrVertexAttribType};
-    static constexpr Attribute kInCircleEdge = {"inCircleEdge", kFloat4_GrVertexAttribType};
-    static constexpr Attribute kInDashParams = {"inDashParams", kFloat4_GrVertexAttribType};
+    static constexpr Attribute kInPosition =
+            {"inPosition", kFloat2_GrVertexAttribType, kFloat2_GrSLType};
+    static constexpr Attribute kInColor =
+            {"inColor", kUByte4_norm_GrVertexAttribType, kHalf4_GrSLType};
+    static constexpr Attribute kInCircleEdge =
+            {"inCircleEdge", kFloat4_GrVertexAttribType, kFloat4_GrSLType};
+    static constexpr Attribute kInDashParams =
+            {"inDashParams", kFloat4_GrVertexAttribType, kFloat4_GrSLType};
 
     GR_DECLARE_GEOMETRY_PROCESSOR_TEST
 
@@ -597,7 +605,7 @@ private:
             // avoid calling inversesqrt on zero.
             fragBuilder->codeAppend("grad_dot = max(grad_dot, 1.0e-4);");
             fragBuilder->codeAppend("half invlen = inversesqrt(grad_dot);");
-            fragBuilder->codeAppend("half edgeAlpha = clamp(0.5-test*invlen, 0.0, 1.0);");
+            fragBuilder->codeAppend("half edgeAlpha = saturate(0.5-test*invlen);");
 
             // for inner curve
             if (egp.fStroke) {
@@ -606,7 +614,7 @@ private:
                 fragBuilder->codeAppend("test = dot(offset, offset) - 1.0;");
                 fragBuilder->codeAppendf("grad = 2.0*offset*%s.zw;", ellipseRadii.fsIn());
                 fragBuilder->codeAppend("invlen = inversesqrt(dot(grad, grad));");
-                fragBuilder->codeAppend("edgeAlpha *= clamp(0.5+test*invlen, 0.0, 1.0);");
+                fragBuilder->codeAppend("edgeAlpha *= saturate(0.5+test*invlen);");
             }
 
             fragBuilder->codeAppendf("%s = half4(edgeAlpha);", args.fOutputCoverage);
@@ -635,10 +643,14 @@ private:
         return IthAttribute(i, kInPosition, kInColor, kInEllipseOffset, kInEllipseRadii);
     }
 
-    static constexpr Attribute kInPosition = {"inPosition", kFloat2_GrVertexAttribType};
-    static constexpr Attribute kInColor = {"inColor", kUByte4_norm_GrVertexAttribType};
-    static constexpr Attribute kInEllipseOffset = {"inEllipseOffset", kHalf2_GrVertexAttribType};
-    static constexpr Attribute kInEllipseRadii = {"inEllipseRadii", kHalf4_GrVertexAttribType};
+    static constexpr Attribute kInPosition =
+            {"inPosition", kFloat2_GrVertexAttribType, kFloat2_GrSLType};
+    static constexpr Attribute kInColor =
+            {"inColor", kUByte4_norm_GrVertexAttribType, kHalf4_GrSLType};
+    static constexpr Attribute kInEllipseOffset =
+            {"inEllipseOffset", kFloat2_GrVertexAttribType, kHalf2_GrSLType};
+    static constexpr Attribute kInEllipseRadii =
+            {"inEllipseRadii", kFloat4_GrVertexAttribType, kHalf4_GrSLType};
 
     SkMatrix fLocalMatrix;
     bool fStroke;
@@ -751,10 +763,10 @@ private:
             fragBuilder->codeAppend("half invlen = inversesqrt(grad_dot);");
             if (DIEllipseStyle::kHairline == diegp.fStyle) {
                 // can probably do this with one step
-                fragBuilder->codeAppend("half edgeAlpha = clamp(1.0-test*invlen, 0.0, 1.0);");
-                fragBuilder->codeAppend("edgeAlpha *= clamp(1.0+test*invlen, 0.0, 1.0);");
+                fragBuilder->codeAppend("half edgeAlpha = saturate(1.0-test*invlen);");
+                fragBuilder->codeAppend("edgeAlpha *= saturate(1.0+test*invlen);");
             } else {
-                fragBuilder->codeAppend("half edgeAlpha = clamp(0.5-test*invlen, 0.0, 1.0);");
+                fragBuilder->codeAppend("half edgeAlpha = saturate(0.5-test*invlen);");
             }
 
             // for inner curve
@@ -768,7 +780,7 @@ private:
                         "             2.0*%s.x*duvdy.x + 2.0*%s.y*duvdy.y);",
                         offsets1.fsIn(), offsets1.fsIn(), offsets1.fsIn(), offsets1.fsIn());
                 fragBuilder->codeAppend("invlen = inversesqrt(dot(grad, grad));");
-                fragBuilder->codeAppend("edgeAlpha *= clamp(0.5+test*invlen, 0.0, 1.0);");
+                fragBuilder->codeAppend("edgeAlpha *= saturate(0.5+test*invlen);");
             }
 
             fragBuilder->codeAppendf("%s = half4(edgeAlpha);", args.fOutputCoverage);
@@ -807,12 +819,16 @@ private:
         return IthAttribute(i, kInPosition, kInColor, kInEllipseOffsets0, kInEllipseOffsets1);
     }
 
-    static constexpr Attribute kInPosition = {"inPosition", kFloat2_GrVertexAttribType};
-    static constexpr Attribute kInColor = {"inColor", kUByte4_norm_GrVertexAttribType};
+    static constexpr Attribute kInPosition =
+            {"inPosition", kFloat2_GrVertexAttribType, kFloat2_GrSLType};
+    static constexpr Attribute kInColor =
+            {"inColor", kUByte4_norm_GrVertexAttribType, kHalf4_GrSLType};
     static constexpr Attribute kInEllipseOffsets0 = {"inEllipseOffsets0",
-                                                     kHalf2_GrVertexAttribType};
+                                                     kFloat2_GrVertexAttribType,
+                                                     kHalf2_GrSLType};
     static constexpr Attribute kInEllipseOffsets1 = {"inEllipseOffsets1",
-                                                     kHalf2_GrVertexAttribType};
+                                                     kFloat2_GrVertexAttribType,
+                                                     kHalf2_GrSLType};
 
     SkMatrix fViewMatrix;
     DIEllipseStyle fStyle;
@@ -941,7 +957,7 @@ public:
                                                radius, style, arcParams);
     }
 
-    CircleOp(const Helper::MakeArgs& helperArgs, GrColor color, const SkMatrix& viewMatrix,
+    CircleOp(const Helper::MakeArgs& helperArgs, const GrColor4h& color, const SkMatrix& viewMatrix,
              SkPoint center, SkScalar radius, const GrStyle& style, const ArcParams* arcParams)
             : GrMeshDrawOp(ClassID()), fHelper(helperArgs, GrAAType::kCoverage) {
         const SkStrokeRec& stroke = style.strokeRec();
@@ -1121,7 +1137,7 @@ public:
 
     const char* name() const override { return "CircleOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
     }
 
@@ -1131,9 +1147,10 @@ public:
             string.appendf(
                     "Color: 0x%08x Rect [L: %.2f, T: %.2f, R: %.2f, B: %.2f],"
                     "InnerRad: %.2f, OuterRad: %.2f\n",
-                    fCircles[i].fColor, fCircles[i].fDevBounds.fLeft, fCircles[i].fDevBounds.fTop,
-                    fCircles[i].fDevBounds.fRight, fCircles[i].fDevBounds.fBottom,
-                    fCircles[i].fInnerRadius, fCircles[i].fOuterRadius);
+                    fCircles[i].fColor.toGrColor(), fCircles[i].fDevBounds.fLeft,
+                    fCircles[i].fDevBounds.fTop, fCircles[i].fDevBounds.fRight,
+                    fCircles[i].fDevBounds.fBottom, fCircles[i].fInnerRadius,
+                    fCircles[i].fOuterRadius);
         }
         string += fHelper.dumpInfo();
         string += INHERITED::dumpInfo();
@@ -1141,7 +1158,7 @@ public:
     }
 
     RequiresDstTexture finalize(const GrCaps& caps, const GrAppliedClip* clip) override {
-        GrColor* color = &fCircles.front().fColor;
+        GrColor4h* color = &fCircles.front().fColor;
         return fHelper.xpRequiresDstTexture(caps, clip, GrProcessorAnalysisCoverage::kSingleChannel,
                                             color);
     }
@@ -1200,7 +1217,8 @@ private:
         for (const auto& circle : fCircles) {
             SkScalar innerRadius = circle.fInnerRadius;
             SkScalar outerRadius = circle.fOuterRadius;
-            GrColor color = circle.fColor;
+            // TODO4F: Preserve float colors
+            GrColor color = circle.fColor.toGrColor();
             const SkRect& bounds = circle.fDevBounds;
 
             CircleVertex* v0 = reinterpret_cast<CircleVertex*>(vertices + 0 * vertexStride);
@@ -1470,29 +1488,29 @@ private:
             vertices += circle_type_to_vert_count(circle.fStroked) * vertexStride;
         }
 
-        GrMesh mesh(GrPrimitiveType::kTriangles);
-        mesh.setIndexed(indexBuffer, fIndexCount, firstIndex, 0, fVertCount - 1,
-                        GrPrimitiveRestart::kNo);
-        mesh.setVertexData(vertexBuffer, firstVertex);
+        GrMesh* mesh = target->allocMesh(GrPrimitiveType::kTriangles);
+        mesh->setIndexed(indexBuffer, fIndexCount, firstIndex, 0, fVertCount - 1,
+                         GrPrimitiveRestart::kNo);
+        mesh->setVertexData(vertexBuffer, firstVertex);
         auto pipe = fHelper.makePipeline(target);
         target->draw(std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState, mesh);
     }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
         CircleOp* that = t->cast<CircleOp>();
 
         // can only represent 65535 unique vertices with 16-bit indices
         if (fVertCount + that->fVertCount > 65536) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (!fHelper.isCompatible(that->fHelper, caps, this->bounds(), that->bounds())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (fHelper.usesLocalCoords() &&
             !fViewMatrixIfUsingLocalCoords.cheapEqualTo(that->fViewMatrixIfUsingLocalCoords)) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         // Because we've set up the ops that don't use the planes with noop values
@@ -1503,15 +1521,14 @@ private:
         fRoundCaps |= that->fRoundCaps;
 
         fCircles.push_back_n(that->fCircles.count(), that->fCircles.begin());
-        this->joinBounds(*that);
         fVertCount += that->fVertCount;
         fIndexCount += that->fIndexCount;
         fAllFill = fAllFill && that->fAllFill;
-        return true;
+        return CombineResult::kMerged;
     }
 
     struct Circle {
-        GrColor fColor;
+        GrColor4h fColor;
         SkScalar fInnerRadius;
         SkScalar fOuterRadius;
         SkScalar fClipPlane[3];
@@ -1560,7 +1577,7 @@ public:
                                                             onAngle, offAngle, phaseAngle);
     }
 
-    ButtCapDashedCircleOp(const Helper::MakeArgs& helperArgs, GrColor color,
+    ButtCapDashedCircleOp(const Helper::MakeArgs& helperArgs, const GrColor4h& color,
                           const SkMatrix& viewMatrix, SkPoint center, SkScalar radius,
                           SkScalar strokeWidth, SkScalar startAngle, SkScalar onAngle,
                           SkScalar offAngle, SkScalar phaseAngle)
@@ -1634,7 +1651,9 @@ public:
 
     const char* name() const override { return "ButtCappedDashedCircleOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override { fHelper.visitProxies(func); }
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
+        fHelper.visitProxies(func);
+    }
 
     SkString dumpInfo() const override {
         SkString string;
@@ -1643,10 +1662,11 @@ public:
                     "Color: 0x%08x Rect [L: %.2f, T: %.2f, R: %.2f, B: %.2f],"
                     "InnerRad: %.2f, OuterRad: %.2f, OnAngle: %.2f, TotalAngle: %.2f, "
                     "Phase: %.2f\n",
-                    fCircles[i].fColor, fCircles[i].fDevBounds.fLeft, fCircles[i].fDevBounds.fTop,
-                    fCircles[i].fDevBounds.fRight, fCircles[i].fDevBounds.fBottom,
-                    fCircles[i].fInnerRadius, fCircles[i].fOuterRadius, fCircles[i].fOnAngle,
-                    fCircles[i].fTotalAngle, fCircles[i].fPhaseAngle);
+                    fCircles[i].fColor.toGrColor(), fCircles[i].fDevBounds.fLeft,
+                    fCircles[i].fDevBounds.fTop, fCircles[i].fDevBounds.fRight,
+                    fCircles[i].fDevBounds.fBottom, fCircles[i].fInnerRadius,
+                    fCircles[i].fOuterRadius, fCircles[i].fOnAngle, fCircles[i].fTotalAngle,
+                    fCircles[i].fPhaseAngle);
         }
         string += fHelper.dumpInfo();
         string += INHERITED::dumpInfo();
@@ -1654,7 +1674,7 @@ public:
     }
 
     RequiresDstTexture finalize(const GrCaps& caps, const GrAppliedClip* clip) override {
-        GrColor* color = &fCircles.front().fColor;
+        GrColor4h* color = &fCircles.front().fColor;
         return fHelper.xpRequiresDstTexture(caps, clip, GrProcessorAnalysisCoverage::kSingleChannel,
                                             color);
     }
@@ -1717,12 +1737,15 @@ private:
                 totalAngle = -totalAngle;
             }
 
+            // TODO4F: Preserve float colors
+            GrColor color = circle.fColor.toGrColor();
+
             // The bounding geometry for the circle is composed of an outer bounding octagon and
             // an inner bounded octagon.
 
             // Initializes the attributes that are the same at each vertex. Also applies reflection.
             auto init_const_attrs_and_reflect = [&](CircleVertex* v) {
-                v->fColor = circle.fColor;
+                v->fColor = color;
                 v->fOuterRadius = circle.fOuterRadius;
                 v->fInnerRadius = normInnerRadius;
                 v->fOnAngle = circle.fOnAngle;
@@ -1786,40 +1809,39 @@ private:
             vertices += circle_type_to_vert_count(true) * kVertexStride;
         }
 
-        GrMesh mesh(GrPrimitiveType::kTriangles);
-        mesh.setIndexed(indexBuffer, fIndexCount, firstIndex, 0, fVertCount - 1,
-                        GrPrimitiveRestart::kNo);
-        mesh.setVertexData(vertexBuffer, firstVertex);
+        GrMesh* mesh = target->allocMesh(GrPrimitiveType::kTriangles);
+        mesh->setIndexed(indexBuffer, fIndexCount, firstIndex, 0, fVertCount - 1,
+                         GrPrimitiveRestart::kNo);
+        mesh->setVertexData(vertexBuffer, firstVertex);
         auto pipe = fHelper.makePipeline(target);
         target->draw(std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState, mesh);
     }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
         ButtCapDashedCircleOp* that = t->cast<ButtCapDashedCircleOp>();
 
         // can only represent 65535 unique vertices with 16-bit indices
         if (fVertCount + that->fVertCount > 65536) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (!fHelper.isCompatible(that->fHelper, caps, this->bounds(), that->bounds())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (fHelper.usesLocalCoords() &&
             !fViewMatrixIfUsingLocalCoords.cheapEqualTo(that->fViewMatrixIfUsingLocalCoords)) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         fCircles.push_back_n(that->fCircles.count(), that->fCircles.begin());
-        this->joinBounds(*that);
         fVertCount += that->fVertCount;
         fIndexCount += that->fIndexCount;
-        return true;
+        return CombineResult::kMerged;
     }
 
     struct Circle {
-        GrColor fColor;
+        GrColor4h fColor;
         SkScalar fOuterRadius;
         SkScalar fInnerRadius;
         SkScalar fOnAngle;
@@ -1921,8 +1943,9 @@ public:
                                                 params, stroke);
     }
 
-    EllipseOp(const Helper::MakeArgs& helperArgs, GrColor color, const SkMatrix& viewMatrix,
-              const DeviceSpaceParams& params, const SkStrokeRec& stroke)
+    EllipseOp(const Helper::MakeArgs& helperArgs, const GrColor4h& color,
+              const SkMatrix& viewMatrix, const DeviceSpaceParams& params,
+              const SkStrokeRec& stroke)
             : INHERITED(ClassID()), fHelper(helperArgs, GrAAType::kCoverage) {
         SkStrokeRec::Style style = stroke.getStyle();
         bool isStrokeOnly =
@@ -1946,7 +1969,7 @@ public:
 
     const char* name() const override { return "EllipseOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
     }
 
@@ -1957,9 +1980,9 @@ public:
             string.appendf(
                     "Color: 0x%08x Rect [L: %.2f, T: %.2f, R: %.2f, B: %.2f], "
                     "XRad: %.2f, YRad: %.2f, InnerXRad: %.2f, InnerYRad: %.2f\n",
-                    geo.fColor, geo.fDevBounds.fLeft, geo.fDevBounds.fTop, geo.fDevBounds.fRight,
-                    geo.fDevBounds.fBottom, geo.fXRadius, geo.fYRadius, geo.fInnerXRadius,
-                    geo.fInnerYRadius);
+                    geo.fColor.toGrColor(), geo.fDevBounds.fLeft, geo.fDevBounds.fTop,
+                    geo.fDevBounds.fRight, geo.fDevBounds.fBottom, geo.fXRadius, geo.fYRadius,
+                    geo.fInnerXRadius, geo.fInnerYRadius);
         }
         string += fHelper.dumpInfo();
         string += INHERITED::dumpInfo();
@@ -1967,7 +1990,7 @@ public:
     }
 
     RequiresDstTexture finalize(const GrCaps& caps, const GrAppliedClip* clip) override {
-        GrColor* color = &fEllipses.front().fColor;
+        GrColor4h* color = &fEllipses.front().fColor;
         return fHelper.xpRequiresDstTexture(caps, clip, GrProcessorAnalysisCoverage::kSingleChannel,
                                             color);
     }
@@ -1984,16 +2007,16 @@ private:
         // Setup geometry processor
         sk_sp<GrGeometryProcessor> gp(new EllipseGeometryProcessor(fStroked, localMatrix));
 
-        QuadHelper helper;
         SkASSERT(sizeof(EllipseVertex) == gp->debugOnly_vertexStride());
-        EllipseVertex* verts = reinterpret_cast<EllipseVertex*>(
-                helper.init(target, sizeof(EllipseVertex), fEllipses.count()));
+        QuadHelper helper(target, sizeof(EllipseVertex), fEllipses.count());
+        EllipseVertex* verts = reinterpret_cast<EllipseVertex*>(helper.vertices());
         if (!verts) {
             return;
         }
 
         for (const auto& ellipse : fEllipses) {
-            GrColor color = ellipse.fColor;
+            // TODO4F: Preserve float colors
+            GrColor color = ellipse.fColor.toGrColor();
             SkScalar xRadius = ellipse.fXRadius;
             SkScalar yRadius = ellipse.fYRadius;
 
@@ -2043,29 +2066,28 @@ private:
         helper.recordDraw(target, std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState);
     }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
         EllipseOp* that = t->cast<EllipseOp>();
 
         if (!fHelper.isCompatible(that->fHelper, caps, this->bounds(), that->bounds())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (fStroked != that->fStroked) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (fHelper.usesLocalCoords() &&
             !fViewMatrixIfUsingLocalCoords.cheapEqualTo(that->fViewMatrixIfUsingLocalCoords)) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         fEllipses.push_back_n(that->fEllipses.count(), that->fEllipses.begin());
-        this->joinBounds(*that);
-        return true;
+        return CombineResult::kMerged;
     }
 
     struct Ellipse {
-        GrColor fColor;
+        GrColor4h fColor;
         SkScalar fXRadius;
         SkScalar fYRadius;
         SkScalar fInnerXRadius;
@@ -2160,8 +2182,8 @@ public:
         return Helper::FactoryHelper<DIEllipseOp>(context, std::move(paint), params, viewMatrix);
     }
 
-    DIEllipseOp(Helper::MakeArgs& helperArgs, GrColor color, const DeviceSpaceParams& params,
-                const SkMatrix& viewMatrix)
+    DIEllipseOp(Helper::MakeArgs& helperArgs, const GrColor4h& color,
+                const DeviceSpaceParams& params, const SkMatrix& viewMatrix)
             : INHERITED(ClassID()), fHelper(helperArgs, GrAAType::kCoverage) {
         // This expands the outer rect so that after CTM we end up with a half-pixel border
         SkScalar a = viewMatrix[SkMatrix::kMScaleX];
@@ -2184,7 +2206,7 @@ public:
 
     const char* name() const override { return "DIEllipseOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
     }
 
@@ -2195,9 +2217,9 @@ public:
                     "Color: 0x%08x Rect [L: %.2f, T: %.2f, R: %.2f, B: %.2f], XRad: %.2f, "
                     "YRad: %.2f, InnerXRad: %.2f, InnerYRad: %.2f, GeoDX: %.2f, "
                     "GeoDY: %.2f\n",
-                    geo.fColor, geo.fBounds.fLeft, geo.fBounds.fTop, geo.fBounds.fRight,
-                    geo.fBounds.fBottom, geo.fXRadius, geo.fYRadius, geo.fInnerXRadius,
-                    geo.fInnerYRadius, geo.fGeoDx, geo.fGeoDy);
+                    geo.fColor.toGrColor(), geo.fBounds.fLeft, geo.fBounds.fTop,
+                    geo.fBounds.fRight, geo.fBounds.fBottom, geo.fXRadius, geo.fYRadius,
+                    geo.fInnerXRadius, geo.fInnerYRadius, geo.fGeoDx, geo.fGeoDy);
         }
         string += fHelper.dumpInfo();
         string += INHERITED::dumpInfo();
@@ -2205,7 +2227,7 @@ public:
     }
 
     RequiresDstTexture finalize(const GrCaps& caps, const GrAppliedClip* clip) override {
-        GrColor* color = &fEllipses.front().fColor;
+        GrColor4h* color = &fEllipses.front().fColor;
         return fHelper.xpRequiresDstTexture(caps, clip, GrProcessorAnalysisCoverage::kSingleChannel,
                                             color);
     }
@@ -2219,15 +2241,15 @@ private:
                 new DIEllipseGeometryProcessor(this->viewMatrix(), this->style()));
 
         SkASSERT(sizeof(DIEllipseVertex) == gp->debugOnly_vertexStride());
-        QuadHelper helper;
-        DIEllipseVertex* verts = reinterpret_cast<DIEllipseVertex*>(
-                helper.init(target, sizeof(DIEllipseVertex), fEllipses.count()));
+        QuadHelper helper(target, sizeof(DIEllipseVertex), fEllipses.count());
+        DIEllipseVertex* verts = reinterpret_cast<DIEllipseVertex*>(helper.vertices());
         if (!verts) {
             return;
         }
 
         for (const auto& ellipse : fEllipses) {
-            GrColor color = ellipse.fColor;
+            // TODO4F: Preserve float colors
+            GrColor color = ellipse.fColor.toGrColor();
             SkScalar xRadius = ellipse.fXRadius;
             SkScalar yRadius = ellipse.fYRadius;
 
@@ -2277,24 +2299,23 @@ private:
         helper.recordDraw(target, std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState);
     }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
         DIEllipseOp* that = t->cast<DIEllipseOp>();
         if (!fHelper.isCompatible(that->fHelper, caps, this->bounds(), that->bounds())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (this->style() != that->style()) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         // TODO rewrite to allow positioning on CPU
         if (!this->viewMatrix().cheapEqualTo(that->viewMatrix())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         fEllipses.push_back_n(that->fEllipses.count(), that->fEllipses.begin());
-        this->joinBounds(*that);
-        return true;
+        return CombineResult::kMerged;
     }
 
     const SkMatrix& viewMatrix() const { return fEllipses[0].fViewMatrix; }
@@ -2302,7 +2323,7 @@ private:
 
     struct Ellipse {
         SkMatrix fViewMatrix;
-        GrColor fColor;
+        GrColor4h fColor;
         SkScalar fXRadius;
         SkScalar fYRadius;
         SkScalar fInnerXRadius;
@@ -2465,8 +2486,9 @@ public:
                                                       devRect, devRadius,
                                                       devStrokeWidth, strokeOnly);
     }
-    CircularRRectOp(Helper::MakeArgs& helperArgs, GrColor color, const SkMatrix& viewMatrix,
-                    const SkRect& devRect, float devRadius, float devStrokeWidth, bool strokeOnly)
+    CircularRRectOp(Helper::MakeArgs& helperArgs, const GrColor4h& color,
+                    const SkMatrix& viewMatrix, const SkRect& devRect, float devRadius,
+                    float devStrokeWidth, bool strokeOnly)
             : INHERITED(ClassID())
             , fViewMatrixIfUsingLocalCoords(viewMatrix)
             , fHelper(helperArgs, GrAAType::kCoverage) {
@@ -2518,7 +2540,7 @@ public:
 
     const char* name() const override { return "CircularRRectOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
     }
 
@@ -2528,9 +2550,10 @@ public:
             string.appendf(
                     "Color: 0x%08x Rect [L: %.2f, T: %.2f, R: %.2f, B: %.2f],"
                     "InnerRad: %.2f, OuterRad: %.2f\n",
-                    fRRects[i].fColor, fRRects[i].fDevBounds.fLeft, fRRects[i].fDevBounds.fTop,
-                    fRRects[i].fDevBounds.fRight, fRRects[i].fDevBounds.fBottom,
-                    fRRects[i].fInnerRadius, fRRects[i].fOuterRadius);
+                    fRRects[i].fColor.toGrColor(), fRRects[i].fDevBounds.fLeft,
+                    fRRects[i].fDevBounds.fTop, fRRects[i].fDevBounds.fRight,
+                    fRRects[i].fDevBounds.fBottom, fRRects[i].fInnerRadius,
+                    fRRects[i].fOuterRadius);
         }
         string += fHelper.dumpInfo();
         string += INHERITED::dumpInfo();
@@ -2538,7 +2561,7 @@ public:
     }
 
     RequiresDstTexture finalize(const GrCaps& caps, const GrAppliedClip* clip) override {
-        GrColor* color = &fRRects.front().fColor;
+        GrColor4h* color = &fRRects.front().fColor;
         return fHelper.xpRequiresDstTexture(caps, clip, GrProcessorAnalysisCoverage::kSingleChannel,
                                             color);
     }
@@ -2654,7 +2677,8 @@ private:
 
         int currStartVertex = 0;
         for (const auto& rrect : fRRects) {
-            GrColor color = rrect.fColor;
+            // TODO4F: Preserve float colors
+            GrColor color = rrect.fColor.toGrColor();
             SkScalar outerRadius = rrect.fOuterRadius;
             const SkRect& bounds = rrect.fDevBounds;
 
@@ -2713,7 +2737,7 @@ private:
                 SkScalar maxOffset = -rrect.fInnerRadius / overstrokeOuterRadius;
 
                 FillInOverstrokeVerts(&verts, bounds, outerRadius, overstrokeOuterRadius, maxOffset,
-                                      overstrokeOuterRadius, 0.0f, rrect.fColor);
+                                      overstrokeOuterRadius, 0.0f, color);
             }
 
             const uint16_t* primIndices = rrect_type_to_indices(rrect.fType);
@@ -2725,41 +2749,40 @@ private:
             currStartVertex += rrect_type_to_vert_count(rrect.fType);
         }
 
-        GrMesh mesh(GrPrimitiveType::kTriangles);
-        mesh.setIndexed(indexBuffer, fIndexCount, firstIndex, 0, fVertCount - 1,
-                        GrPrimitiveRestart::kNo);
-        mesh.setVertexData(vertexBuffer, firstVertex);
+        GrMesh* mesh = target->allocMesh(GrPrimitiveType::kTriangles);
+        mesh->setIndexed(indexBuffer, fIndexCount, firstIndex, 0, fVertCount - 1,
+                         GrPrimitiveRestart::kNo);
+        mesh->setVertexData(vertexBuffer, firstVertex);
         auto pipe = fHelper.makePipeline(target);
         target->draw(std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState, mesh);
     }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
         CircularRRectOp* that = t->cast<CircularRRectOp>();
 
         // can only represent 65535 unique vertices with 16-bit indices
         if (fVertCount + that->fVertCount > 65536) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (!fHelper.isCompatible(that->fHelper, caps, this->bounds(), that->bounds())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (fHelper.usesLocalCoords() &&
             !fViewMatrixIfUsingLocalCoords.cheapEqualTo(that->fViewMatrixIfUsingLocalCoords)) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         fRRects.push_back_n(that->fRRects.count(), that->fRRects.begin());
-        this->joinBounds(*that);
         fVertCount += that->fVertCount;
         fIndexCount += that->fIndexCount;
         fAllFill = fAllFill && that->fAllFill;
-        return true;
+        return CombineResult::kMerged;
     }
 
     struct RRect {
-        GrColor fColor;
+        GrColor4h fColor;
         SkScalar fInnerRadius;
         SkScalar fOuterRadius;
         SkRect fDevBounds;
@@ -2850,9 +2873,9 @@ public:
                                                         strokeOnly);
     }
 
-    EllipticalRRectOp(Helper::MakeArgs helperArgs, GrColor color, const SkMatrix& viewMatrix,
-                      const SkRect& devRect, float devXRadius, float devYRadius,
-                      SkVector devStrokeHalfWidths, bool strokeOnly)
+    EllipticalRRectOp(Helper::MakeArgs helperArgs, const GrColor4h& color,
+                      const SkMatrix& viewMatrix, const SkRect& devRect, float devXRadius,
+                      float devYRadius, SkVector devStrokeHalfWidths, bool strokeOnly)
             : INHERITED(ClassID()), fHelper(helperArgs, GrAAType::kCoverage) {
         SkScalar innerXRadius = 0.0f;
         SkScalar innerYRadius = 0.0f;
@@ -2882,7 +2905,7 @@ public:
 
     const char* name() const override { return "EllipticalRRectOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
     }
 
@@ -2893,9 +2916,9 @@ public:
             string.appendf(
                     "Color: 0x%08x Rect [L: %.2f, T: %.2f, R: %.2f, B: %.2f], "
                     "XRad: %.2f, YRad: %.2f, InnerXRad: %.2f, InnerYRad: %.2f\n",
-                    geo.fColor, geo.fDevBounds.fLeft, geo.fDevBounds.fTop, geo.fDevBounds.fRight,
-                    geo.fDevBounds.fBottom, geo.fXRadius, geo.fYRadius, geo.fInnerXRadius,
-                    geo.fInnerYRadius);
+                    geo.fColor.toGrColor(), geo.fDevBounds.fLeft, geo.fDevBounds.fTop,
+                    geo.fDevBounds.fRight, geo.fDevBounds.fBottom, geo.fXRadius, geo.fYRadius,
+                    geo.fInnerXRadius, geo.fInnerYRadius);
         }
         string += fHelper.dumpInfo();
         string += INHERITED::dumpInfo();
@@ -2903,7 +2926,7 @@ public:
     }
 
     RequiresDstTexture finalize(const GrCaps& caps, const GrAppliedClip* clip) override {
-        GrColor* color = &fRRects.front().fColor;
+        GrColor4h* color = &fRRects.front().fColor;
         return fHelper.xpRequiresDstTexture(caps, clip, GrProcessorAnalysisCoverage::kSingleChannel,
                                             color);
     }
@@ -2927,17 +2950,18 @@ private:
         sk_sp<const GrBuffer> indexBuffer = get_rrect_index_buffer(
                 fStroked ? kStroke_RRectType : kFill_RRectType, target->resourceProvider());
 
-        PatternHelper helper(GrPrimitiveType::kTriangles);
-        EllipseVertex* verts = reinterpret_cast<EllipseVertex*>(
-                helper.init(target, sizeof(EllipseVertex), indexBuffer.get(),
-                            kVertsPerStandardRRect, indicesPerInstance, fRRects.count()));
+        PatternHelper helper(target, GrPrimitiveType::kTriangles, sizeof(EllipseVertex),
+                             indexBuffer.get(), kVertsPerStandardRRect, indicesPerInstance,
+                             fRRects.count());
+        EllipseVertex* verts = reinterpret_cast<EllipseVertex*>(helper.vertices());
         if (!verts || !indexBuffer) {
             SkDebugf("Could not allocate vertices\n");
             return;
         }
 
         for (const auto& rrect : fRRects) {
-            GrColor color = rrect.fColor;
+            // TODO4F: Preserve float colors
+            GrColor color = rrect.fColor.toGrColor();
             // Compute the reciprocals of the radii here to save time in the shader
             SkScalar xRadRecip = SkScalarInvert(rrect.fXRadius);
             SkScalar yRadRecip = SkScalarInvert(rrect.fYRadius);
@@ -3000,29 +3024,28 @@ private:
         helper.recordDraw(target, std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState);
     }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
         EllipticalRRectOp* that = t->cast<EllipticalRRectOp>();
 
         if (!fHelper.isCompatible(that->fHelper, caps, this->bounds(), that->bounds())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (fStroked != that->fStroked) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         if (fHelper.usesLocalCoords() &&
             !fViewMatrixIfUsingLocalCoords.cheapEqualTo(that->fViewMatrixIfUsingLocalCoords)) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         fRRects.push_back_n(that->fRRects.count(), that->fRRects.begin());
-        this->joinBounds(*that);
-        return true;
+        return CombineResult::kMerged;
     }
 
     struct RRect {
-        GrColor fColor;
+        GrColor4h fColor;
         SkScalar fXRadius;
         SkScalar fYRadius;
         SkScalar fInnerXRadius;
@@ -3182,7 +3205,15 @@ std::unique_ptr<GrDrawOp> GrOvalOpFactory::MakeOvalOp(GrContext* context,
 
     // Otherwise, if we have shader derivative support, render as device-independent
     if (shaderCaps->shaderDerivativeSupport()) {
-        return DIEllipseOp::Make(context, std::move(paint), viewMatrix, oval, style.strokeRec());
+        SkScalar a = viewMatrix[SkMatrix::kMScaleX];
+        SkScalar b = viewMatrix[SkMatrix::kMSkewX];
+        SkScalar c = viewMatrix[SkMatrix::kMSkewY];
+        SkScalar d = viewMatrix[SkMatrix::kMScaleY];
+        // Check for near-degenerate matrix
+        if (a*a + c*c > SK_ScalarNearlyZero && b*b + d*d > SK_ScalarNearlyZero) {
+            return DIEllipseOp::Make(context, std::move(paint), viewMatrix, oval,
+                                     style.strokeRec());
+        }
     }
 
     return nullptr;

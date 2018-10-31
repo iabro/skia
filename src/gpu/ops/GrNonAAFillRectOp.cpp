@@ -125,9 +125,10 @@ public:
 
     NonAAFillRectOp() = delete;
 
-    NonAAFillRectOp(const Helper::MakeArgs& args, GrColor color, const SkMatrix& viewMatrix,
-                    const SkRect& rect, const SkRect* localRect, const SkMatrix* localMatrix,
-                    GrAAType aaType, const GrUserStencilSettings* stencilSettings)
+    NonAAFillRectOp(const Helper::MakeArgs& args, const GrColor4h& color,
+                    const SkMatrix& viewMatrix, const SkRect& rect, const SkRect* localRect,
+                    const SkMatrix* localMatrix, GrAAType aaType,
+                    const GrUserStencilSettings* stencilSettings)
             : INHERITED(ClassID()), fHelper(args, aaType, stencilSettings) {
 
         SkASSERT(!viewMatrix.hasPerspective() && (!localMatrix || !localMatrix->hasPerspective()));
@@ -149,7 +150,7 @@ public:
 
     const char* name() const override { return "NonAAFillRectOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
     }
 
@@ -160,8 +161,8 @@ public:
         for (int i = 0; i < fRects.count(); ++i) {
             const RectInfo& info = fRects[i];
             str.appendf("%d: Color: 0x%08x, Rect [L: %.2f, T: %.2f, R: %.2f, B: %.2f]\n", i,
-                        info.fColor, info.fRect.fLeft, info.fRect.fTop, info.fRect.fRight,
-                        info.fRect.fBottom);
+                        info.fColor.toGrColor(), info.fRect.fLeft, info.fRect.fTop,
+                        info.fRect.fRight, info.fRect.fBottom);
         }
         str += fHelper.dumpInfo();
         str += INHERITED::dumpInfo();
@@ -169,7 +170,7 @@ public:
     }
 
     RequiresDstTexture finalize(const GrCaps& caps, const GrAppliedClip* clip) override {
-        GrColor* color = &fRects.front().fColor;
+        GrColor4h* color = &fRects.front().fColor;
         return fHelper.xpRequiresDstTexture(caps, clip, GrProcessorAnalysisCoverage::kNone, color);
     }
 
@@ -192,9 +193,9 @@ private:
         int rectCount = fRects.count();
 
         sk_sp<const GrBuffer> indexBuffer = target->resourceProvider()->refQuadIndexBuffer();
-        PatternHelper helper(GrPrimitiveType::kTriangles);
-        void* vertices = helper.init(target, kVertexStride, indexBuffer.get(), kVertsPerRect,
-                                     kIndicesPerRect, rectCount);
+        PatternHelper helper(target, GrPrimitiveType::kTriangles, kVertexStride, indexBuffer.get(),
+                             kVertsPerRect, kIndicesPerRect, rectCount);
+        void* vertices = helper.vertices();
         if (!vertices || !indexBuffer) {
             SkDebugf("Could not allocate vertices\n");
             return;
@@ -203,25 +204,25 @@ private:
         for (int i = 0; i < rectCount; i++) {
             intptr_t verts =
                     reinterpret_cast<intptr_t>(vertices) + i * kVertsPerRect * kVertexStride;
-            tesselate(verts, kVertexStride, fRects[i].fColor, &fRects[i].fViewMatrix,
+            // TODO4F: Preserve float colors
+            tesselate(verts, kVertexStride, fRects[i].fColor.toGrColor(), &fRects[i].fViewMatrix,
                       fRects[i].fRect, &fRects[i].fLocalQuad);
         }
         auto pipe = fHelper.makePipeline(target);
         helper.recordDraw(target, std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState);
     }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
         NonAAFillRectOp* that = t->cast<NonAAFillRectOp>();
         if (!fHelper.isCompatible(that->fHelper, caps, this->bounds(), that->bounds())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
         fRects.push_back_n(that->fRects.count(), that->fRects.begin());
-        this->joinBounds(*that);
-        return true;
+        return CombineResult::kMerged;
     }
 
     struct RectInfo {
-        GrColor fColor;
+        GrColor4h fColor;
         SkMatrix fViewMatrix;
         SkRect fRect;
         GrQuad fLocalQuad;
@@ -255,7 +256,7 @@ public:
 
     NonAAFillRectPerspectiveOp() = delete;
 
-    NonAAFillRectPerspectiveOp(const Helper::MakeArgs& args, GrColor color,
+    NonAAFillRectPerspectiveOp(const Helper::MakeArgs& args, const GrColor4h& color,
                                const SkMatrix& viewMatrix, const SkRect& rect,
                                const SkRect* localRect, const SkMatrix* localMatrix,
                                GrAAType aaType, const GrUserStencilSettings* stencilSettings)
@@ -279,7 +280,7 @@ public:
 
     const char* name() const override { return "NonAAFillRectPerspectiveOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
     }
 
@@ -289,8 +290,8 @@ public:
         for (int i = 0; i < fRects.count(); ++i) {
             const RectInfo& geo = fRects[i];
             str.appendf("%d: Color: 0x%08x, Rect [L: %.2f, T: %.2f, R: %.2f, B: %.2f]\n", i,
-                        geo.fColor, geo.fRect.fLeft, geo.fRect.fTop, geo.fRect.fRight,
-                        geo.fRect.fBottom);
+                        geo.fColor.toGrColor(), geo.fRect.fLeft, geo.fRect.fTop,
+                        geo.fRect.fRight, geo.fRect.fBottom);
         }
         str += fHelper.dumpInfo();
         str += INHERITED::dumpInfo();
@@ -298,7 +299,7 @@ public:
     }
 
     RequiresDstTexture finalize(const GrCaps& caps, const GrAppliedClip* clip) override {
-        GrColor* color = &fRects.front().fColor;
+        GrColor4h* color = &fRects.front().fColor;
         return fHelper.xpRequiresDstTexture(caps, clip, GrProcessorAnalysisCoverage::kNone, color);
     }
 
@@ -325,9 +326,9 @@ private:
         int rectCount = fRects.count();
 
         sk_sp<const GrBuffer> indexBuffer = target->resourceProvider()->refQuadIndexBuffer();
-        PatternHelper helper(GrPrimitiveType::kTriangles);
-        void* vertices = helper.init(target, vertexStride, indexBuffer.get(), kVertsPerRect,
-                                     kIndicesPerRect, rectCount);
+        PatternHelper helper(target, GrPrimitiveType::kTriangles, vertexStride, indexBuffer.get(),
+                             kVertsPerRect, kIndicesPerRect, rectCount);
+        void* vertices = helper.vertices();
         if (!vertices || !indexBuffer) {
             SkDebugf("Could not allocate vertices\n");
             return;
@@ -335,44 +336,45 @@ private:
 
         for (int i = 0; i < rectCount; i++) {
             const RectInfo& info = fRects[i];
+            // TODO4F: Preserve float colors
+            GrColor color = info.fColor.toGrColor();
             intptr_t verts =
                     reinterpret_cast<intptr_t>(vertices) + i * kVertsPerRect * vertexStride;
             if (fHasLocalRect) {
                 GrQuad quad(info.fLocalRect);
-                tesselate(verts, vertexStride, info.fColor, nullptr, info.fRect, &quad);
+                tesselate(verts, vertexStride, color, nullptr, info.fRect, &quad);
             } else {
-                tesselate(verts, vertexStride, info.fColor, nullptr, info.fRect, nullptr);
+                tesselate(verts, vertexStride, color, nullptr, info.fRect, nullptr);
             }
         }
         auto pipe = fHelper.makePipeline(target);
         helper.recordDraw(target, std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState);
     }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
         NonAAFillRectPerspectiveOp* that = t->cast<NonAAFillRectPerspectiveOp>();
         if (!fHelper.isCompatible(that->fHelper, caps, this->bounds(), that->bounds())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         // We could combine across perspective vm changes if we really wanted to.
         if (!fViewMatrix.cheapEqualTo(that->fViewMatrix)) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
         if (fHasLocalRect != that->fHasLocalRect) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
         if (fHasLocalMatrix && !fLocalMatrix.cheapEqualTo(that->fLocalMatrix)) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         fRects.push_back_n(that->fRects.count(), that->fRects.begin());
-        this->joinBounds(*that);
-        return true;
+        return CombineResult::kMerged;
     }
 
     struct RectInfo {
         SkRect fRect;
-        GrColor fColor;
+        GrColor4h fColor;
         SkRect fLocalRect;
     };
 

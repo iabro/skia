@@ -106,10 +106,14 @@ private:
 
     const TextureSampler& onTextureSampler(int) const override { return fSampler; }
 
-    static constexpr Attribute kPositions = {"position", kFloat2_GrVertexAttribType};
-    static constexpr Attribute kTextureCoords = {"textureCoords", kFloat2_GrVertexAttribType};
-    static constexpr Attribute kTextureDomain = {"textureDomain", kFloat4_GrVertexAttribType};
-    static constexpr Attribute kColors = {"color", kUByte4_norm_GrVertexAttribType};
+    static constexpr Attribute kPositions =
+            {"position", kFloat2_GrVertexAttribType, kFloat2_GrSLType};
+    static constexpr Attribute kTextureCoords =
+            {"textureCoords", kFloat2_GrVertexAttribType, kFloat2_GrSLType};
+    static constexpr Attribute kTextureDomain =
+            {"textureDomain", kFloat4_GrVertexAttribType, kFloat4_GrSLType};
+    static constexpr Attribute kColors =
+            {"color", kUByte4_norm_GrVertexAttribType, kHalf4_GrSLType};
 
     sk_sp<GrColorSpaceXform> fColorSpaceXform;
     TextureSampler fSampler;
@@ -147,7 +151,7 @@ public:
                                                      std::move(iter), dst);
     }
 
-    NonAALatticeOp(Helper::MakeArgs& helperArgs, GrColor color, const SkMatrix& viewMatrix,
+    NonAALatticeOp(Helper::MakeArgs& helperArgs, const GrColor4h& color, const SkMatrix& viewMatrix,
                    sk_sp<GrTextureProxy> proxy, sk_sp<GrColorSpaceXform> colorSpaceXform,
                    GrSamplerState::Filter filter, std::unique_ptr<SkLatticeIter> iter,
                    const SkRect& dst)
@@ -168,7 +172,7 @@ public:
 
     const char* name() const override { return "NonAALatticeOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         func(fProxy.get());
         fHelper.visitProxies(func);
     }
@@ -178,8 +182,8 @@ public:
 
         for (int i = 0; i < fPatches.count(); ++i) {
             str.appendf("%d: Color: 0x%08x Dst [L: %.2f, T: %.2f, R: %.2f, B: %.2f]\n", i,
-                        fPatches[i].fColor, fPatches[i].fDst.fLeft, fPatches[i].fDst.fTop,
-                        fPatches[i].fDst.fRight, fPatches[i].fDst.fBottom);
+                        fPatches[i].fColor.toGrColor(), fPatches[i].fDst.fLeft,
+                        fPatches[i].fDst.fTop, fPatches[i].fDst.fRight, fPatches[i].fDst.fBottom);
         }
 
         str += fHelper.dumpInfo();
@@ -190,7 +194,7 @@ public:
     FixedFunctionFlags fixedFunctionFlags() const override { return fHelper.fixedFunctionFlags(); }
 
     RequiresDstTexture finalize(const GrCaps& caps, const GrAppliedClip* clip) override {
-        auto opaque = GrColorIsOpaque(fPatches[0].fColor) && GrPixelConfigIsOpaque(fProxy->config())
+        auto opaque = fPatches[0].fColor.isOpaque() && GrPixelConfigIsOpaque(fProxy->config())
                               ? GrProcessorAnalysisColor::Opaque::kYes
                               : GrProcessorAnalysisColor::Opaque::kNo;
         auto analysisColor = GrProcessorAnalysisColor(opaque);
@@ -223,9 +227,9 @@ private:
         }
 
         sk_sp<const GrBuffer> indexBuffer = target->resourceProvider()->refQuadIndexBuffer();
-        PatternHelper helper(GrPrimitiveType::kTriangles);
-        void* vertices = helper.init(target, kVertexStide, indexBuffer.get(), kVertsPerRect,
-                                     kIndicesPerRect, numRects);
+        PatternHelper helper(target, GrPrimitiveType::kTriangles, kVertexStide, indexBuffer.get(),
+                             kVertsPerRect, kIndicesPerRect, numRects);
+        void* vertices = helper.vertices();
         if (!vertices || !indexBuffer) {
             SkDebugf("Could not allocate vertices\n");
             return;
@@ -234,6 +238,8 @@ private:
         intptr_t verts = reinterpret_cast<intptr_t>(vertices);
         for (int i = 0; i < patchCnt; i++) {
             const Patch& patch = fPatches[i];
+            // TODO4F: Preserve float colors
+            GrColor patchColor = patch.fColor.toGrColor();
 
             // Apply the view matrix here if it is scale-translate.  Otherwise, we need to
             // wait until we've created the dst rects.
@@ -269,7 +275,7 @@ private:
                 }
 
                 for (int j = 0; j < kVertsPerRect; ++j) {
-                    vertices[j].fColor = patch.fColor;
+                    vertices[j].fColor = patchColor;
                 }
                 verts += kVertsPerRect * kVertexStide;
             }
@@ -286,31 +292,30 @@ private:
         helper.recordDraw(target, std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState);
     }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps& caps) override {
         NonAALatticeOp* that = t->cast<NonAALatticeOp>();
         if (fProxy != that->fProxy) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
         if (fFilter != that->fFilter) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
         if (GrColorSpaceXform::Equals(fColorSpaceXform.get(), that->fColorSpaceXform.get())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
         if (!fHelper.isCompatible(that->fHelper, caps, this->bounds(), that->bounds())) {
-            return false;
+            return CombineResult::kCannotCombine;
         }
 
         fPatches.move_back_n(that->fPatches.count(), that->fPatches.begin());
-        this->joinBounds(*that);
-        return true;
+        return CombineResult::kMerged;
     }
 
     struct Patch {
         SkMatrix fViewMatrix;
         std::unique_ptr<SkLatticeIter> fIter;
         SkRect fDst;
-        GrColor fColor;
+        GrColor4h fColor;
     };
 
     Helper fHelper;

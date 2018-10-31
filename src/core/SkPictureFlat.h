@@ -49,7 +49,7 @@ enum DrawType {
     DRAW_RRECT,
     DRAW_SPRITE_RETIRED_2015_REMOVED_2018,
     DRAW_TEXT,
-    DRAW_TEXT_ON_PATH,
+    DRAW_TEXT_ON_PATH_RETIRED_08_2018_REMOVED_10_2018,
     DRAW_TEXT_TOP_BOTTOM,   // fast variant of DRAW_TEXT
     DRAW_VERTICES_RETIRED_03_2017_REMOVED_01_2018,
     RESTORE,
@@ -97,7 +97,8 @@ enum DrawType {
 
     FLUSH,
 
-    LAST_DRAWTYPE_ENUM = FLUSH
+    DRAW_IMAGE_SET,
+    LAST_DRAWTYPE_ENUM = DRAW_IMAGE_SET
 };
 
 enum DrawVertexFlags {
@@ -156,7 +157,7 @@ static inline bool ClipParams_unpackDoAA(uint32_t packed) {
 class SkTypefacePlayback {
 public:
     SkTypefacePlayback() : fCount(0), fArray(nullptr) {}
-    ~SkTypefacePlayback();
+    ~SkTypefacePlayback() = default;
 
     void setCount(size_t count);
 

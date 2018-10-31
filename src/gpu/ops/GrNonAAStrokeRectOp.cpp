@@ -63,7 +63,7 @@ public:
 
     const char* name() const override { return "NonAAStrokeRectOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
     }
 
@@ -72,7 +72,8 @@ public:
         string.appendf(
                 "Color: 0x%08x, Rect [L: %.2f, T: %.2f, R: %.2f, B: %.2f], "
                 "StrokeWidth: %.2f\n",
-                fColor, fRect.fLeft, fRect.fTop, fRect.fRight, fRect.fBottom, fStrokeWidth);
+                fColor.toGrColor(), fRect.fLeft, fRect.fTop, fRect.fRight, fRect.fBottom,
+                fStrokeWidth);
         string += fHelper.dumpInfo();
         string += INHERITED::dumpInfo();
         return string;
@@ -99,9 +100,9 @@ public:
                                                         stroke, aaType);
     }
 
-    NonAAStrokeRectOp(const Helper::MakeArgs& helperArgs, GrColor color, Helper::Flags flags,
-                      const SkMatrix& viewMatrix, const SkRect& rect, const SkStrokeRec& stroke,
-                      GrAAType aaType)
+    NonAAStrokeRectOp(const Helper::MakeArgs& helperArgs, const GrColor4h& color,
+                      Helper::Flags flags, const SkMatrix& viewMatrix, const SkRect& rect,
+                      const SkStrokeRec& stroke, GrAAType aaType)
             : INHERITED(ClassID()), fHelper(helperArgs, aaType, flags) {
         fColor = color;
         fViewMatrix = viewMatrix;
@@ -188,21 +189,17 @@ private:
             vertex[4].set(fRect.fLeft, fRect.fTop);
         }
 
-        GrMesh mesh(primType);
-        mesh.setNonIndexedNonInstanced(vertexCount);
-        mesh.setVertexData(vertexBuffer, firstVertex);
+        GrMesh* mesh = target->allocMesh(primType);
+        mesh->setNonIndexedNonInstanced(vertexCount);
+        mesh->setVertexData(vertexBuffer, firstVertex);
         auto pipe = fHelper.makePipeline(target);
         target->draw(std::move(gp), pipe.fPipeline, pipe.fFixedDynamicState, mesh);
     }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps&) override {
-        // NonAA stroke rects cannot combine right now
-        // TODO make these combinable.
-        return false;
-    }
+    // TODO: override onCombineIfPossible
 
     Helper fHelper;
-    GrColor fColor;
+    GrColor4h fColor;
     SkMatrix fViewMatrix;
     SkRect fRect;
     SkScalar fStrokeWidth;

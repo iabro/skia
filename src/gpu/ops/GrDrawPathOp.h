@@ -34,13 +34,13 @@ protected:
                 ? RequiresDstTexture::kYes : RequiresDstTexture::kNo;
     }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fProcessorSet.visitProxies(func);
     }
 
 protected:
     const SkMatrix& viewMatrix() const { return fViewMatrix; }
-    GrColor color() const { return fInputColor; }
+    const GrColor4h& color() const { return fInputColor; }
     GrPathRendering::FillType fillType() const { return fFillType; }
     const GrProcessorSet& processors() const { return fProcessorSet; }
     GrProcessorSet detachProcessors() { return std::move(fProcessorSet); }
@@ -61,7 +61,7 @@ private:
     void onPrepare(GrOpFlushState*) final {}
 
     SkMatrix fViewMatrix;
-    GrColor fInputColor;
+    GrColor4h fInputColor;
     GrProcessorSet::Analysis fAnalysis;
     GrPathRendering::FillType fFillType;
     GrAAType fAAType;
@@ -92,8 +92,6 @@ private:
             , fPath(path) {
         this->setTransformedBounds(path->getBounds(), viewMatrix, HasAABloat::kNo, IsZeroArea::kNo);
     }
-
-    bool onCombineIfPossible(GrOp* t, const GrCaps& caps) override { return false; }
 
     void onExecute(GrOpFlushState* state) override;
 

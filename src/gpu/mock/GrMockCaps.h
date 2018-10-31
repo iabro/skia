@@ -27,7 +27,6 @@ public:
         fShaderCaps->fGeometryShaderSupport = options.fGeometryShaderSupport;
         fShaderCaps->fIntegerSupport = options.fIntegerSupport;
         fShaderCaps->fFlatInterpolationSupport = options.fFlatInterpolationSupport;
-        fShaderCaps->fMaxVertexSamplers = options.fMaxVertexSamplers;
         fShaderCaps->fMaxFragmentSamplers = options.fMaxFragmentSamplers;
         fShaderCaps->fShaderDerivativeSupport = options.fShaderDerivativeSupport;
 
@@ -97,6 +96,27 @@ public:
 
     bool getConfigFromBackendFormat(const GrBackendFormat& format, SkColorType ct,
                                     GrPixelConfig* config) const override {
+        const GrPixelConfig* mockFormat = format.getMockFormat();
+        if (!mockFormat) {
+            return false;
+        }
+        *config = *mockFormat;
+        return true;
+    }
+
+    bool getYUVAConfigFromBackendTexture(const GrBackendTexture& tex,
+                                         GrPixelConfig* config) const override {
+        GrMockTextureInfo texInfo;
+        if (!tex.getMockTextureInfo(&texInfo)) {
+            return false;
+        }
+
+        *config = texInfo.fConfig;
+        return true;
+    }
+
+    bool getYUVAConfigFromBackendFormat(const GrBackendFormat& format,
+                                        GrPixelConfig* config) const override {
         const GrPixelConfig* mockFormat = format.getMockFormat();
         if (!mockFormat) {
             return false;

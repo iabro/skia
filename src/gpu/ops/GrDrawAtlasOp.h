@@ -32,13 +32,13 @@ public:
                                                     spriteCount, xforms, rects, colors);
     }
 
-    GrDrawAtlasOp(const Helper::MakeArgs& helperArgs, GrColor color, const SkMatrix& viewMatrix,
-                  GrAAType, int spriteCount, const SkRSXform* xforms, const SkRect* rects,
-                  const SkColor* colors);
+    GrDrawAtlasOp(const Helper::MakeArgs& helperArgs, const GrColor4h& color,
+                  const SkMatrix& viewMatrix, GrAAType, int spriteCount, const SkRSXform* xforms,
+                  const SkRect* rects, const SkColor* colors);
 
     const char* name() const override { return "DrawAtlasOp"; }
 
-    void visitProxies(const VisitProxyFunc& func) const override {
+    void visitProxies(const VisitProxyFunc& func, VisitorType) const override {
         fHelper.visitProxies(func);
     }
 
@@ -51,22 +51,22 @@ public:
 private:
     void onPrepareDraws(Target*) override;
 
-    GrColor color() const { return fColor; }
+    const GrColor4h& color() const { return fColor; }
     const SkMatrix& viewMatrix() const { return fViewMatrix; }
     bool hasColors() const { return fHasColors; }
     int quadCount() const { return fQuadCount; }
 
-    bool onCombineIfPossible(GrOp* t, const GrCaps&) override;
+    CombineResult onCombineIfPossible(GrOp* t, const GrCaps&) override;
 
     struct Geometry {
-        GrColor fColor;
+        GrColor4h fColor;
         SkTArray<uint8_t, true> fVerts;
     };
 
     SkSTArray<1, Geometry, true> fGeoData;
     Helper fHelper;
     SkMatrix fViewMatrix;
-    GrColor fColor;
+    GrColor4h fColor;
     int fQuadCount;
     bool fHasColors;
 

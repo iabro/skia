@@ -9,50 +9,90 @@
 
 #include "SkTo.h"
 #include "SkTypeface.h"
-#include "SkUtils.h"
+#include "SkUTF.h"
 
-SkFont::SkFont(sk_sp<SkTypeface> face, SkScalar size, SkScalar scaleX, SkScalar skewX, MaskType mt,
-               uint32_t flags)
+#define kDefault_Size       12
+#define kDefault_Flags      0
+#define kDefault_Hinting    SkFont::kNormal_Hinting
+
+static inline SkScalar valid_size(SkScalar size) {
+    return SkTMax<SkScalar>(0, size);
+}
+
+SkFont::SkFont(sk_sp<SkTypeface> face, SkScalar size, SkScalar scaleX, SkScalar skewX,
+               uint32_t flags, int align)
     : fTypeface(face ? std::move(face) : SkTypeface::MakeDefault())
-    , fSize(size)
+    , fSize(valid_size(size))
     , fScaleX(scaleX)
     , fSkewX(skewX)
-    , fFlags(flags)
-    , fMaskType(SkToU8(mt))
+    , fFlags(flags & kAllFlags)
+    , fAlign(SkToU8(align))
+    , fHinting(kDefault_Hinting)
 {
-    SkASSERT(size > 0);
-    SkASSERT(scaleX > 0);
-    SkASSERT(SkScalarIsFinite(skewX));
-    SkASSERT(0 == (flags & ~kAllFlags));
+    SkASSERT(align >= 0 && align <= 2);
 }
 
-sk_sp<SkFont> SkFont::Make(sk_sp<SkTypeface> face, SkScalar size, SkScalar scaleX, SkScalar skewX,
-                           MaskType mt, uint32_t flags) {
-    if (size <= 0 || !SkScalarIsFinite(size)) {
-        return nullptr;
-    }
-    if (scaleX <= 0 || !SkScalarIsFinite(scaleX)) {
-        return nullptr;
-    }
-    if (!SkScalarIsFinite(skewX)) {
-        return nullptr;
-    }
-    flags &= kAllFlags;
-    return sk_sp<SkFont>(new SkFont(std::move(face), size, scaleX, skewX, mt, flags));
+SkFont::SkFont() : SkFont(nullptr, kDefault_Size, 1, 0, kDefault_Flags, 0)
+{}
+
+SkFont::SkFont(sk_sp<SkTypeface> face, SkScalar size, uint32_t flags)
+    : SkFont(std::move(face), size, 1, 0, flags) {}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+static inline uint32_t set_clear_mask(uint32_t bits, bool cond, uint32_t mask) {
+    return cond ? bits | mask : bits & ~mask;
 }
 
-sk_sp<SkFont> SkFont::Make(sk_sp<SkTypeface> face, SkScalar size, MaskType mt, uint32_t flags) {
-    return SkFont::Make(std::move(face), size, 1, 0, mt, flags);
+void SkFont::setForceAutoHinting(bool predicate) {
+    fFlags = set_clear_mask(fFlags, predicate, kForceAutoHinting_Flag);
+}
+void SkFont::setEmbeddedBitmaps(bool predicate) {
+    fFlags = set_clear_mask(fFlags, predicate, kEmbeddedBitmaps_Flag);
+}
+void SkFont::setSubpixel(bool predicate) {
+    fFlags = set_clear_mask(fFlags, predicate, kSubpixel_Flag);
+}
+void SkFont::setLinearMetrics(bool predicate) {
+    fFlags = set_clear_mask(fFlags, predicate, kLinearMetrics_Flag);
+}
+void SkFont::setEmbolden(bool predicate) {
+    fFlags = set_clear_mask(fFlags, predicate, kEmbolden_Flag);
 }
 
-sk_sp<SkFont> SkFont::makeWithSize(SkScalar newSize) const {
-    return SkFont::Make(sk_ref_sp(this->getTypeface()), newSize, this->getScaleX(),
-                        this->getSkewX(), this->getMaskType(), this->getFlags());
+void SkFont::DEPRECATED_setAntiAlias(bool predicate) {
+    fFlags = set_clear_mask(fFlags, predicate, kDEPRECATED_Antialias_Flag);
 }
 
-sk_sp<SkFont> SkFont::makeWithFlags(uint32_t newFlags) const {
-    return SkFont::Make(sk_ref_sp(this->getTypeface()), this->getSize(), this->getScaleX(),
-                        this->getSkewX(), this->getMaskType(), newFlags);
+void SkFont::DEPRECATED_setLCDRender(bool predicate) {
+    fFlags = set_clear_mask(fFlags, predicate, kDEPRECATED_LCDRender_Flag);
+}
+
+void SkFont::setHinting(Hinting h) {
+    fHinting = SkToU8(h);
+}
+
+void SkFont::setSize(SkScalar size) {
+    fSize = valid_size(size);
+}
+void SkFont::setScaleX(SkScalar scale) {
+    fScaleX = scale;
+}
+void SkFont::setSkewX(SkScalar skew) {
+    fSkewX = skew;
+}
+void SkFont::setFlags(uint32_t flags) {
+    fFlags = flags & kAllFlags;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+SkFont SkFont::makeWithSize(SkScalar newSize) const {
+    return {this->refTypeface(), newSize, this->getScaleX(), this->getSkewX(), this->getFlags()};
+}
+
+SkFont SkFont::makeWithFlags(uint32_t newFlags) const {
+    return {this->refTypeface(), this->getSize(), this->getScaleX(), this->getSkewX(), newFlags};
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -116,35 +156,58 @@ SkScalar SkFont::measureText(const void* text, size_t byteLength, SkTextEncoding
 
 #include "SkPaint.h"
 
-sk_sp<SkFont> SkFont::Testing_CreateFromPaint(const SkPaint& paint) {
+void SkFont::LEGACY_applyToPaint(SkPaint* paint) const {
+    paint->setTypeface(fTypeface);
+    paint->setTextSize(fSize);
+    paint->setTextScaleX(fScaleX);
+    paint->setTextSkewX(fSkewX);
+
+    paint->setEmbeddedBitmapText(SkToBool(fFlags & kEmbeddedBitmaps_Flag));
+    paint->setFakeBoldText(SkToBool(fFlags & kEmbolden_Flag));
+    paint->setAutohinted(SkToBool(fFlags & kForceAutoHinting_Flag));
+    paint->setSubpixelText(SkToBool(fFlags & kSubpixel_Flag));
+    paint->setLinearText(SkToBool(fFlags & kLinearMetrics_Flag));
+    paint->setAntiAlias(SkToBool(fFlags & kDEPRECATED_Antialias_Flag));
+    paint->setLCDRenderText(SkToBool(fFlags & kDEPRECATED_LCDRender_Flag));
+
+    paint->setHinting((SkPaint::Hinting)this->getHinting());
+
+#ifdef SK_SUPPORT_LEGACY_SETTEXTALIGN
+    paint->setTextAlign((SkPaint::Align)fAlign);
+#endif
+}
+
+SkFont SkFont::LEGACY_ExtractFromPaint(const SkPaint& paint) {
     uint32_t flags = 0;
-    if (paint.isVerticalText()) {
-        flags |= kVertical_Flag;
-    }
     if (paint.isEmbeddedBitmapText()) {
         flags |= kEmbeddedBitmaps_Flag;
     }
     if (paint.isFakeBoldText()) {
         flags |= kEmbolden_Flag;
     }
-
-    if (SkPaint::kFull_Hinting == paint.getHinting()) {
-        flags |= kEnableByteCodeHints_Flag;
-    }
     if (paint.isAutohinted()) {
-        flags |= kEnableAutoHints_Flag;
+        flags |= kForceAutoHinting_Flag;
     }
-    if (paint.isSubpixelText() || paint.isLinearText()) {
-        // this is our default
-    } else {
-        flags |= kUseNonlinearMetrics_Flag;
+    if (paint.isSubpixelText()) {
+        flags |= kSubpixel_Flag;
+    }
+    if (paint.isLinearText()) {
+        flags |= kLinearMetrics_Flag;
     }
 
-    MaskType maskType = SkFont::kBW_MaskType;
     if (paint.isAntiAlias()) {
-        maskType = paint.isLCDRenderText() ? kLCD_MaskType : kA8_MaskType;
+        flags |= kDEPRECATED_Antialias_Flag;
+    }
+    if (paint.isLCDRenderText()) {
+        flags |= kDEPRECATED_LCDRender_Flag;
     }
 
-    return Make(sk_ref_sp(paint.getTypeface()), paint.getTextSize(), paint.getTextScaleX(),
-                paint.getTextSkewX(), maskType, flags);
+    SkFont font(sk_ref_sp(paint.getTypeface()), paint.getTextSize(), paint.getTextScaleX(),
+                paint.getTextSkewX(), flags
+#ifdef SK_SUPPORT_LEGACY_SETTEXTALIGN
+                , (int)paint.getTextAlign()
+#endif
+                );
+    font.setHinting((Hinting)paint.getHinting());
+    return font;
 }
